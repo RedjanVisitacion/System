@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/RedjanVisitacion/System/issues"
   },
-  "homepage": "https://github.com/RedjanVisitacion/System#readme"
+  "homepage": "https://github.com/RedjanVisitacion/System#readme",
+  "dependencies": {
+    "bootstrap": "^5.2.3"
+  }
 }
