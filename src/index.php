@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Bootstrap App</title>
   <link rel="icon" href="/img/icon.png"/>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="main.css">
 
 </head>
@@ -48,6 +48,6 @@
 </nav>
 
 </body>
-<script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </html>
