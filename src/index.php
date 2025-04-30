@@ -15,9 +15,19 @@
     body {
       font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
       background: #f6fafd;
+      padding-top: 0;
     }
     .navbar {
-      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1200;
+      transition: background 0.3s, opacity 0.3s;
+    }
+    .navbar.faded {
+      opacity: 0.92;
+      transition: opacity 0.3s;
     }
     .bg-dark {
       background: linear-gradient(135deg, #232526 0%, #2563eb 100%) !important;
@@ -92,16 +102,17 @@
       color: #ef4444 !important;
     }
     #sidebar {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      height: calc(100vh - 60px);
+      z-index: 1102;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.04);
       transition: width 0.5s cubic-bezier(0.4, 0.2, 0.2, 1), background 0.4s, padding 0.4s;
     }
     #sidebar.collapsed {
       width: 70px !important;
       min-width: 70px !important;
-      transition: width 0.5s cubic-bezier(0.4, 0.2, 0.2, 1), background 0.4s, padding 0.4s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
     }
     #sidebar.collapsed ul.nav {
       align-items: center;
@@ -160,6 +171,7 @@
       border-radius: 24px;
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
       padding: 1.5rem;
+      margin-top: 2rem;
     }
     .calendar-table th, .calendar-table td {
       min-width: 32px;
@@ -169,31 +181,199 @@
       font-size: 1rem;
       padding: 0.25rem;
     }
-    @media (max-width: 575.98px) {
+    @media (max-width: 991.98px) {
+      .navbar .container-fluid {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding-right: 56px !important;
+        position: relative;
+      }
+      .navbar .d-flex.align-items-center {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .navbar-brand {
+        font-size: 1.1rem !important;
+      }
+      .burger-menu {
+        display: inline-block;
+        position: absolute;
+        top: 10px;
+        right: 18px;
+        z-index: 1300;
+      }
+      #sidebar {
+        position: fixed;
+        left: 0;
+        top: 60px;
+        height: calc(100vh - 60px);
+        z-index: 1102;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4,0.2,0.2,1);
+        box-shadow: 2px 0 8px rgba(0,0,0,0.10);
+        width: 240px !important;
+        min-width: 60px !important;
+        background: linear-gradient(135deg, #232526 0%, #2563eb 100%) !important;
+        padding-top: 1.5rem !important;
+      }
+      #sidebar.active {
+        transform: translateX(0);
+        top: 60px;
+        height: calc(100vh - 60px);
+      }
+      .main-content {
+        margin-left: 0;
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+      .main-content .row.g-4 {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin: 0;
+      }
+      .dashboard-card, .calendar-card {
+        width: 95vw;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .col-12, .col-lg-8, .col-lg-4 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
       .calendar-card {
-        max-width: 100%;
-        padding: 1rem;
+        margin-top: 1.5rem;
       }
-      .calendar-table th, .calendar-table td {
-        min-width: 24px;
-        height: 24px;
-        font-size: 0.85rem;
-        padding: 0.1rem;
-      }
-      #calendarMonthYear {
+      #sidebar .nav-link {
         font-size: 1.1rem;
+        padding: 16px 18px;
+      }
+      #sidebar .sidebar-header {
+        font-size: 1.1rem;
+      }
+      #closeSidebarBtn {
+        display: inline-block !important;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1301;
+      }
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.25);
+        z-index: 1100;
+      }
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+    @media (max-width: 575.98px) {
+      .navbar .container-fluid {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+      .navbar .d-flex.align-items-center {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.25rem;
+      }
+      .navbar-brand {
+        font-size: 0.95rem !important;
+      }
+      .navbar img[alt="Electoral Commission Logo"] {
+        width: 32px !important;
+        height: 32px !important;
+        margin-right: 8px !important;
+      }
+      .navbar .btn {
+        font-size: 0.9rem;
+        padding: 0.25rem 0.7rem;
+        margin-top: 0.5rem;
+      }
+      #sidebar {
+        padding: 1rem 0.2rem 1rem 0.2rem !important;
+        min-width: 50px !important;
+      }
+      #sidebar .sidebar-header {
+        font-size: 0.95rem;
+      }
+      #sidebar .nav-link {
+        font-size: 0.92rem;
+        padding: 7px 6px;
+      }
+    }
+    /* Burger icon styles */
+    .burger-menu {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 2.2rem;
+      color: #fff;
+      z-index: 1300;
+      cursor: pointer;
+    }
+    @media (max-width: 575.98px) {
+      .burger-menu {
+        font-size: 1.7rem;
+      }
+    }
+    @media (min-width: 992px) {
+      body {
+        padding-top: 0;
+      }
+      .calendar-card {
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+      }
+    }
+    .main-content {
+      margin-left: 240px;
+      transition: margin-left 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+      margin-top: 3rem;
+    }
+    .body-sidebar-collapsed .main-content {
+      margin-left: 70px;
+    }
+    @media (min-width: 576px) {
+      .modal-dialog {
+        margin-top: 90px;
+      }
+    }
+    @media (max-width: 575.98px) {
+      .modal-dialog {
+        margin-top: 30px;
       }
     }
   </style>
 </head>
 <body>
   <!-- Top Bar -->
-  <nav class="navbar navbar-expand-lg" style="background: #2563eb; height: 60px;">
+  <nav class="navbar navbar-expand-lg position-relative" style="background: #2563eb; height: 60px;">
     <div class="container-fluid">
       <div class="d-flex align-items-center">
         <img src="../img/icon.png" alt="Electoral Commission Logo" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
         <span class="navbar-brand mb-0 h1 text-white" style="font-size:1.5rem;">Electoral Commission</span>
       </div>
+      <button class="burger-menu" id="burgerMenuBtn" aria-label="Open menu"><i class="bi bi-list"></i></button>
       <div>
         <button class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500;">
           <i class="bi bi-person-circle me-2" style="font-size:1.5rem;"></i> OFFICER01
@@ -206,9 +386,10 @@
     <div class="row g-0 flex-nowrap">
       <!-- Sidebar -->
       <div id="sidebar" class="col-auto col-md-3 col-xl-2 bg-dark text-white p-4 min-vh-100 d-flex flex-column" style="box-shadow:2px 0 8px rgba(0,0,0,0.04);">
-        <div class="mb-4 d-flex align-items-center justify-content-between">
+        <div class="mb-4 d-flex align-items-center justify-content-between position-relative">
           <span class="fw-bold sidebar-header sidebar-text">Dashboard</span>
           <button id="sidebarToggle" class="btn btn-secondary btn-sm rounded-circle d-none d-md-inline ms-auto"><i id="sidebarToggleIcon" class="bi bi-chevron-left"></i></button>
+          <button class="btn btn-secondary btn-sm rounded-circle d-inline d-md-none ms-2" id="closeSidebarBtn" style="display:none; position:absolute; top:10px; right:10px;"><i class="bi bi-x"></i></button>
         </div>
         <ul class="nav flex-column gap-2">
           <li class="nav-item">
@@ -243,6 +424,12 @@
           </li>
           <li class="nav-item">
             <a class="nav-link text-white d-flex align-items-center" href="#">
+              <i class="bi bi-file-earmark-bar-graph"></i>
+              <span class="sidebar-text">Generate Report</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white d-flex align-items-center" href="#">
               <i class="bi bi-box-arrow-right"></i>
               <span class="sidebar-text">Logout</span>
             </a>
@@ -250,7 +437,7 @@
         </ul>
       </div>
       <!-- Main Content -->
-      <div class="col px-0 px-md-4 py-4 flex-grow-1">
+      <div class="col px-0 px-md-4 py-4 flex-grow-1 main-content">
         <div class="row g-4">
           <!-- Function Cards -->
           <div class="col-12 col-lg-8">
@@ -284,6 +471,13 @@
                   <div class="fw-bold">All Results</div>
                 </a>
               </div>
+              <!-- Function Card: Generate Report -->
+              <div class="col-12 col-sm-6 col-md-4">
+                <a href="#" class="dashboard-card p-4 text-center text-decoration-none h-100 d-block">
+                  <div class="icon mb-2"><i class="bi bi-file-earmark-bar-graph"></i></div>
+                  <div class="fw-bold">Generate Report</div>
+                </a>
+              </div>
             </div>
           </div>
           <!-- Calendar -->
@@ -313,6 +507,7 @@
       </div>
     </div>
   </div>
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../function/dashboard.js"></script>
   <!-- Add Candidate Modal -->
@@ -367,9 +562,11 @@
     if (sidebar.classList.contains('collapsed')) {
       icon.classList.remove('bi-chevron-left');
       icon.classList.add('bi-chevron-right');
+      document.body.classList.add('body-sidebar-collapsed');
     } else {
       icon.classList.remove('bi-chevron-right');
       icon.classList.add('bi-chevron-left');
+      document.body.classList.remove('body-sidebar-collapsed');
     }
   };
   // Calendar functionality
@@ -440,6 +637,46 @@
     currentYear = today.getFullYear();
     renderCalendar(currentMonth, currentYear);
   };
+  // Responsive sidebar burger menu
+  const burgerMenuBtn = document.getElementById('burgerMenuBtn');
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const closeSidebarBtn = document.getElementById('closeSidebarBtn');
+
+  function openSidebarMobile() {
+    sidebar.classList.add('active');
+    sidebarOverlay.classList.add('active');
+    if (closeSidebarBtn) closeSidebarBtn.style.display = 'inline-block';
+  }
+  function closeSidebarMobile() {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+    if (closeSidebarBtn) closeSidebarBtn.style.display = 'none';
+  }
+  if (burgerMenuBtn) {
+    burgerMenuBtn.onclick = openSidebarMobile;
+  }
+  if (sidebarOverlay) {
+    sidebarOverlay.onclick = closeSidebarMobile;
+  }
+  if (closeSidebarBtn) {
+    closeSidebarBtn.onclick = closeSidebarMobile;
+  }
+  // Hide sidebar on resize if needed
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 991.98) {
+      closeSidebarMobile();
+    }
+  });
+  // Header fade effect on scroll
+  window.addEventListener('scroll', function() {
+    const navbar = document.querySelector('.navbar');
+    if (window.scrollY > 10) {
+      navbar.classList.add('faded');
+    } else {
+      navbar.classList.remove('faded');
+    }
+  });
   </script>
 </body>
 </html>
