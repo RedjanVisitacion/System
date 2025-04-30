@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <title>Bootstrap App</title>
   <link rel="icon" href="/img/icon.png"/>
-  <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="main.css">
+
+  <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body>
   <div class="container text-center mt-5">
