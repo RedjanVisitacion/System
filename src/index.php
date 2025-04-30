@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Bootstrap App</title>
+  <link rel="icon" href="/img/icon.png"/>
   <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
 </head>
 <body>
