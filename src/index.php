@@ -101,7 +101,7 @@
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="../../function/dashboard.js"></script>
+  <script src="../function/dashboard.js"></script>
   <!-- Add Candidate Modal -->
   <div class="modal fade" id="addCandidateModal" tabindex="-1" aria-labelledby="addCandidateModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -111,12 +111,45 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          <!-- Add your form here -->
-          <input type="text" class="form-control mb-2" placeholder="Candidate Name">
-          <button class="btn btn-primary w-100">Add</button>
+          <form id="addCandidateForm">
+            <input type="text" class="form-control mb-2" name="name" placeholder="Candidate Name" required>
+            <button type="submit" class="btn btn-primary w-100">Add</button>
+          </form>
+          <div id="addCandidateMsg" class="mt-2"></div>
         </div>
       </div>
     </div>
   </div>
+  <script>
+  document.getElementById('addCandidateForm').onsubmit = function(e) {
+      e.preventDefault();
+      var form = this;
+      var msg = document.getElementById('addCandidateMsg');
+      msg.textContent = '';
+      var formData = new FormData(form);
+      fetch('add_candidate.php', {
+          method: 'POST',
+          body: formData
+      })
+      .then(r => r.text())
+      .then(response => {
+          if (response.trim() === 'success') {
+              msg.textContent = 'Candidate added!';
+              msg.className = 'text-success mt-2';
+              form.reset();
+          } else if (response.trim() === 'empty') {
+              msg.textContent = 'Please enter a name.';
+              msg.className = 'text-danger mt-2';
+          } else {
+              msg.textContent = 'Error adding candidate.';
+              msg.className = 'text-danger mt-2';
+          }
+      })
+      .catch(() => {
+          msg.textContent = 'Error connecting to server.';
+          msg.className = 'text-danger mt-2';
+      });
+  };
+  </script>
 </body>
 </html>
