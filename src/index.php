@@ -32,7 +32,7 @@
       color: #fff !important;
     }
     .sidebar-header {
-      font-size: 1.4rem;
+      font-size: 1.1rem;
       font-weight: 600;
       letter-spacing: 1px;
     }
@@ -91,10 +91,13 @@
     .text-danger {
       color: #ef4444 !important;
     }
+    #sidebar {
+      transition: width 0.5s cubic-bezier(0.4, 0.2, 0.2, 1), background 0.4s, padding 0.4s;
+    }
     #sidebar.collapsed {
       width: 70px !important;
       min-width: 70px !important;
-      transition: width 0.2s;
+      transition: width 0.5s cubic-bezier(0.4, 0.2, 0.2, 1), background 0.4s, padding 0.4s;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -127,6 +130,29 @@
       justify-content: center;
       width: 100%;
     }
+    #sidebarToggleIcon {
+      transition: transform 0.3s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+    #sidebar.collapsed #sidebarToggleIcon {
+      transform: rotate(180deg);
+    }
+    #sidebar .sidebar-text {
+      margin-left: 12px;
+      transition: margin 0.3s;
+    }
+    #sidebar.collapsed .sidebar-text {
+      margin-left: 0;
+    }
+    #sidebar .sidebar-header-container .sidebar-header {
+      margin-right: 16px;
+    }
+    #sidebar .sidebar-header-container #sidebarToggle {
+      margin-left: 16px;
+      transition: margin 0.3s;
+    }
+    #sidebar.collapsed .sidebar-header-container #sidebarToggle {
+      margin-left: 0;
+    }
   </style>
 </head>
 <body>
@@ -151,7 +177,7 @@
       <div id="sidebar" class="col-auto col-md-3 col-xl-2 bg-dark text-white p-4 min-vh-100 d-flex flex-column" style="box-shadow:2px 0 8px rgba(0,0,0,0.04);">
         <div class="mb-4 d-flex align-items-center justify-content-between">
           <span class="fw-bold sidebar-header sidebar-text">Dashboard</span>
-          <button id="sidebarToggle" class="btn btn-secondary btn-sm rounded-circle d-none d-md-inline"><i class="bi bi-chevron-left"></i></button>
+          <button id="sidebarToggle" class="btn btn-secondary btn-sm rounded-circle d-none d-md-inline ms-auto"><i id="sidebarToggleIcon" class="bi bi-chevron-left"></i></button>
         </div>
         <ul class="nav flex-column gap-2">
           <li class="nav-item">
@@ -308,7 +334,16 @@
       });
   };
   document.getElementById('sidebarToggle').onclick = function() {
-    document.getElementById('sidebar').classList.toggle('collapsed');
+    var sidebar = document.getElementById('sidebar');
+    var icon = document.getElementById('sidebarToggleIcon');
+    sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+      icon.classList.remove('bi-chevron-left');
+      icon.classList.add('bi-chevron-right');
+    } else {
+      icon.classList.remove('bi-chevron-right');
+      icon.classList.add('bi-chevron-left');
+    }
   };
   </script>
 </body>
