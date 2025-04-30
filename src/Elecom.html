@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELECOM - Electoral Commission</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="img/icon.png">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container">
+            <nav>
+                <img class="headP hlogo" src="img/icon.png" alt="ELECOM Logo">
+
+                
+                <!-- Burger Menu Button -->
+                <div class="burger">
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                </div>
+    
+                <!-- Navigation Menu -->
+                <div class="nav-links">
+                    <a href="#home" class="active">Home</a>
+                    <a href="#about">About</a>
+                    <a href="#candidates">Candidates</a>
+                    <a href="#vote">Vote</a>
+                    <a href="#results">Results</a>
+                    <a href="#contact">Contact</a>
+                    <a href="#" class="btn" type="button" onclick="window.open('Elecom.html', '_blank');">Login</a>
+                </div>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Home Section -->
+<section id="home">
+    <video src="https://ustpstratcomm.github.io/banner_embed/banner.mp4" autoplay loop muted class="homVid"></video>
+    <div class="home-content">
+        <img src="img/icon.png" class="homeL" alt="ELECOM Logo">
+        <h2>Welcome to ELECOM</h2>
+        <p>Your trusted platform for fair and transparent elections.</p>
+    </div>
+</section>
+
+    
+    <!-- About Section -->
+    <section id="about">
+        <h2>About</h2>
+        <p><strong>Mission:</strong> To ensure a fair, transparent, and accessible electoral process for all.</p>
+        <p><strong>Vision:</strong> A democratic society where every vote counts and elections are conducted with integrity.</p>
+        <p><strong>Goals:</strong></p>
+        <ul>
+            <li>Promote voter education and awareness.</li>
+            <li>Implement secure and efficient election processes.</li>
+            <li>Encourage active participation in governance.</li>
+        </ul>
+    </section>
+    
+    <!-- Candidates Section -->
+<section id="candidates">
+    <h2>Meet the Candidates</h2>
+    
+    <div class="organization" id="usg">
+        <h3>University Student Government (USG)</h3>
+        <div class="position" id="usg-president">
+            <h4>President</h4>
+            <div class="candidate-list">
+                <div class="candidate">
+                    <img src="img/USG.jpg" alt="Candidate 1">
+                    <p>Click to view candidate</p>
+                </div>
+                <!-- More USG President candidates -->
+            </div>
+        </div>
+        <!-- Add more positions like VP, Secretary, etc. -->
+    </div>
+    
+    <div class="organization" id="site">
+        <h3>Society of Information Technology Enthusiasts (SITE)</h3>
+        <div class="position" id="site-president">
+            <h4>President</h4>
+            <div class="candidate-list">
+                <div class="candidate">
+                    <img src="img/SITE.jpg" alt="Candidate 1">
+                    <p>Click to view candidate</p>
+                </div>
+                <!-- More SITE President candidates -->
+            </div>
+        </div>
+        <!-- Add more positions -->
+    </div>
+    
+    <div class="organization" id="pafe">
+        <h3>Prime Association for Future Educators (PAFE)</h3>
+        <div class="position" id="pafe-president">
+            <h4>President</h4>
+            <div class="candidate-list">
+                <div class="candidate">
+                    <img src="img/PAFE.jpg" alt="Candidate 1">
+                    <p>Click to view candidate</p>
+                </div>
+                <!-- More PAFE President candidates -->
+            </div>
+        </div>
+        <!-- Add more positions -->
+    </div>
+    
+    <div class="organization" id="afprotech">
+        <h3>Association of Food Processing Technology (AFPROTECH)</h3>
+        <div class="position" id="afprotech-president">
+            <h4>President</h4>
+            <div class="candidate-list">
+                <div class="candidate">
+                    <img src="img/AFPROTECHS.jpg" alt="Candidate 1">
+                    <p>Click to view candidate</p>
+                </div>
+                <!-- More AFPROTECH President candidates -->
+            </div>
+        </div>
+        <!-- Add more positions -->
+    </div>
+</section>
+
+<!-- Voting Section -->
+<section id="vote">
+    <h2>Vote Now</h2>
+    <form>
+        <label for="voter-name">Your Name:</label>
+        <input type="text" id="voter-name" required>
+        
+        <label for="organization">Select Organization:</label>
+        <select id="organization">
+            <option value="">Click to select</option>
+            <option value="usg">University Student Government (USG)</option>
+            <option value="site">Society of Information Technology Enthusiasts (SITE)</option>
+            <option value="pafe">Prime Association for Future Educators (PAFE)</option>
+            <option value="afprotech">Association of Food Processing Technology (AFPROTECH)</option>
+        </select>
+        
+        <label for="position">Select Position:</label>
+        <select id="position">
+            <option value="">Click to select</option>
+            <!-- Positions will be dynamically loaded based on selected organization -->
+        </select>
+        
+        <label for="candidate">Select Candidate:</label>
+        <select id="candidate">
+            <option value="">Click to select</option>
+            <!-- Candidates will be dynamically loaded based on selected position -->
+        </select>
+        
+        <button type="submit">Submit Vote</button>
+    </form>
+</section>
+
+<!-- Results Section -->
+<section id="results">
+    <h2>Election Results</h2>
+    <p>Results will be announced soon...</p>
+</section>
+
+    
+    <!-- Contact Section -->
+    <section id="contact">
+        <h2>Contact Us</h2>
+        <p>Email: visitacionredjanphils@gmail.com</p>
+        <p>Phone: +639 534 181 760</p>
+    </section>
+    
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 ELECOM. All rights reserved.</p>
+    </footer>
+
+    <script src="function/main.js"></script>
+</body>
+</html>
