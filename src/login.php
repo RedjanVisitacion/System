@@ -313,25 +313,39 @@
       .login-page-container {
         flex-direction: column;
         max-width: 400px;
-        margin: 20px auto;
-        align-items: stretch;
+        margin: 0 auto;
+        align-items: center;
+        gap: 0;
+        padding: 0;
       }
       .login-logo-side {
         width: 100%;
         max-width: 100%;
         border-right: none;
-        border-bottom: 1px solid rgba(200, 220, 255, 0.18);
-        border-radius: 28px 28px 0 0;
-        padding: 18px 0;
+        border-bottom: none;
+        border-radius: 20px 20px 0 0;
+        padding: 0;
+        margin: 0;
         justify-content: center;
+        align-items: center;
+        display: flex;
+        box-shadow: none;
+        text-align: center;
+        background: transparent;
+      }
+      .elecom-logo-img {
+        display: block;
+        margin: 0 auto;
+        text-align: center;
+        float: none;
+        max-width: 90px;
       }
       .login-form-card {
         width: 100%;
-        padding: 32px 16px 32px 16px;
-        border-radius: 0 0 28px 28px;
-      }
-      .elecom-logo-img {
-        max-width: 90px;
+        padding: 0 0 32px 0;
+        border-radius: 0 0 20px 20px;
+        margin: 0;
+        box-shadow: 0 2px 16px rgba(37,99,235,0.08);
       }
       .welcome-title {
         font-size: 1.5rem;
@@ -375,32 +389,38 @@
     }
     @media (max-width: 600px) {
       .login-page-container {
-        margin: 10px;
+        margin: 0;
         border-radius: 20px;
-        max-width: 350px;
+        max-width: 98vw;
+        gap: 0;
+        padding: 0;
+        align-items: center;
       }
       .login-logo-side {
-        padding: 10px 0;
+        padding: 0;
         border-radius: 20px 20px 0 0;
-      }
-      .login-form-card {
-        padding: 18px 6px 24px 6px;
-        border-radius: 0 0 20px 20px;
+        margin: 0;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        text-align: center;
+        background: transparent;
       }
       .elecom-logo-img {
+        display: block;
+        margin: 0 auto;
+        text-align: center;
+        float: none;
         max-width: 60px;
       }
-      .input-group {
-        width: 95%;
-        max-width: 280px;
+      .login-form-card {
+        padding: 0 0 24px 0;
+        border-radius: 0 0 20px 20px;
+        margin: 0;
+        box-shadow: 0 2px 16px rgba(37,99,235,0.08);
       }
-      .form-options {
-        width: 95%;
-        max-width: 280px;
-      }
-      .btn-primary {
-        width: 95%;
-        max-width: 280px;
+      .welcome-title {
+        font-size: 1.75rem;
       }
     }
     @media (max-width: 480px) {
@@ -433,6 +453,32 @@
         margin: 0 auto 16px auto;
         width: 95%;
       }
+    }
+    /* Enhanced dual ring spinner for loading overlay */
+    .dual-ring-spinner {
+      display: inline-block;
+      width: 56px;
+      height: 56px;
+      position: relative;
+    }
+    .dual-ring-spinner:after {
+      content: " ";
+      display: block;
+      width: 44px;
+      height: 44px;
+      margin: 6px;
+      border-radius: 50%;
+      border: 6px solid #2563eb;
+      border-color: #2563eb transparent #60a5fa transparent;
+      animation: dual-ring-spin 1.2s linear infinite;
+      box-shadow: 0 0 16px 2px #2563eb55;
+    }
+    @keyframes dual-ring-spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-glow {
+      text-shadow: 0 0 8px #2563eb88, 0 0 16px #60a5fa44;
     }
   </style>
 </head>
@@ -468,7 +514,7 @@
         <div class="input-error" id="passwordError"></div>
         <div class="form-options mb-2">
           <label class="mb-0"><input type="checkbox" id="rememberMe" /> Remember me</label>
-          <a href="#" class="forgot-link">Forgot Password?</a>
+    
         </div>
         <button type="submit" class="btn btn-primary" id="loginBtn">
           <span id="loginBtnText">Login</span>
@@ -479,9 +525,9 @@
     </div>
   </div>
   <div id="loginLoadingOverlay" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(37,99,235,0.18);backdrop-filter:blur(4px);align-items:center;justify-content:center;flex-direction:column;">
-    <div style="background:rgba(255,255,255,0.95);padding:40px 32px 32px 32px;border-radius:18px;box-shadow:0 4px 32px rgba(37,99,235,0.13);display:flex;flex-direction:column;align-items:center;">
-      <div class="spinner" style="width:40px;height:40px;border-width:5px;margin-bottom:18px;"></div>
-      <div style="font-size:1.2rem;font-weight:600;color:#2563eb;">Logging in...</div>
+    <div style="background:rgba(255,255,255,0.97);padding:44px 36px 36px 36px;border-radius:20px;box-shadow:0 4px 32px rgba(37,99,235,0.13);display:flex;flex-direction:column;align-items:center;">
+      <div class="dual-ring-spinner" style="margin-bottom:22px;"></div>
+      <div class="loading-glow" style="font-size:1.25rem;font-weight:700;color:#2563eb;letter-spacing:1px;">Logging in...</div>
     </div>
   </div>
 <script>
