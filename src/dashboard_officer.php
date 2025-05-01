@@ -130,8 +130,8 @@ $stmt->close();
       }
 
       .navbar {
-        position: fixed;
-        top: 0;
+        position: sticky !important;
+        top: 0 !important;
         left: 0;
         width: 100%;
         z-index: 1200;
@@ -165,6 +165,15 @@ $stmt->close();
 
       .mobile-menu-btn i {
         font-size: 1.75rem !important;
+        transition: transform 0.3s ease;
+      }
+
+      .mobile-menu-btn.active i {
+        transform: rotate(45deg);
+      }
+
+      .mobile-menu-btn.active i::before {
+        content: '\F659' !important;
       }
 
       .elecom-logo {
@@ -176,7 +185,7 @@ $stmt->close();
       }
 
       .main-content {
-        margin: 56px 0 0 0 !important;
+        margin: 0 !important;
         padding: 0.75rem !important;
         min-height: calc(100vh - 56px);
         background: #f8fafc;
@@ -927,6 +936,7 @@ $stmt->close();
   const sidebarOverlay = document.getElementById('sidebarOverlay');
 
   mobileMenuBtn.addEventListener('click', function() {
+    this.classList.toggle('active');
     sidebar.classList.toggle('active');
     sidebarOverlay.classList.toggle('active');
   });
@@ -934,6 +944,7 @@ $stmt->close();
   sidebarOverlay.addEventListener('click', function() {
     sidebar.classList.remove('active');
     sidebarOverlay.classList.remove('active');
+    mobileMenuBtn.classList.remove('active');
   });
 
   // Close sidebar when clicking outside on mobile
@@ -942,6 +953,7 @@ $stmt->close();
       if (!sidebar.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
         sidebar.classList.remove('active');
         sidebarOverlay.classList.remove('active');
+        mobileMenuBtn.classList.remove('active');
       }
     }
   });
