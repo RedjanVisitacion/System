@@ -20,7 +20,7 @@ $stmt->close();
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="main.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
@@ -52,6 +52,123 @@ $stmt->close();
     .nav-link:hover, .nav-link.active {
       background: #2563eb;
       color: #fff !important;
+    }
+    .mobile-profile-pic {
+      display: none;
+    }
+    .profile-button {
+      display: flex;
+    }
+    @media (max-width: 575.98px) {
+      .elecom-logo {
+        display: none;
+      }
+      .profile-button {
+        display: none;
+      }
+      .mobile-profile-container {
+        display: block;
+        cursor: pointer;
+      }
+      .mobile-profile-pic {
+        display: block;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        margin-right: 10px;
+        box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+        object-fit: cover;
+      }
+      .electoral-commission-title {
+        font-size: 1.1rem !important;
+      }
+      .navbar-brand {
+        margin-right: 0 !important;
+      }
+      .navbar {
+        padding: 0 !important;
+      }
+      .navbar .container-fluid {
+        padding: 0.5rem !important;
+        width: 100% !important;
+        margin: 0 !important;
+      }
+      .main-content {
+        margin: 60px 0 0 0 !important;
+        padding: 0.5rem !important;
+        width: 100% !important;
+      }
+      .row {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+      }
+      .col-12, .col-md-6, .col-lg-8 {
+        padding: 0.25rem !important;
+        margin: 0 !important;
+        width: 100% !important;
+      }
+      .dashboard-card {
+        margin: 0.25rem 0 !important;
+        padding: 1rem !important;
+        width: 100% !important;
+        border-radius: 12px !important;
+      }
+      .dashboard-card .icon {
+        width: 36px;
+        height: 36px;
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+      }
+      .dashboard-card .fw-bold {
+        font-size: 1rem !important;
+        margin-bottom: 4px;
+      }
+      .dashboard-card .fs-4 {
+        font-size: 1.5rem !important;
+      }
+      .calendar-card {
+        display: none !important;
+      }
+      #sidebar {
+        width: 100% !important;
+      }
+      .container-fluid {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+      }
+      body {
+        overflow-x: hidden !important;
+        width: 100% !important;
+      }
+    }
+    @media (min-width: 576px) and (max-width: 767.98px) {
+      .electoral-commission-title {
+        font-size: 1.25rem !important;
+      }
+      .dashboard-card {
+        padding: 1.25rem !important;
+      }
+      .dashboard-card .icon {
+        width: 42px;
+        height: 42px;
+        font-size: 1.5rem;
+      }
+      .dashboard-card .fw-bold {
+        font-size: 1.1rem !important;
+      }
+      .dashboard-card .fs-4 {
+        font-size: 1.75rem !important;
+      }
+    }
+    @media (max-width: 767px) {
+      .main-content {
+        margin-left: 0;
+      }
+      .row > * {
+        padding-right: calc(var(--bs-gutter-x) * .25);
+        padding-left: calc(var(--bs-gutter-x) * .25);
+      }
     }
     .sidebar-header {
       font-size: 1.1rem;
@@ -209,13 +326,6 @@ $stmt->close();
       .navbar-brand {
         font-size: 1.1rem !important;
       }
-      .burger-menu {
-        display: inline-block;
-        position: absolute;
-        top: 10px;
-        right: 18px;
-        z-index: 1300;
-      }
       #sidebar {
         position: fixed;
         left: 0;
@@ -296,57 +406,6 @@ $stmt->close();
         display: block;
       }
     }
-    @media (max-width: 575.98px) {
-      .navbar .container-fluid {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.25rem;
-      }
-      .navbar .d-flex.align-items-center {
-        flex-direction: row;
-        align-items: center;
-        gap: 0.25rem;
-      }
-      .navbar-brand {
-        font-size: 0.95rem !important;
-      }
-      .navbar img[alt="Electoral Commission Logo"] {
-        width: 32px !important;
-        height: 32px !important;
-        margin-right: 8px !important;
-      }
-      .navbar .btn {
-        font-size: 0.9rem;
-        padding: 0.25rem 0.7rem;
-        margin-top: 0.5rem;
-      }
-      #sidebar {
-        padding: 1rem 0.2rem 1rem 0.2rem !important;
-        min-width: 50px !important;
-      }
-      #sidebar .sidebar-header {
-        font-size: 0.95rem;
-      }
-      #sidebar .nav-link {
-        font-size: 0.92rem;
-        padding: 7px 6px;
-      }
-    }
-    /* Burger icon styles */
-    .burger-menu {
-      display: none;
-      background: none;
-      border: none;
-      font-size: 2.2rem;
-      color: #fff;
-      z-index: 1300;
-      cursor: pointer;
-    }
-    @media (max-width: 575.98px) {
-      .burger-menu {
-        font-size: 1.7rem;
-      }
-    }
     @media (min-width: 992px) {
       body {
         padding-top: 0;
@@ -375,6 +434,39 @@ $stmt->close();
         margin-top: 30px;
       }
     }
+    .electoral-commission-title {
+      font-family: 'Libre Baskerville', serif;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: linear-gradient(45deg, #ffffff, #e0e7ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    @media (min-width: 576px) and (max-width: 991.98px) {
+      .main-content {
+        margin: 60px 0 0 0 !important;
+        padding: 1rem !important;
+        width: 100% !important;
+      }
+      .calendar-card {
+        display: none !important;
+      }
+      .col-12.col-lg-8 {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0.5rem !important;
+      }
+      .dashboard-card {
+        margin: 0.5rem 0 !important;
+        width: 100% !important;
+      }
+      .container-fluid {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -382,11 +474,21 @@ $stmt->close();
   <nav class="navbar navbar-expand-lg position-relative" style="background: #2563eb; height: 60px;">
     <div class="container-fluid">
       <div class="d-flex align-items-center">
-        <img src="../img/icon.png" alt="Electoral Commission Logo" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
-        <span class="navbar-brand mb-0 h1 text-white" style="font-size:1.5rem;">Electoral Commission</span>
+        <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
+        <a href="profile.php" class="mobile-profile-container">
+          <?php if (!empty($user_profile['profile_picture'])): ?>
+            <img src="../uploads/profile_pictures/<?php echo htmlspecialchars($user_profile['profile_picture']); ?>" 
+                 alt="Profile Picture" 
+                 class="mobile-profile-pic">
+          <?php else: ?>
+            <div class="mobile-profile-pic mobile-profile-pic-default">
+              <i class="bi bi-person-circle"></i>
+            </div>
+          <?php endif; ?>
+        </a>
+        <span class="navbar-brand mb-0 h1 electoral-commission-title" style="font-size:1.5rem;">Electoral Commission</span>
       </div>
-      <button class="burger-menu" id="burgerMenuBtn" aria-label="Open menu"><i class="bi bi-list"></i></button>
-      <div>
+      <div class="profile-button">
         <a href="profile.php" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500;">
           <?php if (!empty($user_profile['profile_picture'])): ?>
             <img src="../uploads/profile_pictures/<?php echo htmlspecialchars($user_profile['profile_picture']); ?>" 
