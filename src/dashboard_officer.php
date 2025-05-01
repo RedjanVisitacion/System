@@ -1,9 +1,9 @@
 <?php
 require_once 'check_session.php';
 
-// Fetch user's profile picture
+// Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
-$stmt = $con->prepare("SELECT profile_picture FROM user_profile WHERE user_id = ?");
+$stmt = $con->prepare("SELECT profile_picture, full_name FROM user_profile WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -395,7 +395,7 @@ $stmt->close();
           <?php else: ?>
             <i class="bi bi-person-circle me-2" style="font-size:1.5rem;"></i>
           <?php endif; ?>
-          <?php echo htmlspecialchars($_SESSION['user_id']); ?>
+          <?php echo !empty($user_profile['full_name']) ? htmlspecialchars($user_profile['full_name']) : htmlspecialchars($_SESSION['user_id']); ?>
         </a>
       </div>
     </div>
