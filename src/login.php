@@ -14,89 +14,89 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Inter', 'Roboto', Arial, sans-serif;
+      background: linear-gradient(135deg, #e0e7ef 0%, #f5f7fa 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow-x: hidden;
     }
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, rgba(224, 231, 239, 0.5) 0%, rgba(245, 247, 250, 0.9) 100%),
-                  url('../img/votE.jpg');
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(224, 231, 239, 0.5) 0%, rgba(40, 126, 184, 0.9) 100%), url('../img/votE.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100vw;
-      overflow-x: hidden;
     }
     .login-page-container {
       display: flex;
       align-items: stretch;
       justify-content: center;
       width: 100%;
-      max-width: 900px;
+      max-width: 520px;
       margin: 0 auto;
-      background: none;
       border-radius: 28px;
-      box-shadow: 0 10px 40px rgba(60,60,100,0.1), 0 4px 12px rgba(37,99,235,0.08);
+      box-shadow: 0 8px 40px rgba(60,60,100,0.13), 0 2px 8px rgba(37,99,235,0.08);
       overflow: hidden;
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(8px);
     }
     .login-logo-side {
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40%;
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(24, 113, 155, 0.9));
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-right: 1px solid rgba(255, 255, 255, 0.4);
-      padding: 40px;
-      transition: all 0.3s ease;
-    }
-    .login-logo-side:hover {
-      box-shadow: 0 15px 50px rgba(37,99,235,0.15), 0 4px 12px rgba(37,99,235,0.1);
-      transform: translateY(-3px) scale(1.01);
-      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: rgba(255,255,255,0.35);
+      border-right: 1px solid rgba(200, 220, 255, 0.18);
+      padding: 32px 18px;
+      min-width: 0;
+      max-width: 240px;
+      width: 240px;
+      border-radius: 28px 0 0 28px;
+      box-shadow: 0 2px 16px rgba(37,99,235,0.04);
+      position: relative;
+      backdrop-filter: blur(16px);
     }
     .elecom-logo-img {
       width: 100%;
-      max-width: 280px;
+      max-width: 110px;
       height: auto;
       object-fit: contain;
-      padding: 8px;
-      position: relative;
+      padding: 0;
       display: block;
       margin: 0 auto;
+      filter: drop-shadow(0 2px 8px rgba(37,99,235,0.08));
     }
     .login-form-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(24, 113, 155, 0.7));
+      background: linear-gradient(135deg, rgba(37,99,235,0.35) 0%, rgba(59,130,246,0.30) 100%);
+      border: 1.5px solid rgba(37,99,235,0.18);
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
-      padding: 40px 32px 32px 32px;
-      width: 60%;
-      min-height: 340px;
+      padding: 48px 32px 40px 32px;
+      width: 100%;
+      min-width: 0;
+      min-height: 320px;
       position: relative;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .login-form-card:hover {
-      box-shadow: 0 15px 50px rgba(37,99,235,0.15), 0 4px 12px rgba(37,99,235,0.1);
-      transform: translateY(-3px) scale(1.01);
-      border: 1px solid rgba(255, 255, 255, 0.6);
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 255, 0.8));
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
     }
     .welcome-title {
-      font-weight: 800;
+      font-weight: 700;
       font-size: 2rem;
-      margin-bottom: 0.25rem;
+      margin-bottom: 0.5rem;
       line-height: 1.1;
       letter-spacing: 0.5px;
       text-align: center;
       text-decoration: none;
+      color: #222;
     }
     .highlight {
       color: #2563eb;
@@ -108,7 +108,7 @@
       font-weight: 900;
       text-decoration: none;
       letter-spacing: 1px;
-      text-shadow: 0 2px 4px rgba(37,99,235,0.1);
+      text-shadow: 0 2px 4px rgba(37,99,235,0.08);
     }
     .subtitle {
       color: #888;
@@ -120,14 +120,17 @@
     .input-group {
       display: flex;
       align-items: center;
-      background: #f1f3f6;
-      border-radius: 8px;
-      margin-bottom: 20px;
+      background: rgba(255,255,255,0.55);
+      border-radius: 10px;
+      margin-bottom: 18px;
       position: relative;
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
+      border: 1.5px solid #b6d0ff;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
       height: 44px;
       padding: 0;
+      width: 100%;
+      max-width: 320px;
+      box-shadow: 0 1px 4px rgba(37,99,235,0.04);
     }
     .input-group input {
       border: none;
@@ -137,8 +140,8 @@
       font-size: 15px;
       color: #222;
       padding: 0 44px 0 16px;
-      border-radius: 6px;
-      transition: all 0.3s ease;
+      border-radius: 10px;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
       height: 100%;
       box-sizing: border-box;
       background: transparent;
@@ -168,11 +171,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
       font-size: 14px;
-      gap: 16px;
+      gap: 12px;
       width: 100%;
-      padding: 0 4px;
+      max-width: 320px;
+      padding: 0 2px;
     }
     .forgot-link {
       color: #2563eb;
@@ -180,6 +184,7 @@
       font-weight: 500;
       transition: color 0.2s;
       margin-left: auto;
+      font-size: 14px;
     }
     .forgot-link:hover {
       color: #1e40af;
@@ -187,35 +192,70 @@
     }
     .btn-primary {
       width: 100%;
-      background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+      max-width: 320px;
+      background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
       color: #fff;
       border: none;
       padding: 12px;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
-      margin-bottom: 12px;
+      margin-bottom: 10px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
       font-weight: 600;
-      box-shadow: 0 4px 12px rgba(37,99,235,0.15);
+      box-shadow: 0 2px 8px rgba(37,99,235,0.10);
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
       height: 44px;
+      position: relative;
+      overflow: hidden;
     }
     .btn-primary:hover {
       background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(37,99,235,0.2);
+      transform: translateY(-1px) scale(1.01);
+      box-shadow: 0 6px 16px rgba(37,99,235,0.13);
     }
     .btn-primary:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 8px rgba(37,99,235,0.15);
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 2px 8px rgba(37,99,235,0.10);
     }
     .btn-primary:disabled {
       opacity: 0.7;
       cursor: not-allowed;
+      transform: none;
+    }
+    .btn-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .btn-primary.loading .btn-content {
+      opacity: 0;
+    }
+    .loading-spinner {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s linear infinite;
+      opacity: 0;
+      transition: opacity 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .btn-primary.loading .loading-spinner {
+      opacity: 1;
+    }
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
     .toggle-password {
       position: absolute;
@@ -272,21 +312,26 @@
     @media (max-width: 900px) {
       .login-page-container {
         flex-direction: column;
-        max-width: 500px;
+        max-width: 400px;
         margin: 20px auto;
+        align-items: stretch;
       }
       .login-logo-side {
         width: 100%;
+        max-width: 100%;
         border-right: none;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-        padding: 30px;
+        border-bottom: 1px solid rgba(200, 220, 255, 0.18);
+        border-radius: 28px 28px 0 0;
+        padding: 18px 0;
+        justify-content: center;
       }
       .login-form-card {
         width: 100%;
-        padding: 30px 24px;
+        padding: 32px 16px 32px 16px;
+        border-radius: 0 0 28px 28px;
       }
       .elecom-logo-img {
-        max-width: 200px;
+        max-width: 90px;
       }
       .welcome-title {
         font-size: 1.5rem;
@@ -295,14 +340,16 @@
         font-size: 1rem;
       }
       .input-group {
-        height: 38px;
+        width: 90%;
+        max-width: 320px;
       }
-      .input-group input {
-        font-size: 14px;
+      .form-options {
+        width: 90%;
+        max-width: 320px;
       }
       .btn-primary {
-        height: 36px;
-        font-size: 15px;
+        width: 90%;
+        max-width: 320px;
       }
     }
     @media (max-width: 768px) {
@@ -330,15 +377,30 @@
       .login-page-container {
         margin: 10px;
         border-radius: 20px;
+        max-width: 350px;
       }
       .login-logo-side {
-        padding: 20px;
+        padding: 10px 0;
+        border-radius: 20px 20px 0 0;
       }
       .login-form-card {
-        padding: 20px 16px;
+        padding: 18px 6px 24px 6px;
+        border-radius: 0 0 20px 20px;
       }
       .elecom-logo-img {
-        max-width: 150px;
+        max-width: 60px;
+      }
+      .input-group {
+        width: 95%;
+        max-width: 280px;
+      }
+      .form-options {
+        width: 95%;
+        max-width: 280px;
+      }
+      .btn-primary {
+        width: 95%;
+        max-width: 280px;
       }
     }
     @media (max-width: 480px) {
@@ -451,8 +513,7 @@ loginForm.addEventListener('submit', function(e) {
   if (!valid) return;
 
   loginBtn.disabled = true;
-  loginBtnText.style.display = 'none';
-  loginSpinner.style.display = 'inline-block';
+  loginBtn.classList.add('loading');
 
   fetch('login_verify.php', {
     method: 'POST',
@@ -462,13 +523,12 @@ loginForm.addEventListener('submit', function(e) {
   .then(res => res.json())
   .then(data => {
     loginBtn.disabled = false;
-    loginBtnText.style.display = 'inline';
-    loginSpinner.style.display = 'none';
+    loginBtn.classList.remove('loading');
     if (data.success) {
       if (data.role === 'officer') {
-        window.location.href = 'dashboard_officer.html';
+        window.location.href = 'dashboard_officer.php';
       } else {
-        window.location.href = 'dashboard_student.html';
+        window.location.href = 'dashboard_student.php';
       }
     } else {
       loginError.textContent = data.message || 'Login failed. Please try again.';
@@ -478,8 +538,7 @@ loginForm.addEventListener('submit', function(e) {
   })
   .catch(() => {
     loginBtn.disabled = false;
-    loginBtnText.style.display = 'inline';
-    loginSpinner.style.display = 'none';
+    loginBtn.classList.remove('loading');
     loginError.textContent = 'A network error occurred.';
   });
 });
