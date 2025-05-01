@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <link rel="icon" href="../img/icon.png"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ELECOM Voting System Login</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -33,27 +34,26 @@
       min-height: 80vh;
       align-items: center;
       justify-content: center;
-      background: none;
       margin: auto;
-      gap: 0;
+      gap: 48px;
     }
-    .login-image {
+    .logo-card {
       flex: 1 1 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: #f1f3f6;
-      min-height: 100%;
+      background: #f7f9fb;
+      min-height: 420px;
       min-width: 0;
-      border-top-left-radius: 32px;
-      border-bottom-left-radius: 32px;
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
-      box-shadow: 0 8px 32px rgba(60,60,100,0.07);
+      border-radius: 36px;
+      box-shadow: 0 8px 32px rgba(60,60,100,0.10);
+      padding: 32px 24px;
+      margin: 0 0 0 24px;
+      transition: box-shadow 0.3s;
     }
-    .login-image img {
-      width: 240px;
-      max-width: 80vw;
+    .logo-card img {
+      width: 220px;
+      max-width: 60vw;
       border-radius: 50%;
       box-shadow: 0 4px 24px rgba(0,0,0,0.10);
       background: transparent;
@@ -62,7 +62,7 @@
       display: block;
       transition: box-shadow 0.3s;
     }
-    .login-image img:hover {
+    .logo-card img:hover {
       box-shadow: 0 8px 32px rgba(37,99,235,0.18);
     }
     .login-form-card {
@@ -73,11 +73,11 @@
       justify-content: center;
       padding: 56px 40px 48px 40px;
       box-shadow: 0 8px 32px rgba(60,60,100,0.13);
-      border-radius: 32px;
+      border-radius: 36px;
       max-width: 420px;
       min-width: 320px;
       min-height: 480px;
-      margin: 0 auto;
+      margin: 0 24px 0 0;
       position: relative;
     }
     .brand {
@@ -213,7 +213,6 @@
       z-index: 10;
       opacity: 0.95;
     }
-    @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
     @media (max-width: 991.98px) {
       .login-split {
         flex-direction: column;
@@ -221,15 +220,12 @@
         gap: 0;
         max-width: 100vw;
       }
-      .login-image {
+      .logo-card {
         min-height: 180px;
-        padding: 32px 0 0 0;
-        border-radius: 0;
-        border-top-left-radius: 32px;
-        border-top-right-radius: 32px;
-        border-bottom-left-radius: 0;
-        border-bottom-right-radius: 0;
+        border-radius: 32px 32px 0 0;
         box-shadow: none;
+        margin: 0;
+        padding: 32px 0 0 0;
       }
       .login-form-card {
         margin: 0 auto 32px auto;
@@ -242,7 +238,7 @@
       }
     }
     @media (max-width: 575.98px) {
-      .login-image img {
+      .logo-card img {
         width: 120px;
         padding: 0;
       }
@@ -260,8 +256,8 @@
 <body>
 <div class="main-wrapper">
   <div class="login-split">
-    <div class="login-image">
-      <img src="../../img/icon.png" alt="ELECOM Logo" />
+    <div class="logo-card">
+      <img src="../img/icon.png" alt="ELECOM Logo" />
     </div>
     <div class="login-form-card">
       <div class="brand">ELECOM Voting System</div>
