@@ -1,5 +1,14 @@
 <?php
 require_once 'check_session.php';
+
+// Fetch user's profile picture
+$user_id = $_SESSION['user_id'];
+$stmt = $con->prepare("SELECT profile_picture FROM user_profile WHERE user_id = ?");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$user_profile = $result->fetch_assoc();
+$stmt->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -378,9 +387,16 @@ require_once 'check_session.php';
       </div>
       <button class="burger-menu" id="burgerMenuBtn" aria-label="Open menu"><i class="bi bi-list"></i></button>
       <div>
-        <button class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500;">
-          <i class="bi bi-person-circle me-2" style="font-size:1.5rem;"></i> <?php echo htmlspecialchars($_SESSION['user_id']); ?>
-        </button>
+        <a href="profile.php" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500;">
+          <?php if (!empty($user_profile['profile_picture'])): ?>
+            <img src="../uploads/profile_pictures/<?php echo htmlspecialchars($user_profile['profile_picture']); ?>" 
+                 alt="Profile Picture" 
+                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
+          <?php else: ?>
+            <i class="bi bi-person-circle me-2" style="font-size:1.5rem;"></i>
+          <?php endif; ?>
+          <?php echo htmlspecialchars($_SESSION['user_id']); ?>
+        </a>
       </div>
     </div>
   </nav>
