@@ -27,7 +27,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, rgba(224, 231, 239, 0.5) 0%, rgba(40, 126, 184, 0.9) 100%), url('../img/votE.jpg');
+      background: linear-gradient(135deg, rgba(57, 66, 77, 0.5) 0%, rgba(6, 73, 117, 0.9) 100%), url('../img/votE.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
@@ -72,8 +72,8 @@
       filter: drop-shadow(0 2px 8px rgba(37,99,235,0.08));
     }
     .login-form-card {
-      background: linear-gradient(135deg, rgba(37,99,235,0.35) 0%, rgba(59,130,246,0.30) 100%);
-      border: 1.5px solid rgba(37,99,235,0.18);
+      background: linear-gradient(135deg, rgba(10, 77, 231, 0.84) 0%, rgba(187, 201, 221, 0.3) 100%);
+      border: 1.5px solid rgba(0, 0, 0, 0.18);
       box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
       backdrop-filter: blur(18px);
       -webkit-backdrop-filter: blur(18px);
@@ -100,7 +100,7 @@
     }
     .highlight {
       color: #2563eb;
-      background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+      background: linear-gradient(90deg,rgb(240, 242, 245) 0%,rgb(52, 66, 104) 50%, #1e40af 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -179,7 +179,7 @@
       padding: 0 2px;
     }
     .forgot-link {
-      color: #2563eb;
+      color:rgba(51, 53, 56, 0.59);
       text-decoration: none;
       font-weight: 500;
       transition: color 0.2s;
@@ -193,7 +193,7 @@
     .btn-primary {
       width: 100%;
       max-width: 320px;
-      background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+      background: linear-gradient(90deg,rgb(105, 161, 194) 0%,rgb(10, 81, 173) 100%);
       color: #fff;
       border: none;
       padding: 12px;
@@ -467,7 +467,7 @@
         </div>
         <div class="input-error" id="passwordError"></div>
         <div class="form-options mb-2">
-          <label class="mb-0"><input type="checkbox" /> Remember me</label>
+          <label class="mb-0"><input type="checkbox" id="rememberMe" /> Remember me</label>
           <a href="#" class="forgot-link">Forgot Password?</a>
         </div>
         <button type="submit" class="btn btn-primary" id="loginBtn">
@@ -476,6 +476,12 @@
         </button>
         <div class="input-error text-center" id="loginError"></div>
       </form>
+    </div>
+  </div>
+  <div id="loginLoadingOverlay" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(37,99,235,0.18);backdrop-filter:blur(4px);align-items:center;justify-content:center;flex-direction:column;">
+    <div style="background:rgba(255,255,255,0.95);padding:40px 32px 32px 32px;border-radius:18px;box-shadow:0 4px 32px rgba(37,99,235,0.13);display:flex;flex-direction:column;align-items:center;">
+      <div class="spinner" style="width:40px;height:40px;border-width:5px;margin-bottom:18px;"></div>
+      <div style="font-size:1.2rem;font-weight:600;color:#2563eb;">Logging in...</div>
     </div>
   </div>
 <script>
@@ -490,6 +496,17 @@ const loginError = document.getElementById('loginError');
 const loginBtn = document.getElementById('loginBtn');
 const loginBtnText = document.getElementById('loginBtnText');
 const loginSpinner = document.getElementById('loginSpinner');
+const rememberMe = document.getElementById('rememberMe');
+const loginLoadingOverlay = document.getElementById('loginLoadingOverlay');
+
+// On page load, check localStorage for remembered userId
+window.addEventListener('DOMContentLoaded', () => {
+  const rememberedUserId = localStorage.getItem('rememberedUserId');
+  if (rememberedUserId) {
+    userIdInput.value = rememberedUserId;
+    rememberMe.checked = true;
+  }
+});
 
 loginForm.addEventListener('submit', function(e) {
   e.preventDefault();
@@ -512,6 +529,13 @@ loginForm.addEventListener('submit', function(e) {
   }
   if (!valid) return;
 
+  // Remember me logic
+  if (rememberMe.checked) {
+    localStorage.setItem('rememberedUserId', userIdInput.value.trim());
+  } else {
+    localStorage.removeItem('rememberedUserId');
+  }
+
   loginBtn.disabled = true;
   loginBtn.classList.add('loading');
 
@@ -525,11 +549,15 @@ loginForm.addEventListener('submit', function(e) {
     loginBtn.disabled = false;
     loginBtn.classList.remove('loading');
     if (data.success) {
-      if (data.role === 'officer') {
-        window.location.href = 'dashboard_officer.php';
-      } else {
-        window.location.href = 'dashboard_student.php';
-      }
+      // Show loading overlay and delay redirect
+      loginLoadingOverlay.style.display = 'flex';
+      setTimeout(() => {
+        if (data.role === 'officer') {
+          window.location.href = 'dashboard_officer.php';
+        } else {
+          window.location.href = 'dashboard_student.php';
+        }
+      }, 1000);
     } else {
       loginError.textContent = data.message || 'Login failed. Please try again.';
       userIdGroup.classList.add('error');

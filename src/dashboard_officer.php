@@ -6,7 +6,7 @@ require_once 'check_session.php';
 <head>
   <meta charset="UTF-8">
   <title>Electoral Commission Dashboard</title>
-  <link rel="icon" href="../../img/icon.png"/>
+  <link rel="icon" href="../img/icon.png"/>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -373,7 +373,7 @@ require_once 'check_session.php';
   <nav class="navbar navbar-expand-lg position-relative" style="background: #2563eb; height: 60px;">
     <div class="container-fluid">
       <div class="d-flex align-items-center">
-        <img src="../../img/icon.png" alt="Electoral Commission Logo" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
+        <img src="../img/icon.png" alt="Electoral Commission Logo" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
         <span class="navbar-brand mb-0 h1 text-white" style="font-size:1.5rem;">Electoral Commission</span>
       </div>
       <button class="burger-menu" id="burgerMenuBtn" aria-label="Open menu"><i class="bi bi-list"></i></button>
