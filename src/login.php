@@ -438,23 +438,6 @@
         margin: 0 auto;
         display: block;
       }
-      .form-options {
-        width: 95%;
-        max-width: 320px;
-        margin: -8px auto 16px auto;
-        padding: 0 2px;
-      }
-      .input-error {
-        margin-top: -8px;
-        margin-bottom: 8px;
-        padding: 4px 0;
-        font-size: 0.9rem;
-        width: 95%;
-        max-width: 320px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.4;
-      }
     }
     @media (max-width: 480px) {
       .login-page-container {
@@ -488,11 +471,8 @@
       .form-options {
         flex-direction: column;
         align-items: flex-start;
-        gap: 8px;
-        width: 95%;
-        max-width: 320px;
-        margin: -8px auto 16px auto;
-        padding: 0 2px;
+        gap: 12px;
+        margin-right: 20px;
       }
       .forgot-link {
         margin-left: 0;
@@ -506,17 +486,6 @@
         max-width: 320px;
         margin: 0 auto;
         display: block;
-      }
-      .input-error {
-        margin-top: -8px;
-        margin-bottom: 8px;
-        padding: 4px 0;
-        font-size: 0.85rem;
-        width: 95%;
-        max-width: 320px;
-        margin-left: auto;
-        margin-right: auto;
-        line-height: 1.4;
       }
     }
     /* Enhanced dual ring spinner for loading overlay */
