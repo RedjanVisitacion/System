@@ -35,7 +35,8 @@ $stmt->close();
       left: 0;
       width: 100%;
       z-index: 1200;
-      transition: background 0.3s, opacity 0.3s;
+      background: #2563eb;
+      height: 60px;
     }
     .navbar.faded {
       opacity: 0.92;
@@ -59,87 +60,209 @@ $stmt->close();
     .profile-button {
       display: flex;
     }
+    .profile-button a {
+      transition: all 0.3s ease;
+    }
+    
+    .profile-button a:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+    }
+    
+    .profile-button img, .mobile-profile-pic {
+      transition: all 0.3s ease;
+    }
+    
+    .profile-button:hover img {
+      transform: scale(1.1);
+    }
+    
+    .mobile-profile-container {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .mobile-profile-container::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: #fff;
+      transition: all 0.3s ease;
+      transform: translateX(-50%);
+    }
+    
+    .mobile-profile-container:hover::after {
+      width: 100%;
+    }
+    
+    .mobile-profile-container:active .mobile-profile-pic {
+      transform: scale(0.95);
+    }
+    
+    @keyframes profilePulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+      }
+    }
+    
+    .profile-button a:hover img,
+    .mobile-profile-container:hover .mobile-profile-pic {
+      animation: profilePulse 1.5s infinite;
+    }
+
+    /* Original mobile styles */
     @media (max-width: 575.98px) {
-      .elecom-logo {
-        display: none;
+      body {
+        background: #f8fafc;
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        overflow-x: hidden;
       }
-      .profile-button {
-        display: none;
-      }
-      .mobile-profile-container {
-        display: block;
-        cursor: pointer;
-      }
-      .mobile-profile-pic {
-        display: block;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        margin-right: 10px;
-        box-shadow: 0 2px 8px rgba(37,99,235,0.10);
-        object-fit: cover;
-      }
-      .electoral-commission-title {
-        font-size: 1.1rem !important;
-      }
-      .navbar-brand {
-        margin-right: 0 !important;
-      }
+
       .navbar {
-        padding: 0 !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1200;
+        height: 56px;
+        padding: 0 1rem !important;
+        background: #2563eb;
+        display: flex;
+        align-items: center;
       }
+
       .navbar .container-fluid {
-        padding: 0.5rem !important;
-        width: 100% !important;
+        padding: 0 !important;
         margin: 0 !important;
+        width: 100%;
       }
+
+      .electoral-commission-title {
+        font-size: 1rem !important;
+        margin: 0 !important;
+        color: white !important;
+        -webkit-text-fill-color: white !important;
+        text-shadow: none !important;
+        background: none !important;
+      }
+
+      .mobile-menu-btn {
+        display: block !important;
+        padding: 4px !important;
+        margin-right: 8px !important;
+      }
+
+      .mobile-menu-btn i {
+        font-size: 1.75rem !important;
+      }
+
+      .elecom-logo {
+        display: none !important;
+      }
+
+      .profile-button {
+        display: none !important;
+      }
+
       .main-content {
-        margin: 60px 0 0 0 !important;
-        padding: 0.5rem !important;
-        width: 100% !important;
+        margin: 56px 0 0 0 !important;
+        padding: 0.75rem !important;
+        min-height: calc(100vh - 56px);
+        background: #f8fafc;
+        width: 100%;
       }
-      .row {
+
+      .row.g-4 {
         margin: 0 !important;
         padding: 0 !important;
-        width: 100% !important;
+        width: 100%;
+        gap: 0.75rem !important;
       }
-      .col-12, .col-md-6, .col-lg-8 {
-        padding: 0.25rem !important;
-        margin: 0 !important;
-        width: 100% !important;
+
+      .col-12.col-lg-8 {
+        width: 100%;
+        padding: 0;
       }
+
+      .col-12.col-md-6 {
+        width: 100%;
+        padding: 0;
+        margin-bottom: 0.75rem;
+      }
+
       .dashboard-card {
-        margin: 0.25rem 0 !important;
-        padding: 1rem !important;
-        width: 100% !important;
-        border-radius: 12px !important;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        padding: 1rem;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: auto;
       }
+
       .dashboard-card .icon {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        background: #e0e7ff;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 0.5rem;
+        color: #2563eb;
+      }
+
+      .dashboard-card .icon i {
         font-size: 1.25rem;
-        margin-bottom: 8px;
       }
-      .dashboard-card .fw-bold {
-        font-size: 1rem !important;
-        margin-bottom: 4px;
+
+      .dashboard-card h3 {
+        font-size: 0.875rem;
+        color: #4b5563;
+        margin-bottom: 0.25rem;
+        margin-top: 0;
       }
+
       .dashboard-card .fs-4 {
-        font-size: 1.5rem !important;
+        font-size: 1.25rem !important;
+        font-weight: 600;
+        color: #2563eb;
+        margin: 0;
       }
+
       .calendar-card {
         display: none !important;
       }
+
       #sidebar {
-        width: 100% !important;
+        width: 240px !important;
+        transform: translateX(-100%);
       }
-      .container-fluid {
-        max-width: 100% !important;
-        overflow-x: hidden !important;
+
+      #sidebar.active {
+        transform: translateX(0);
       }
-      body {
-        overflow-x: hidden !important;
-        width: 100% !important;
+
+      .sidebar-overlay.active {
+        background: rgba(0, 0, 0, 0.3);
+      }
+    }
+    @media (min-width: 576px) {
+      .mobile-menu-btn {
+        display: none !important;
       }
     }
     @media (min-width: 576px) and (max-width: 767.98px) {
@@ -311,6 +434,18 @@ $stmt->close();
       padding: 0.25rem;
     }
     @media (max-width: 991.98px) {
+      .mobile-menu-btn {
+        display: block;
+        margin-right: 10px;
+      }
+      
+      .elecom-logo {
+        margin-left: 0;
+      }
+      
+      .electoral-commission-title {
+        font-size: 1.1rem !important;
+      }
       .navbar .container-fluid {
         flex-direction: column;
         align-items: flex-start;
@@ -405,6 +540,7 @@ $stmt->close();
       .sidebar-overlay.active {
         display: block;
       }
+
     }
     @media (min-width: 992px) {
       body {
@@ -467,6 +603,22 @@ $stmt->close();
         overflow-x: hidden !important;
       }
     }
+    .mobile-menu-btn {
+      display: none;
+      background: transparent;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    
+    .mobile-menu-btn:hover {
+      transform: scale(1.1);
+    }
+    
+    .mobile-menu-btn:active {
+      transform: scale(0.95);
+    }
   </style>
 </head>
 <body>
@@ -474,18 +626,10 @@ $stmt->close();
   <nav class="navbar navbar-expand-lg position-relative" style="background: #2563eb; height: 60px;">
     <div class="container-fluid">
       <div class="d-flex align-items-center">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
+        </button>
         <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
-        <a href="profile.php" class="mobile-profile-container">
-          <?php if (!empty($user_profile['profile_picture'])): ?>
-            <img src="../uploads/profile_pictures/<?php echo htmlspecialchars($user_profile['profile_picture']); ?>" 
-                 alt="Profile Picture" 
-                 class="mobile-profile-pic">
-          <?php else: ?>
-            <div class="mobile-profile-pic mobile-profile-pic-default">
-              <i class="bi bi-person-circle"></i>
-            </div>
-          <?php endif; ?>
-        </a>
         <span class="navbar-brand mb-0 h1 electoral-commission-title" style="font-size:1.5rem;">Electoral Commission</span>
       </div>
       <div class="profile-button">
@@ -562,7 +706,7 @@ $stmt->close();
         <div class="row g-4">
           <!-- Function Cards -->
           <div class="col-12 col-lg-8">
-            <div class="row g-4 justify-content-center justify-content-lg-start">
+            <div class="row g-4 justify-content-center">
               <!-- Dashboard Cards -->
               <div class="col-12 col-md-6">
                 <div class="dashboard-card p-4">
@@ -603,7 +747,7 @@ $stmt->close();
             </div>
           </div>
           <!-- Calendar Card -->
-          <div class="col-12 col-lg-4">
+          <div class="col-12 col-lg-4 d-none d-lg-block">
             <div class="calendar-card">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">Calendar</h5>
@@ -777,35 +921,28 @@ $stmt->close();
     currentYear = today.getFullYear();
     renderCalendar(currentMonth, currentYear);
   };
-  // Responsive sidebar burger menu
-  const burgerMenuBtn = document.getElementById('burgerMenuBtn');
+  // Mobile menu functionality
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebar = document.getElementById('sidebar');
   const sidebarOverlay = document.getElementById('sidebarOverlay');
-  const closeSidebarBtn = document.getElementById('closeSidebarBtn');
 
-  function openSidebarMobile() {
-    sidebar.classList.add('active');
-    sidebarOverlay.classList.add('active');
-    if (closeSidebarBtn) closeSidebarBtn.style.display = 'inline-block';
-  }
-  function closeSidebarMobile() {
+  mobileMenuBtn.addEventListener('click', function() {
+    sidebar.classList.toggle('active');
+    sidebarOverlay.classList.toggle('active');
+  });
+
+  sidebarOverlay.addEventListener('click', function() {
     sidebar.classList.remove('active');
     sidebarOverlay.classList.remove('active');
-    if (closeSidebarBtn) closeSidebarBtn.style.display = 'none';
-  }
-  if (burgerMenuBtn) {
-    burgerMenuBtn.onclick = openSidebarMobile;
-  }
-  if (sidebarOverlay) {
-    sidebarOverlay.onclick = closeSidebarMobile;
-  }
-  if (closeSidebarBtn) {
-    closeSidebarBtn.onclick = closeSidebarMobile;
-  }
-  // Hide sidebar on resize if needed
-  window.addEventListener('resize', function() {
-    if (window.innerWidth > 991.98) {
-      closeSidebarMobile();
+  });
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', function(event) {
+    if (window.innerWidth <= 991.98) {
+      if (!sidebar.contains(event.target) && !mobileMenuBtn.contains(event.target)) {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+      }
     }
   });
   // Header fade effect on scroll
