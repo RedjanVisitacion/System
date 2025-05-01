@@ -455,6 +455,7 @@ $stmt->close();
       .electoral-commission-title {
         font-size: 1.1rem !important;
       }
+
       .navbar .container-fluid {
         flex-direction: column;
         align-items: flex-start;
@@ -462,14 +463,17 @@ $stmt->close();
         padding-right: 56px !important;
         position: relative;
       }
+
       .navbar .d-flex.align-items-center {
         flex-direction: row;
         align-items: center;
         gap: 0.5rem;
       }
+
       .navbar-brand {
         font-size: 1.1rem !important;
       }
+
       #sidebar {
         position: fixed;
         left: 0;
@@ -484,11 +488,11 @@ $stmt->close();
         background: linear-gradient(135deg, #232526 0%, #2563eb 100%) !important;
         padding-top: 1.5rem !important;
       }
+
       #sidebar.active {
         transform: translateX(0);
-        top: 60px;
-        height: calc(100vh - 60px);
       }
+
       .main-content {
         margin-left: 0;
         margin-top: 1.5rem;
@@ -500,18 +504,21 @@ $stmt->close();
         padding-left: 0 !important;
         padding-right: 0 !important;
       }
+
       .main-content .row.g-4 {
         flex-direction: column;
         align-items: center;
         width: 100%;
         margin: 0;
       }
+
       .dashboard-card, .calendar-card {
         width: 95vw;
         max-width: 400px;
         margin-left: auto;
         margin-right: auto;
       }
+
       .col-12, .col-lg-8, .col-lg-4 {
         width: 100% !important;
         max-width: 100% !important;
@@ -519,23 +526,20 @@ $stmt->close();
         padding-left: 0 !important;
         padding-right: 0 !important;
       }
+
       .calendar-card {
         margin-top: 1.5rem;
       }
+
       #sidebar .nav-link {
         font-size: 1.1rem;
         padding: 16px 18px;
       }
+
       #sidebar .sidebar-header {
         font-size: 1.1rem;
       }
-      #closeSidebarBtn {
-        display: inline-block !important;
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 1301;
-      }
+
       .sidebar-overlay {
         display: none;
         position: fixed;
@@ -546,10 +550,10 @@ $stmt->close();
         background: rgba(0,0,0,0.25);
         z-index: 1100;
       }
+
       .sidebar-overlay.active {
         display: block;
       }
-
     }
     @media (min-width: 992px) {
       body {
@@ -663,7 +667,6 @@ $stmt->close();
         <div class="mb-4 d-flex align-items-center justify-content-between position-relative">
           <span class="fw-bold sidebar-header sidebar-text">Dashboard</span>
           <button id="sidebarToggle" class="btn btn-secondary btn-sm rounded-circle d-none d-md-inline ms-auto"><i id="sidebarToggleIcon" class="bi bi-chevron-left"></i></button>
-          <button class="btn btn-secondary btn-sm rounded-circle d-inline d-md-none ms-2" id="closeSidebarBtn" style="display:none; position:absolute; top:10px; right:10px;"><i class="bi bi-x"></i></button>
         </div>
         <ul class="nav flex-column gap-2">
           <li class="nav-item">
