@@ -554,7 +554,7 @@
     </div>
     <div class="login-form-card">
       <div class="mb-2">
-        <h1 class="welcome-title">Welcome to <span class="highlight">ELECOM</span></h1>
+        <h1 class="welcome-title">Welcome to <span class="highlight">ELECOM </span></h1>
         <span class="subtitle">‎ </span>
        
       </div>
