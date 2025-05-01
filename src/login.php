@@ -338,7 +338,7 @@
         margin: 0 auto;
         text-align: center;
         float: none;
-        max-width: 90px;
+        max-width: 100px;
       }
       .login-form-card {
         width: 100%;
@@ -379,7 +379,7 @@
         padding: 30px;
       }
       .login-form-card {
-        width: 90%;
+        width: 100%;
         max-width: 320px;
         padding: 32px 24px;
       }
@@ -391,10 +391,13 @@
       .login-page-container {
         margin: 0;
         border-radius: 20px;
-        max-width: 98vw;
+        max-width: 100%;
         gap: 0;
         padding: 0;
         align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(8px);
       }
       .login-logo-side {
         padding: 0;
@@ -404,20 +407,27 @@
         align-items: center;
         display: flex;
         text-align: center;
-        background: transparent;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        width: 100%;
       }
       .elecom-logo-img {
         display: block;
         margin: 0 auto;
         text-align: center;
         float: none;
-        max-width: 60px;
+        max-width: 120px;
       }
       .login-form-card {
         padding: 0 0 24px 0;
         border-radius: 0 0 20px 20px;
         margin: 0;
-        box-shadow: 0 2px 16px rgba(37,99,235,0.08);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(8px);
+        width: 100%;
       }
       .welcome-title {
         font-size: 1.75rem;
@@ -426,17 +436,28 @@
     @media (max-width: 480px) {
       .login-page-container {
         padding: 8px 15px;
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(8px);
+        width: 100%;
       }
       .login-form-card {
         padding: 15px;
-        width: 80%;
-        max-width: 80%;
+        width: 100%;
+        max-width: 100%;
         margin: 0 auto !important;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(8px);
       }
       .login-logo-side {
-        width: 80%;
-        max-width: 80%;
+        width: 100%;
+        max-width: 100%;
         padding: 10px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       }
       .welcome-title {
         font-size: 1.1rem;
