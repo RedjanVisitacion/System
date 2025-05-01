@@ -1,6 +1,4 @@
-<?php
-// No PHP logic needed here for login form
-?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
