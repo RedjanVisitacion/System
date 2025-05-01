@@ -580,7 +580,7 @@ $stmt->close();
     }
     @media (max-width: 575.98px) {
       .modal-dialog {
-        margin-top: 30px;
+        margin-top: 60px;
       }
     }
     .electoral-commission-title {
@@ -632,6 +632,25 @@ $stmt->close();
     .mobile-menu-btn:active {
       transform: scale(0.95);
     }
+
+    /* Add Candidate Modal Mobile Styles */
+    #addCandidateModal .modal-dialog {
+      margin-top: 80px;
+    }
+
+    #addCandidateModal .modal-content {
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    #addCandidateModal .modal-header {
+      padding: 1rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    #addCandidateModal .modal-body {
+      padding: 1.5rem;
+    }
   </style>
 </head>
 <body>
@@ -682,7 +701,7 @@ $stmt->close();
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#addCandidateModal">
+            <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#addCandidateModal" onclick="if(window.innerWidth <= 991.98){document.getElementById('sidebar').classList.remove('active');document.getElementById('sidebarOverlay').classList.remove('active');document.getElementById('mobileMenuBtn').classList.remove('active');}">
               <i class="bi bi-plus-circle"></i>
               <span class="sidebar-text">Add Candidate</span>
             </a>
