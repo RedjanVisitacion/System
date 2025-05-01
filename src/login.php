@@ -9,65 +9,85 @@
   <style>
     html, body {
       height: 100%;
+      min-height: 100vh;
+      width: 100vw;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
     body {
       min-height: 100vh;
-      background: linear-gradient(135deg, #e0e7ef 0%, #f5f7fa 100%);
+      background: linear-gradient(135deg, rgba(224, 231, 239, 0.5) 0%, rgba(245, 247, 250, 0.9) 100%),
+                  url('../img/votE.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       font-family: 'Inter', sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100vw;
+      overflow-x: hidden;
     }
     .login-page-container {
       display: flex;
-      align-items: center;
+      align-items: stretch;
       justify-content: center;
-      gap: 48px;
-      width: 900px;
-      max-width: 98vw;
+      width: 100%;
+      max-width: 900px;
       margin: 0 auto;
       background: none;
-      border-radius: 0;
-      box-shadow: none;
-      padding: 40px 32px;
+      border-radius: 28px;
+      box-shadow: 0 10px 40px rgba(60,60,100,0.1), 0 4px 12px rgba(37,99,235,0.08);
+      overflow: hidden;
     }
     .login-logo-side {
       display: flex;
       align-items: center;
       justify-content: center;
-      min-width: 260px;
-      min-height: 260px;
+      width: 40%;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(24, 113, 155, 0.9));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(255, 255, 255, 0.4);
+      padding: 40px;
+      transition: all 0.3s ease;
+    }
+    .login-logo-side:hover {
+      box-shadow: 0 15px 50px rgba(37,99,235,0.15), 0 4px 12px rgba(37,99,235,0.1);
+      transform: translateY(-3px) scale(1.01);
+      border: 1px solid rgba(255, 255, 255, 0.6);
     }
     .elecom-logo-img {
-      width: 420px;
-      height: 420px;
+      width: 100%;
+      max-width: 280px;
+      height: auto;
       object-fit: contain;
-      position: fixed;
-     
-      padding: 16px;
+      padding: 8px;
+      position: relative;
+      display: block;
+      margin: 0 auto;
     }
     .login-form-card {
-      background: #fff;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.7), rgba(24, 113, 155, 0.7));
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-start;
       align-items: center;
-      padding: 48px 28px 36px 28px;
-      box-shadow: 0 8px 32px rgba(60,60,100,0.13), 0 2px 8px rgba(37,99,235,0.10);
-      border-radius: 24px;
-      max-width: 370px;
-      width: 100%;
-      margin: 0 auto;
-      min-width: 0;
-      min-height: 420px;
+      padding: 40px 32px 32px 32px;
+      width: 60%;
+      min-height: 340px;
       position: relative;
-      transition: box-shadow 0.2s, transform 0.2s;
-      margin-right: 50px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
     .login-form-card:hover {
-      box-shadow: 0 12px 40px rgba(37,99,235,0.18), 0 2px 8px rgba(37,99,235,0.13);
-      transform: translateY(-2px) scale(1.01);
-     
+      box-shadow: 0 15px 50px rgba(37,99,235,0.15), 0 4px 12px rgba(37,99,235,0.1);
+      transform: translateY(-3px) scale(1.01);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.8), rgba(248, 250, 255, 0.8));
     }
     .welcome-title {
       font-weight: 800;
@@ -76,17 +96,19 @@
       line-height: 1.1;
       letter-spacing: 0.5px;
       text-align: center;
+      text-decoration: none;
     }
     .highlight {
       color: #2563eb;
-      background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+      background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
       text-fill-color: transparent;
       font-weight: 900;
-      text-decoration: underline wavy #2563eb33;
+      text-decoration: none;
       letter-spacing: 1px;
+      text-shadow: 0 2px 4px rgba(37,99,235,0.1);
     }
     .subtitle {
       color: #888;
@@ -100,10 +122,10 @@
       align-items: center;
       background: #f1f3f6;
       border-radius: 8px;
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       position: relative;
       border: 2px solid transparent;
-      transition: border-color 0.2s;
+      transition: all 0.3s ease;
       height: 44px;
       padding: 0;
     }
@@ -114,9 +136,9 @@
       width: 100%;
       font-size: 15px;
       color: #222;
-      padding: 0 44px 0 12px;
+      padding: 0 44px 0 16px;
       border-radius: 6px;
-      transition: background 0.2s, box-shadow 0.2s;
+      transition: all 0.3s ease;
       height: 100%;
       box-sizing: border-box;
       background: transparent;
@@ -125,6 +147,10 @@
       outline: none;
       background: #eaf1ff;
       box-shadow: 0 0 0 2px #2563eb44;
+    }
+    .input-group:hover {
+      border-color: #2563eb33;
+      background: #f8fafc;
     }
     .input-group.error {
       border-color: #e53935;
@@ -142,10 +168,11 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 24px;
       font-size: 14px;
-      gap: 8px;
+      gap: 16px;
       width: 100%;
+      padding: 0 4px;
     }
     .forgot-link {
       color: #2563eb;
@@ -160,21 +187,31 @@
     }
     .btn-primary {
       width: 100%;
-      background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+      background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
       color: #fff;
       border: none;
-      padding: 14px;
-      border-radius: 10px;
-      font-size: 19px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
       margin-bottom: 12px;
       cursor: pointer;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      font-weight: 700;
-      box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+      transition: all 0.3s ease;
+      font-weight: 600;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.15);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
+      height: 44px;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(90deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(37,99,235,0.2);
+    }
+    .btn-primary:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 8px rgba(37,99,235,0.15);
     }
     .btn-primary:disabled {
       opacity: 0.7;
@@ -219,21 +256,120 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    @media (max-width: 1200px) {
+      .login-page-container {
+        max-width: 98vw;
+        gap: 24px;
+        padding: 32px 4vw;
+      }
+      .login-logo-side {
+        max-width: 180px;
+      }
+      .login-form-card {
+        max-width: 98vw;
+      }
+    }
     @media (max-width: 900px) {
       .login-page-container {
         flex-direction: column;
-        gap: 18px;
-        padding: 18px 4vw;
-        width: 100%;
+        max-width: 500px;
+        margin: 20px auto;
       }
       .login-logo-side {
-        min-width: 0;
-        min-height: 0;
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+        padding: 30px;
+      }
+      .login-form-card {
+        width: 100%;
+        padding: 30px 24px;
       }
       .elecom-logo-img {
-        width: 120px;
-        height: 120px;
-        padding: 8px;
+        max-width: 200px;
+      }
+      .welcome-title {
+        font-size: 1.5rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
+      .input-group {
+        height: 38px;
+      }
+      .input-group input {
+        font-size: 14px;
+      }
+      .btn-primary {
+        height: 36px;
+        font-size: 15px;
+      }
+    }
+    @media (max-width: 768px) {
+      .login-page-container {
+        flex-direction: column;
+        gap: 24px;
+        padding: 24px 16px;
+      }
+      .login-logo-side {
+        width: 90%;
+        max-width: 320px;
+        margin: 0 auto 24px auto;
+        padding: 30px;
+      }
+      .login-form-card {
+        width: 90%;
+        max-width: 320px;
+        padding: 32px 24px;
+      }
+      .welcome-title {
+        font-size: 1.75rem;
+      }
+    }
+    @media (max-width: 600px) {
+      .login-page-container {
+        margin: 10px;
+        border-radius: 20px;
+      }
+      .login-logo-side {
+        padding: 20px;
+      }
+      .login-form-card {
+        padding: 20px 16px;
+      }
+      .elecom-logo-img {
+        max-width: 150px;
+      }
+    }
+    @media (max-width: 480px) {
+      .login-page-container {
+        padding: 8px 15px;
+      }
+      .login-form-card {
+        padding: 15px;
+        width: 80%;
+        max-width: 80%;
+        margin: 0 auto !important;
+      }
+      .login-logo-side {
+        width: 80%;
+        max-width: 80%;
+        padding: 10px;
+      }
+      .welcome-title {
+        font-size: 1.1rem;
+      }
+      .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+      .forgot-link {
+        margin-left: 0;
+      }
+      .input-group {
+        margin: 0 auto 16px auto;
+        width: 95%;
       }
     }
   </style>
