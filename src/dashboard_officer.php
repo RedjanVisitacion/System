@@ -1,5 +1,6 @@
 <?php
 require_once 'check_session.php';
+require_once 'connection.php'; // Make sure this is included
 
 // Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
@@ -13,7 +14,52 @@ $stmt->close();
 $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user_profile['profile_picture'])
     ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture'])
     : null;
+
+// ✅ Add Candidate Submission Logic
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'], $_POST['info'])) {
+    header('Content-Type: application/json');
+
+    $name = trim($_POST['full_name']);
+    $department = trim($_POST['department']);
+    $position = trim($_POST['position']);
+    $platform = trim($_POST['info']);
+
+    // Check if any of the fields are empty
+    if ($name === '' || $department === '' || $position === '' || $platform === '') {
+        echo json_encode(['success' => false, 'message' => 'All fields are required.']);
+        exit;
+    }
+
+    // Check if the candidate with the same name, department, and position already exists
+    $check_stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE name = ? AND department = ? AND position = ?");
+    $check_stmt->bind_param("sss", $name, $department, $position);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+
+    if ($check_result->num_rows > 0) {
+        // Candidate with this name, department, and position already exists
+        echo json_encode(['success' => false, 'message' => 'Candidate with this name, department, and position already exists.']);
+        exit;
+    }
+
+    // Insert the new candidate into the database
+    $stmt = $con->prepare("INSERT INTO candidate (name, department, position, platform) VALUES (?, ?, ?, ?)");
+    if ($stmt) {
+        $stmt->bind_param("ssss", $name, $department, $position, $platform);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Candidate added successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to insert candidate.']);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+    }
+    exit;
+}
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -985,68 +1031,137 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
   <script src="../function/dashboard.js"></script>
   <!-- Add Candidate Modal -->
   <div class="modal fade" id="addCandidateModal" tabindex="-1" aria-labelledby="addCandidateModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addCandidateModalLabel">Add Candidate</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form id="addCandidateForm">
-            <div class="row g-3">
-              <div class="col-12 col-md-6">
-                <label for="full_name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="full_name" name="full_name" required>
-              </div>
-              <div class="col-12 col-md-6">
-                <label for="section_name" class="form-label">Section Name</label>
-                <input type="text" class="form-control" id="section_name" name="section_name" required>
-              </div>
-              <div class="col-12 col-md-6">
-                <label for="candidatePosition" class="form-label">Position</label>
-                <select class="form-select" id="candidatePosition" name="position" required>
-                  <option value="">Select Position</option>
-                  <option value="president">President</option>
-                  <option value="vice_president">Vice President</option>
-                  <option value="secretary">Secretary</option>
-                  <option value="treasurer">Treasurer</option>
-                </select>
-              </div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="addCandidateModalLabel">Add Candidate</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="addCandidateForm">
+          <div class="row g-3">
+            <div class="col-12 col-md-6">
+              <label for="full_name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="full_name" name="full_name" required>
             </div>
-            <button type="submit" class="btn btn-primary w-100">Add Candidate</button>
-          </form>
-          <div id="addCandidateMsg" class="mt-2"></div>
-        </div>
+            <div class="col-12 col-md-6">
+              <label for="department" class="form-label">Department</label>
+              <select class="form-select" id="department" name="department" required>
+                <option value="">Select Department</option>
+                <option value="USG">USG</option>
+                <option value="BSIT">BSIT (SITE Officers)</option>
+                <option value="BFPT">BFPT (AFPROTECHS)</option>
+                <option value="BTLED">BTLED (PAFE)</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="candidatePosition" class="form-label">Position</label>
+              <select class="form-select" id="candidatePosition" name="position" required>
+                <option value="">Select Position</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label for="info" class="form-label">Candidate Information</label>
+              <textarea class="form-control" id="info" name="info" rows="3" placeholder="Brief background or platform..." required></textarea>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 mt-3">Add Candidate</button>
+        </form>
+        <div id="addCandidateMsg" class="mt-2"></div>
       </div>
     </div>
   </div>
+</div>
+
   <script>
-  document.getElementById('addCandidateForm').onsubmit = function(e) {
-      e.preventDefault();
-      var form = this;
-      var msg = document.getElementById('addCandidateMsg');
-      msg.textContent = '';
-      var formData = new FormData(form);
-      fetch('add_candidate.php', {
-          method: 'POST',
-          body: formData
-      })
-      .then(r => r.json())
-      .then(response => {
-          if (response.success) {
-              msg.textContent = response.message || 'Candidate added!';
-              msg.className = 'text-success mt-2';
-              form.reset();
-          } else {
-              msg.textContent = response.message || 'Error adding candidate.';
-              msg.className = 'text-danger mt-2';
-          }
-      })
-      .catch(() => {
-          msg.textContent = 'Error connecting to server.';
-          msg.className = 'text-danger mt-2';
-      });
-  };
+  const departmentSelect = document.getElementById("department");
+const positionSelect = document.getElementById("candidatePosition");
+
+const positions = {
+  USG: [
+    "President",
+    "Vice-President",
+    "General Secretary",
+    "Associate Secretary",
+    "Treasurer",
+    "Auditor",
+    "PIO",
+    "BTLED Representative",
+    "BSIT Representative",
+    "BFPT Representative"
+  ],
+  BSIT: [
+    "President",
+    "Vice-President",
+    "General Secretary",
+    "Associate Secretary",
+    "Treasurer",
+    "Auditor",
+    "PIO"
+  ],
+  BFPT: [
+    "President",
+    "Vice-President",
+    "General Secretary",
+    "Associate Secretary",
+    "Treasurer",
+    "Auditor",
+    "PIO"
+  ],
+  BTLED: [
+    "President",
+    "Vice-President",
+    "General Secretary",
+    "Associate Secretary",
+    "Treasurer",
+    "Auditor",
+    "PIO"
+  ]
+};
+
+departmentSelect.addEventListener("change", () => {
+  const dept = departmentSelect.value;
+  positionSelect.innerHTML = `<option value="">Select Position</option>`;
+  if (positions[dept]) {
+    positions[dept].forEach(pos => {
+      const option = document.createElement("option");
+      option.value = pos.toLowerCase().replace(/\s+/g, "_");
+      option.textContent = pos;
+      positionSelect.appendChild(option);
+    });
+  }
+});
+
+// Handle form submission
+document.getElementById('addCandidateForm').onsubmit = function(e) {
+  e.preventDefault();
+  var form = this;
+  var msg = document.getElementById('addCandidateMsg');
+  msg.textContent = '';
+  var formData = new FormData(form);
+  fetch('dashboard_officer.php', {
+    method: 'POST',
+    body: formData
+  })
+  .then(r => r.json())
+  .then(response => {
+    if (response.success) {
+      msg.textContent = response.message || 'Candidate added successfully!';
+      msg.className = 'text-success mt-2';
+      form.reset();  // Reset the form after successful submission
+    } else {
+      msg.textContent = response.message || 'Error adding candidate.';
+      msg.className = 'text-danger mt-2';
+    }
+  })
+  .catch(() => {
+    msg.textContent = 'Error connecting to server.';
+    msg.className = 'text-danger mt-2';
+  });
+};
+
+
+  //Sidebar Function
   document.getElementById('sidebarToggle').onclick = function() {
     var sidebar = document.getElementById('sidebar');
     var icon = document.getElementById('sidebarToggleIcon');

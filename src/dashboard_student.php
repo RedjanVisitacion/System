@@ -1093,6 +1093,6 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         updateTotalVotesCast();
       }, 30000);
     });
-  </script>
+L  </script>
 </body>
 </html>
