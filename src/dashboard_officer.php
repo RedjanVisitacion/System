@@ -17,46 +17,46 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
 
 // ✅ Add Candidate Submission Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'], $_POST['info'])) {
-    header('Content-Type: application/json');
+  header('Content-Type: application/json');
 
-    $name = trim($_POST['full_name']);
-    $department = trim($_POST['department']);
-    $position = trim($_POST['position']);
-    $platform = trim($_POST['info']);
+  $name = trim($_POST['full_name']);
+  $department = trim($_POST['department']);
+  $position = ucwords(strtolower(trim($_POST['position']))); // Capitalize only the position
+  $platform = trim($_POST['info']);
 
-    // Check if any of the fields are empty
-    if ($name === '' || $department === '' || $position === '' || $platform === '') {
-        echo json_encode(['success' => false, 'message' => 'All fields are required.']);
-        exit;
-    }
+  // Check if any of the fields are empty
+  if ($name === '' || $department === '' || $position === '' || $platform === '') {
+      echo json_encode(['success' => false, 'message' => 'All fields are required.']);
+      exit;
+  }
 
-    // Check if the candidate with the same name, department, and position already exists
-    $check_stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE name = ? AND department = ? AND position = ?");
-    $check_stmt->bind_param("sss", $name, $department, $position);
-    $check_stmt->execute();
-    $check_result = $check_stmt->get_result();
+  // Check if the candidate already exists
+  $check_stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE name = ? AND department = ? AND position = ?");
+  $check_stmt->bind_param("sss", $name, $department, $position);
+  $check_stmt->execute();
+  $check_result = $check_stmt->get_result();
 
-    if ($check_result->num_rows > 0) {
-        // Candidate with this name, department, and position already exists
-        echo json_encode(['success' => false, 'message' => 'Candidate with this name, department, and position already exists.']);
-        exit;
-    }
+  if ($check_result->num_rows > 0) {
+      echo json_encode(['success' => false, 'message' => 'Candidate with this name, department, and position already exists.']);
+      exit;
+  }
 
-    // Insert the new candidate into the database
-    $stmt = $con->prepare("INSERT INTO candidate (name, department, position, platform) VALUES (?, ?, ?, ?)");
-    if ($stmt) {
-        $stmt->bind_param("ssss", $name, $department, $position, $platform);
-        if ($stmt->execute()) {
-            echo json_encode(['success' => true, 'message' => 'Candidate added successfully.']);
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Failed to insert candidate.']);
-        }
-        $stmt->close();
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Database error.']);
-    }
-    exit;
+  // Insert candidate
+  $stmt = $con->prepare("INSERT INTO candidate (name, department, position, platform) VALUES (?, ?, ?, ?)");
+  if ($stmt) {
+      $stmt->bind_param("ssss", $name, $department, $position, $platform);
+      if ($stmt->execute()) {
+          echo json_encode(['success' => true, 'message' => 'Candidate added successfully.']);
+      } else {
+          echo json_encode(['success' => false, 'message' => 'Failed to insert candidate.']);
+      }
+      $stmt->close();
+  } else {
+      echo json_encode(['success' => false, 'message' => 'Database error.']);
+  }
+  exit;
 }
+
 ?>
 
 
@@ -1094,14 +1094,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
             <input type="text" class="form-control" id="searchCandidate" placeholder="Search Candidate">
           </div>
 
-          <!-- Table -->
-          <div class="table-responsive">
+          <!-- Table with scrollable body -->
+          <div style="max-height: 300px; overflow-y: auto;">
             <table class="table table-bordered table-hover" id="candidateTable">
-              <thead class="table-light">
+              <thead class="table-light" style="position: sticky; top: 0; background-color: white; z-index: 1;">
                 <tr>
-                  <th>
-                    <input type="checkbox" id="selectAllCheckbox"> Select All
-                  </th>
+                  <th><input type="checkbox" id="selectAllCheckbox"> Select All</th>
                   <th>Name</th>
                   <th>Position</th>
                   <th>Department</th>
@@ -1124,71 +1122,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
 
 
   <script>
-  const departmentSelect = document.getElementById("department");
+ const departmentSelect = document.getElementById("department");
 const positionSelect = document.getElementById("candidatePosition");
 
-const positions = {
-  USG: [
-    "President",
-    "Vice-President",
-    "General Secretary",
-    "Associate Secretary",
-    "Treasurer",
-    "Auditor",
-    "PIO",
-    "BTLED Representative",
-    "BSIT Representative",
-    "BFPT Representative"
-  ],
-  BSIT: [
-    "President",
-    "Vice-President",
-    "General Secretary",
-    "Associate Secretary",
-    "Treasurer",
-    "Auditor",
-    "PIO"
-  ],
-  BFPT: [
-    "President",
-    "Vice-President",
-    "General Secretary",
-    "Associate Secretary",
-    "Treasurer",
-    "Auditor",
-    "PIO"
-  ],
-  BTLED: [
-    "President",
-    "Vice-President",
-    "General Secretary",
-    "Associate Secretary",
-    "Treasurer",
-    "Auditor",
-    "PIO"
-  ]
-};
+const basePositions = [
+  "President",
+  "Vice-President",
+  "General Secretary",
+  "Associate Secretary",
+  "Treasurer",
+  "Auditor",
+  "PIO"
+];
 
+const usgRepresentatives = [
+  "BTLED Representative",
+  "BSIT Representative",
+  "BFPT Representative"
+];
+
+// Populate positions based on selected department
 departmentSelect.addEventListener("change", () => {
   const dept = departmentSelect.value;
   positionSelect.innerHTML = `<option value="">Select Position</option>`;
-  if (positions[dept]) {
-    positions[dept].forEach(pos => {
+
+  if (dept) {
+    // Add base positions for any department
+    basePositions.forEach(pos => {
       const option = document.createElement("option");
-      option.value = pos.toLowerCase().replace(/\s+/g, "_");
+      option.value = pos; // Keep original casing
       option.textContent = pos;
       positionSelect.appendChild(option);
     });
+
+    // Add representative positions only for USG
+    if (dept === "USG") {
+      usgRepresentatives.forEach(rep => {
+        const option = document.createElement("option");
+        option.value = rep; // Keep original casing
+        option.textContent = rep;
+        positionSelect.appendChild(option);
+      });
+    }
   }
 });
 
 // Handle form submission
 document.getElementById('addCandidateForm').onsubmit = function(e) {
   e.preventDefault();
-  var form = this;
-  var msg = document.getElementById('addCandidateMsg');
+
+  const form = this;
+  const msg = document.getElementById('addCandidateMsg');
   msg.textContent = '';
-  var formData = new FormData(form);
+  msg.className = '';
+
+  const formData = new FormData(form);
+
   fetch('dashboard_officer.php', {
     method: 'POST',
     body: formData
@@ -1198,7 +1187,8 @@ document.getElementById('addCandidateForm').onsubmit = function(e) {
     if (response.success) {
       msg.textContent = response.message || 'Candidate added successfully!';
       msg.className = 'text-success mt-2';
-      form.reset();  // Reset the form after successful submission
+      form.reset();  // Clear form on success
+      positionSelect.innerHTML = '<option value="">Select Position</option>'; // Reset positions
     } else {
       msg.textContent = response.message || 'Error adding candidate.';
       msg.className = 'text-danger mt-2';
@@ -1209,6 +1199,7 @@ document.getElementById('addCandidateForm').onsubmit = function(e) {
     msg.className = 'text-danger mt-2';
   });
 };
+
 
 
 
@@ -1235,7 +1226,7 @@ function loadCandidateTable(searchQuery = '') {
       if (data.success && Array.isArray(data.candidates) && data.candidates.length > 0) {
         tableBody.innerHTML = '';
         data.candidates.forEach(candidate => {
-          if (!candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) return; // Filter by search
+          if (!candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
 
           const row = document.createElement('tr');
           row.innerHTML = `
@@ -1247,7 +1238,6 @@ function loadCandidateTable(searchQuery = '') {
           tableBody.appendChild(row);
         });
 
-        // Handle selecting/unselecting individual candidates
         document.querySelectorAll('.candidateCheckbox').forEach(checkbox => {
           checkbox.addEventListener('change', updateSelectedCandidates);
         });
@@ -1275,7 +1265,7 @@ selectAllCheckbox.addEventListener('change', () => {
   checkboxes.forEach(checkbox => {
     checkbox.checked = selectAllCheckbox.checked;
   });
-  updateSelectedCandidates(); // Update remove button state based on selection
+  updateSelectedCandidates();
 });
 
 // Update selected candidates and enable/remove the remove button
@@ -1285,7 +1275,7 @@ function updateSelectedCandidates() {
     selectedCandidates.push(checkbox.getAttribute('data-id'));
   });
 
-  selectedInput.value = selectedCandidates.join(',');
+  selectedInput.value = JSON.stringify(selectedCandidates); // Store as JSON array
   removeBtn.disabled = selectedCandidates.length === 0;
 }
 
@@ -1297,8 +1287,24 @@ document.getElementById('removeCandidateForm').onsubmit = function (e) {
   msg.className = '';
   removeBtn.disabled = true;
 
-  const formData = new FormData(this);
-  formData.append('candidate_id', selectedInput.value); // Append selected candidates
+  let selectedIds;
+  try {
+    selectedIds = JSON.parse(selectedInput.value || '[]');
+  } catch (error) {
+    msg.textContent = 'Invalid selection.';
+    msg.className = 'text-danger mt-2';
+    removeBtn.disabled = false;
+    return;
+  }
+
+  if (selectedIds.length === 0) {
+    msg.textContent = 'No candidates selected.';
+    msg.className = 'text-danger mt-2';
+    return;
+  }
+
+  const formData = new FormData();
+  selectedIds.forEach(id => formData.append('candidate_id[]', id));
 
   fetch('remove_candidate.php', {
     method: 'POST',
@@ -1311,7 +1317,8 @@ document.getElementById('removeCandidateForm').onsubmit = function (e) {
         msg.className = 'text-success mt-2';
         this.reset();
         selectedInput.value = '';
-        loadCandidateTable(); // Refresh table
+        selectAllCheckbox.checked = false;
+        loadCandidateTable();
       } else {
         msg.textContent = response.message || 'Error removing candidate(s).';
         msg.className = 'text-danger mt-2';

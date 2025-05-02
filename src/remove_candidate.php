@@ -2,40 +2,54 @@
 require_once 'check_session.php';
 require_once 'connection.php';
 
+header('Content-Type: application/json');
 
-// ✅ Remove Candidate Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_id'])) {
-  header('Content-Type: application/json');
-  
-  $candidate_id = trim($_POST['candidate_id']);
 
-  if (empty($candidate_id)) {
-      echo json_encode(['success' => false, 'message' => 'No candidate selected.']);
-      exit;
-  }
+    $candidateIds = $_POST['candidate_id'];
 
-  // Ensure candidate_id is numeric to avoid injection
-  if (!ctype_digit($candidate_id)) {
-      echo json_encode(['success' => false, 'message' => 'Invalid candidate ID.']);
-      exit;
-  }
+    // Ensure $candidateIds is an array
+    if (!is_array($candidateIds)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid input format.']);
+        exit;
+    }
 
-  // Prepare and execute the delete query
-  $stmt = $con->prepare("DELETE FROM candidate WHERE candidate_id = ?");
-  $stmt->bind_param("i", $candidate_id);
+    // Filter and sanitize the IDs to allow only digits
+    $filteredIds = array_filter($candidateIds, fn($id) => ctype_digit($id));
+    
+    if (empty($filteredIds)) {
+        echo json_encode(['success' => false, 'message' => 'No valid candidate IDs provided.']);
+        exit;
+    }
 
-  if ($stmt->execute()) {
-      if ($stmt->affected_rows > 0) {
-          echo json_encode(['success' => true, 'message' => 'Candidate removed successfully.']);
-      } else {
-          echo json_encode(['success' => false, 'message' => 'Candidate not found or already removed.']);
-      }
-  } else {
-      echo json_encode(['success' => false, 'message' => 'Failed to remove candidate.']);
-  }
+    // Create a dynamic SQL query with placeholders
+    $placeholders = implode(',', array_fill(0, count($filteredIds), '?'));
+    $types = str_repeat('i', count($filteredIds)); // all IDs are integers
 
-  $stmt->close();
-  exit;
+    $stmt = $con->prepare("DELETE FROM candidate WHERE candidate_id IN ($placeholders)");
+    if (!$stmt) {
+        echo json_encode(['success' => false, 'message' => 'Failed to prepare statement.']);
+        exit;
+    }
+
+    // Bind parameters dynamically
+    $stmt->bind_param($types, ...$filteredIds);
+
+    if ($stmt->execute()) {
+        $deletedCount = $stmt->affected_rows;
+        if ($deletedCount > 0) {
+            echo json_encode(['success' => true, 'message' => "$deletedCount candidate(s) removed successfully."]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No candidates were removed (not found).']);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to execute removal.']);
+    }
+
+    $stmt->close();
+    exit;
 }
 
+echo json_encode(['success' => false, 'message' => 'Invalid request.']);
+exit;
 ?>
