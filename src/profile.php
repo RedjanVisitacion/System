@@ -199,43 +199,47 @@ $stmt->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .profile-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            padding: 2.5rem 2rem;
-            margin-top: 2rem;
-            max-width: 500px;
+            background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(37,99,235,0.10);
+            padding: 2.8rem 2.2rem 2.2rem 2.2rem;
+            margin-top: 2.5rem;
+            width: 100%;
+            max-width: 430px;
             margin-left: auto;
             margin-right: auto;
         }
-        .profile-avatar {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin: 0 auto 1.5rem;
-            position: relative;
-            overflow: visible;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        @media (min-width: 992px) {
+            .profile-card {
+                max-width: 650px;
+                padding: 3rem 2.5rem 2.5rem 2.5rem;
+            }
         }
         @media (max-width: 575.98px) {
             .profile-card {
-                padding: 1.2rem 0.5rem;
+                padding: 1.5rem 1rem 1.2rem 1rem;
                 margin-top: 1rem;
-                max-width: 98vw;
+                border-radius: 16px;
             }
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1.2rem;
+            position: relative;
+            background: linear-gradient(135deg, #2563eb 40%, #60a5fa 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 24px rgba(37,99,235,0.10);
+            border: 4px solid #fff;
+        }
+        @media (max-width: 575.98px) {
             .profile-avatar {
                 width: 100px;
                 height: 100px;
                 margin-bottom: 1rem;
-            }
-            .btn-edit-avatar {
-                bottom: 2px;
-                right: 2px;
-                font-size: 0.95rem;
-                padding: 0.3rem 0.4rem;
             }
         }
         .profile-avatar img {
@@ -243,117 +247,237 @@ $stmt->close();
             height: 100%;
             object-fit: cover;
             border-radius: 50%;
-            display: block;
-        }
-        .profile-avatar .upload-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(0,0,0,0.6);
-            color: white;
-            padding: 8px;
-            font-size: 0.9rem;
-            text-align: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .profile-avatar:hover .upload-overlay {
-            opacity: 1;
-        }
-        .form-control:focus {
-            border-color: #0d6efd;
-            box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
-        }
-        .btn-back-header {
-            background: linear-gradient(90deg,rgb(149, 155, 168) 60%,rgba(104, 105, 107, 0.76) 100%);
-            color: #fff !important;
-            border-radius: 30px;
-            font-size: 1.08rem;
-            box-shadow: 0 2px 8px rgba(56, 59, 63, 0.1);
-            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-            border: none;
-            outline: none;
-            text-decoration: none !important;
-            margin-left: -720px;
-        }
-        .btn-back-header:hover, .btn-back-header:focus {
-            background: linear-gradient(90deg,rgba(80, 81, 82, 0.38) 60%,rgb(132, 134, 138) 100%);
-            color: #fff !important;
-            box-shadow: 0 4px 16px rgba(37,99,235,0.18);
-            transform: translateY(-2px) scale(1.03);
-            text-decoration: none !important;
+            border: 3px solid #2563eb;
+            background: #fff;
         }
         .btn-edit-avatar {
             position: absolute;
-            bottom: 10px;
-            right: 10px;
-            border-radius: 50%;
-            padding: 0.5rem 0.6rem;
-            font-size: 1.1rem;
-            z-index: 2;
-            background: #fff;
-            color: #2563eb;
-            border: 1px solid #e0e7ef;
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-        }
-        .btn-edit-avatar:hover, .btn-edit-avatar:focus {
-            background: #2563eb;
-            color: #fff;
-            box-shadow: 0 4px 16px rgba(37,99,235,0.18);
-        }
-        #editPhotoOptions.dropdown-menu {
-            display: block;
-            opacity: 1;
-            pointer-events: auto;
-            min-width: 170px;
-            border-radius: 12px;
-            margin-top: 16px;
+            bottom: -18px;
             left: 50%;
             transform: translateX(-50%);
-            box-shadow: 0 8px 32px rgba(37,99,235,0.12);
-            background: #fff;
+            border-radius: 50%;
+            padding: 0.6rem 0.7rem;
+            font-size: 1.2rem;
+            z-index: 2;
+            background: #2563eb;
+            color: #fff;
+            border: none;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        @media (max-width: 575.98px) {
+            .btn-edit-avatar {
+                bottom: -12px;
+                padding: 0.4rem 0.5rem;
+                font-size: 1rem;
+            }
+        }
+        .profile-divider {
+            width: 60px;
+            height: 3px;
+            background: #2563eb;
+            border-radius: 2px;
+            margin: 2.2rem auto;
+            opacity: 0.18;
+        }
+        @media (max-width: 575.98px) {
+            .profile-divider {
+                margin: 1.5rem auto;
+            }
+        }
+        .profile-card h4 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.2rem;
+        }
+        @media (max-width: 575.98px) {
+            .profile-card h4 {
+                font-size: 1.2rem;
+            }
+        }
+        .profile-card p.text-muted {
+            font-size: 1.08rem;
+            margin-bottom: 0.5rem;
+        }
+        @media (max-width: 575.98px) {
+            .profile-card p.text-muted {
+                font-size: 1rem;
+            }
+        }
+        .profile-form-row {
+            margin-bottom: 1.1rem;
+        }
+        @media (max-width: 575.98px) {
+            .profile-form-row {
+                margin-bottom: 0.8rem;
+            }
+        }
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+        }
+        .form-control, .form-select {
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            font-size: 1.04rem;
+            box-shadow: none;
             border: 1px solid #e5e7eb;
-            z-index: 1055;
-            position: absolute;
-            top: 100%;
         }
-        #editPhotoOptions.d-none {
-            display: none !important;
+        @media (max-width: 575.98px) {
+            .form-control, .form-select {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.95rem;
+            }
         }
-        #editPhotoOptions .dropdown-item {
-            border-radius: 8px;
-            transition: background 0.15s, color 0.15s;
-            font-size: 1rem;
-            padding: 0.5rem 1rem;
+        .profile-password-section {
+            margin-top: 2.2rem;
+            padding-top: 1.2rem;
+            border-top: 1.5px solid #e5e7eb;
         }
-        #editPhotoOptions .dropdown-item:hover, #editPhotoOptions .dropdown-item:focus {
-            background: #f1f5f9;
+        @media (max-width: 575.98px) {
+            .profile-password-section {
+                margin-top: 1.5rem;
+                padding-top: 1rem;
+            }
+        }
+        .profile-password-section h6 {
+            font-size: 1.08rem;
+            font-weight: 600;
             color: #2563eb;
+            margin-bottom: 1.1rem;
+            letter-spacing: 0.5px;
         }
-        #editPhotoOptions .dropdown-item.text-danger:hover {
-            background: #fee2e2;
-            color: #dc2626;
+        @media (max-width: 575.98px) {
+            .profile-password-section h6 {
+                font-size: 1rem;
+                margin-bottom: 0.8rem;
+            }
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+            border: none;
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 0.7rem 0;
+            margin-top: 0.7rem;
+            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        @media (max-width: 575.98px) {
+            .btn-primary {
+                font-size: 1rem;
+                padding: 0.6rem 0;
+                margin-top: 0.5rem;
+            }
+        }
+        .alert {
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 575.98px) {
+            .alert {
+                padding: 0.8rem;
+                margin-bottom: 1rem;
+                font-size: 0.95rem;
+            }
+        }
+        .form-text {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+        @media (max-width: 575.98px) {
+            .form-text {
+                font-size: 0.8rem;
+            }
+        }
+        .row.g-3 {
+            margin: 0 -0.5rem;
+        }
+        .row.g-3 > * {
+            padding: 0 0.5rem;
+        }
+        @media (max-width: 575.98px) {
+            .row.g-3 {
+                margin: 0 -0.3rem;
+            }
+            .row.g-3 > * {
+                padding: 0 0.3rem;
+            }
         }
         .simple-back-btn {
-            margin-right: 10px;
+            margin-left: 10px;
+            position: static;
+            display: inline-flex;
+        }
+        @media (min-width: 992px) {
+            .simple-back-btn {
+                position: absolute;
+                left: 10px;
+                top: 10px;
+                margin-left: 0;
+                margin-bottom: 0;
+                z-index: 10;
+            }
+            .profile-card {
+                position: relative;
+            }
+        }
+        .navbar {
+            position: relative;
+            min-height: 60px;
+        }
+        .back-btn-container {
+            position: relative;
+            margin: 10px;
+        }
+        @media (max-width: 575.98px) {
+            .navbar {
+                min-height: 45px;
+                padding: 0;
+            }
+            .back-btn-container {
+                margin: 5px;
+            }
+            .back-btn-container .btn {
+                padding: 0.3rem 0.8rem;
+                font-size: 0.9rem;
+            }
+            .back-btn-container .btn i {
+                font-size: 0.9rem;
+            }
+        }
+        @media (min-width: 992px) {
+            .back-btn-container {
+                position: absolute;
+                left: 10px;
+                top: 10px;
+                margin: 0;
+            }
+            .navbar {
+                padding-left: 60px;
+            }
         }
     </style>
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-dark bg-primary shadow-sm sticky-top" style="min-height:60px; z-index: 1050;">
-        <div class="container d-flex justify-content-start">
-            <a href="dashboard_officer.php" class="btn btn-outline-secondary btn-sm bg-white text-dark border-0 d-flex align-items-center gap-2 px-2 py-1 simple-back-btn" style=" border-radius: 50px;">
+    <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:60px; z-index: 1050;">
+        <div class="back-btn-container">
+            <a href="dashboard_officer.php" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
                 <i class="bi bi-arrow-left fs-6"></i>
                 <span class="fw-semibold" style="font-size:1rem;">Back</span>
             </a>
+        </div>
+        <div class="container d-flex justify-content-start">
         </div>
     </nav>
 
     <div class="container py-4">
         <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
+            <div class="col-12 col-md-10 col-lg-8">
                 <div class="profile-card">
                     <div class="text-center mb-4">
                         <div class="profile-avatar position-relative mx-auto">
@@ -366,8 +490,13 @@ $stmt->close();
                                 <i class="bi bi-pencil"></i>
                             </button>
                         </div>
-                        <h4 class="mb-1 mt-3"><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></h4>
-                        <p class="text-muted"><?php echo htmlspecialchars($user['role']); ?></p>
+                        <div class="profile-divider"></div>
+                        <h4 class="mb-1 mt-3 text-center fw-bold">
+                            <?php echo htmlspecialchars($user['full_name'] ?? ''); ?>
+                        </h4>
+                        <p class="text-muted text-center mb-4">
+                            <?php echo htmlspecialchars($user['role']); ?>
+                        </p>
                     </div>
 
                     <?php if (!empty($errors)): ?>
@@ -388,64 +517,60 @@ $stmt->close();
 
                     <form method="POST" action="" enctype="multipart/form-data">
                         <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*" class="d-none">
-                        
-                        <div class="mb-3">
-                            <label for="full_name" class="form-label">Full Name</label>
-                            <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>">
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6 profile-form-row">
+                                <label for="full_name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>">
+                            </div>
+                            <div class="col-12 col-md-6 profile-form-row">
+                                <label for="section_name" class="form-label">Section Name</label>
+                                <input type="text" class="form-control" id="section_name" name="section_name" value="<?php echo htmlspecialchars($user['section_name'] ?? ''); ?>">
+                            </div>
+                            <div class="col-12 col-md-6 profile-form-row">
+                                <label for="program_name" class="form-label">Program Name</label>
+                                <input type="text" class="form-control" id="program_name" name="program_name" value="<?php echo htmlspecialchars($user['program_name'] ?? ''); ?>">
+                            </div>
+                            <div class="col-12 col-md-6 profile-form-row">
+                                <label for="year_level" class="form-label">Year Level</label>
+                                <select class="form-select" id="year_level" name="year_level">
+                                    <option value="">Select Year Level</option>
+                                    <option value="1" <?php if (($user['year_level'] ?? '') == '1') echo 'selected'; ?>>1st Year</option>
+                                    <option value="2" <?php if (($user['year_level'] ?? '') == '2') echo 'selected'; ?>>2nd Year</option>
+                                    <option value="3" <?php if (($user['year_level'] ?? '') == '3') echo 'selected'; ?>>3rd Year</option>
+                                    <option value="4" <?php if (($user['year_level'] ?? '') == '4') echo 'selected'; ?>>4th Year</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 profile-form-row">
+                                <label for="gender" class="form-label">Gender</label>
+                                <select class="form-select" id="gender" name="gender">
+                                    <option value="">Select Gender</option>
+                                    <option value="Male" <?php if (($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
+                                    <option value="Female" <?php if (($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
+                                    <option value="Other" <?php if (($user['gender'] ?? '') == 'Other') echo 'selected'; ?>>Other</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-6 profile-form-row">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
+                            </div>
+                            <div class="col-12 col-md-6 profile-form-row">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="section_name" class="form-label">Section Name</label>
-                            <input type="text" class="form-control" id="section_name" name="section_name" value="<?php echo htmlspecialchars($user['section_name'] ?? ''); ?>">
+                        <div class="profile-password-section">
+                            <h6>Change Password</h6>
+                            <div class="mb-3">
+                                <label for="new_password" class="form-label">New Password</label>
+                                <input type="password" class="form-control" id="new_password" name="new_password" minlength="6">
+                                <div class="form-text">Leave blank to keep current password</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="program_name" class="form-label">Program Name</label>
-                            <input type="text" class="form-control" id="program_name" name="program_name" value="<?php echo htmlspecialchars($user['program_name'] ?? ''); ?>">
-                        </div>
-                        <div class="mb-3">
-                            <label for="year_level" class="form-label">Year Level</label>
-                            <select class="form-select" id="year_level" name="year_level">
-                                <option value="">Select Year Level</option>
-                                <option value="1" <?php if (($user['year_level'] ?? '') == '1') echo 'selected'; ?>>1st Year</option>
-                                <option value="2" <?php if (($user['year_level'] ?? '') == '2') echo 'selected'; ?>>2nd Year</option>
-                                <option value="3" <?php if (($user['year_level'] ?? '') == '3') echo 'selected'; ?>>3rd Year</option>
-                                <option value="4" <?php if (($user['year_level'] ?? '') == '4') echo 'selected'; ?>>4th Year</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="gender" class="form-label">Gender</label>
-                            <select class="form-select" id="gender" name="gender">
-                                <option value="">Select Gender</option>
-                                <option value="Male" <?php if (($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
-                                <option value="Female" <?php if (($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
-                                <option value="Other" <?php if (($user['gender'] ?? '') == 'Other') echo 'selected'; ?>>Other</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email Address</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" 
-                                   value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="new_password" class="form-label">New Password</label>
-                            <input type="password" class="form-control" id="new_password" name="new_password" 
-                                   minlength="6">
-                            <div class="form-text">Leave blank to keep current password</div>
-                        </div>
-
-                        <div class="mb-4">
-                            <label for="confirm_password" class="form-label">Confirm New Password</label>
-                            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
-                        </div>
-
-                        <div class="d-grid">
+                        <div class="d-grid mt-4">
                             <button type="submit" class="btn btn-primary">Update Profile</button>
                         </div>
                     </form>

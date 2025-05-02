@@ -694,6 +694,55 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
       margin-left: auto;
       margin-right: auto;
     }
+    .profile-card-back-btn-wrapper {
+      width: 100%;
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 1.2rem;
+      position: relative;
+      z-index: 2;
+    }
+    .profile-back-btn {
+      border-radius: 50px;
+      background: #fff;
+      color: #2563eb;
+      border: 1.5px solid #e5e7eb;
+      font-weight: 500;
+      box-shadow: 0 2px 8px rgba(37,99,235,0.06);
+      transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    }
+    .profile-back-btn:hover, .profile-back-btn:focus {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.13);
+    }
+    @media (min-width: 992px) {
+      .profile-card-back-btn-wrapper {
+        position: absolute;
+        top: 32px;
+        left: 32px;
+        width: auto;
+        margin-bottom: 0;
+      }
+      .profile-back-btn {
+        min-width: 90px;
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+      }
+    }
+    @media (max-width: 575.98px) {
+      .profile-card-back-btn-wrapper {
+        margin-bottom: 0.7rem;
+      }
+      .profile-back-btn {
+        width: 100%;
+        justify-content: center;
+        font-size: 1rem;
+        padding-left: 0.8rem;
+        padding-right: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
