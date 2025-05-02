@@ -678,7 +678,7 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
             </span>
           <?php endif; ?>
           <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70px; display:inline-block; vertical-align:middle;">
-            <?php echo !empty($user_profile['full_name']) ? htmlspecialchars($user_profile['full_name']) : htmlspecialchars($_SESSION['user_id']); ?>
+            <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
           </span>
         </a>
       </div>

@@ -22,6 +22,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $new_password = trim($_POST['new_password'] ?? '');
     $confirm_password = trim($_POST['confirm_password'] ?? '');
     $profile_picture = null;
+    $full_name = trim($_POST['full_name'] ?? '');
+    $section_name = trim($_POST['section_name'] ?? '');
+    $program_name = trim($_POST['program_name'] ?? '');
+    $year_level = trim($_POST['year_level'] ?? '');
+    $gender = trim($_POST['gender'] ?? '');
 
     // Validate email
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -97,8 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Save profile if no errors
     if (empty($errors)) {
         if ($existingProfile) {
-            $sql = "UPDATE user_profile SET email = ?, phone = ?, updated_at = CURRENT_TIMESTAMP()";
-            $params = [$email, $phone];
+            $sql = "UPDATE user_profile SET full_name = ?, section_name = ?, program_name = ?, year_level = ?, gender = ?, email = ?, phone = ?, updated_at = CURRENT_TIMESTAMP()";
+            $params = [$full_name, $section_name, $program_name, $year_level, $gender, $email, $phone];
 
             if ($profile_picture) {
                 $sql .= ", profile_picture = ?";
@@ -119,9 +124,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $stmt->close();
         } else {
-            $sql = "INSERT INTO user_profile (user_id, email, phone, profile_picture) VALUES (?, ?, ?, ?)";
+            $sql = "INSERT INTO user_profile (user_id, full_name, section_name, program_name, year_level, gender, email, phone, profile_picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
-            $stmt->bind_param("ssss", $logged_user_id, $email, $phone, $profile_picture);
+            $stmt->bind_param("sssssssss", $logged_user_id, $full_name, $section_name, $program_name, $year_level, $gender, $email, $phone, $profile_picture);
             
             if ($stmt->execute()) {
                 $success = true;
@@ -147,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch profile for display
-$stmt = $mysqli->prepare("SELECT u.user_id, u.role, u.department, up.email, up.phone, up.profile_picture, up.full_name 
+$stmt = $mysqli->prepare("SELECT u.user_id, u.role, u.department, up.email, up.phone, up.profile_picture, up.full_name, up.section_name, up.program_name, up.year_level, up.gender 
                          FROM user u 
                          LEFT JOIN user_profile up ON u.user_id = up.user_id 
                          WHERE u.user_id = ?");
@@ -283,6 +288,38 @@ $stmt->close();
                         <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*" class="d-none">
                         
                         <div class="mb-3">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="section_name" class="form-label">Section Name</label>
+                            <input type="text" class="form-control" id="section_name" name="section_name" value="<?php echo htmlspecialchars($user['section_name'] ?? ''); ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="program_name" class="form-label">Program Name</label>
+                            <input type="text" class="form-control" id="program_name" name="program_name" value="<?php echo htmlspecialchars($user['program_name'] ?? ''); ?>">
+                        </div>
+                        <div class="mb-3">
+                            <label for="year_level" class="form-label">Year Level</label>
+                            <select class="form-select" id="year_level" name="year_level">
+                                <option value="">Select Year Level</option>
+                                <option value="1" <?php if (($user['year_level'] ?? '') == '1') echo 'selected'; ?>>1st Year</option>
+                                <option value="2" <?php if (($user['year_level'] ?? '') == '2') echo 'selected'; ?>>2nd Year</option>
+                                <option value="3" <?php if (($user['year_level'] ?? '') == '3') echo 'selected'; ?>>3rd Year</option>
+                                <option value="4" <?php if (($user['year_level'] ?? '') == '4') echo 'selected'; ?>>4th Year</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" name="gender">
+                                <option value="">Select Gender</option>
+                                <option value="Male" <?php if (($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
+                                <option value="Female" <?php if (($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
+                                <option value="Other" <?php if (($user['gender'] ?? '') == 'Other') echo 'selected'; ?>>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" class="form-control" id="email" name="email" 
                                    value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
@@ -329,7 +366,7 @@ $stmt->close();
                             <i class="bi bi-camera-fill"></i> Change Photo
                         </label>
                     `;
-                }
+                };
                 reader.readAsDataURL(this.files[0]);
             }
         });
