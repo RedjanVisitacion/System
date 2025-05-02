@@ -212,13 +212,33 @@ $stmt->close();
             border-color: #0d6efd;
             box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
         }
+        .btn-back-header {
+            background: linear-gradient(90deg,rgb(149, 155, 168) 60%,rgba(104, 105, 107, 0.76) 100%);
+            color: #fff !important;
+            border-radius: 30px;
+            font-size: 1.08rem;
+            box-shadow: 0 2px 8px rgba(56, 59, 63, 0.1);
+            transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+            border: none;
+            outline: none;
+            text-decoration: none !important;
+            margin-left: -720px;
+        }
+        .btn-back-header:hover, .btn-back-header:focus {
+            background: linear-gradient(90deg,rgba(80, 81, 82, 0.38) 60%,rgb(132, 134, 138) 100%);
+            color: #fff !important;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.18);
+            transform: translateY(-2px) scale(1.03);
+            text-decoration: none !important;
+        }
     </style>
 </head>
 <body class="bg-light">
-    <nav class="navbar navbar-dark bg-primary">
-        <div class="container">
-            <a href="dashboard_officer.php" class="btn btn-link text-white text-decoration-none">
-                <i class="bi bi-arrow-left"></i> Back to Dashboard
+    <nav class="navbar navbar-dark bg-primary shadow-sm sticky-top" style="min-height:60px; z-index: 1050;">
+        <div class="container d-flex justify-content-start">
+            <a href="dashboard_officer.php" class="btn btn-outline-secondary btn-sm bg-white text-dark border-0 d-flex align-items-center gap-2 px-2 py-1 simple-back-btn" style="margin:-90px; border-radius: 50px;">
+                <i class="bi bi-arrow-left fs-6"></i>
+                <span class="fw-semibold" style="font-size:1rem;">Back</span>
             </a>
         </div>
     </nav>
