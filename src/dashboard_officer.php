@@ -9,6 +9,10 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user_profile = $result->fetch_assoc();
 $stmt->close();
+
+$profile_picture = !empty($user_profile['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user_profile['profile_picture'])
+    ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture'])
+    : null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -665,15 +669,17 @@ $stmt->close();
         <span class="navbar-brand mb-0 h1 electoral-commission-title" style="font-size:1.5rem;">Electoral Commission</span>
       </div>
       <div class="profile-button">
-        <a href="profile.php" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500;">
-          <?php if (!empty($user_profile['profile_picture'])): ?>
-            <img src="../uploads/profile_pictures/<?php echo htmlspecialchars($user_profile['profile_picture']); ?>" 
-                 alt="Profile Picture" 
-                 style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
+        <a href="profile.php" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500; min-width:120px;">
+          <?php if ($profile_picture): ?>
+            <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
           <?php else: ?>
-            <i class="bi bi-person-circle me-2" style="font-size:1.5rem;"></i>
+            <span class="d-flex align-items-center justify-content-center" style="width:32px; height:32px; background:#e0e7ef; border-radius:50%; margin-right:8px;">
+              <i class="bi bi-person-circle" style="font-size:1.5rem; color:#2563eb;"></i>
+            </span>
           <?php endif; ?>
-          <?php echo !empty($user_profile['full_name']) ? htmlspecialchars($user_profile['full_name']) : htmlspecialchars($_SESSION['user_id']); ?>
+          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70px; display:inline-block; vertical-align:middle;">
+            <?php echo !empty($user_profile['full_name']) ? htmlspecialchars($user_profile['full_name']) : htmlspecialchars($_SESSION['user_id']); ?>
+          </span>
         </a>
       </div>
     </div>

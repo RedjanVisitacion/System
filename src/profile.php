@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch profile for display
-$stmt = $mysqli->prepare("SELECT u.user_id, u.role, u.department, up.email, up.phone, up.profile_picture 
+$stmt = $mysqli->prepare("SELECT u.user_id, u.role, u.department, up.email, up.phone, up.profile_picture, up.full_name 
                          FROM user u 
                          LEFT JOIN user_profile up ON u.user_id = up.user_id 
                          WHERE u.user_id = ?");
@@ -239,7 +239,7 @@ $stmt->close();
                                 <i class="bi bi-camera-fill"></i> Change Photo
                             </label>
                         </div>
-                        <h4 class="mb-1"><?php echo htmlspecialchars($user['user_id']); ?></h4>
+                        <h4 class="mb-1"><?php echo !empty($user['full_name']) ? htmlspecialchars($user['full_name']) : htmlspecialchars($user['user_id']); ?></h4>
                         <p class="text-muted"><?php echo htmlspecialchars($user['role']); ?></p>
                     </div>
 
