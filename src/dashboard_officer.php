@@ -57,42 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     }
     exit;
 }
-
-// ✅ Remove Candidate Logic
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_id'])) {
-  header('Content-Type: application/json');
-  
-  $candidate_id = trim($_POST['candidate_id']);
-
-  if (empty($candidate_id)) {
-      echo json_encode(['success' => false, 'message' => 'No candidate selected.']);
-      exit;
-  }
-
-  // Ensure candidate_id is numeric to avoid injection
-  if (!ctype_digit($candidate_id)) {
-      echo json_encode(['success' => false, 'message' => 'Invalid candidate ID.']);
-      exit;
-  }
-
-  // Prepare and execute the delete query
-  $stmt = $con->prepare("DELETE FROM candidate WHERE candidate_id = ?");
-  $stmt->bind_param("i", $candidate_id);
-
-  if ($stmt->execute()) {
-      if ($stmt->affected_rows > 0) {
-          echo json_encode(['success' => true, 'message' => 'Candidate removed successfully.']);
-      } else {
-          echo json_encode(['success' => false, 'message' => 'Candidate not found or already removed.']);
-      }
-  } else {
-      echo json_encode(['success' => false, 'message' => 'Failed to remove candidate.']);
-  }
-
-  $stmt->close();
-  exit;
-}
-
 ?>
 
 
@@ -1122,15 +1086,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_id'])) {
       </div>
       <div class="modal-body">
         <form id="removeCandidateForm">
-          <input type="hidden" name="candidate_id" id="selectedCandidateId" required>
+          <input type="hidden" name="candidate_id" id="selectedCandidateId">
+          
+          <!-- Search Input -->
+          <div class="mb-3">
+            <label for="searchCandidate" class="form-label">Search by Name</label>
+            <input type="text" class="form-control" id="searchCandidate" placeholder="Search Candidate">
+          </div>
+
+          <!-- Table -->
           <div class="table-responsive">
             <table class="table table-bordered table-hover" id="candidateTable">
               <thead class="table-light">
                 <tr>
+                  <th>
+                    <input type="checkbox" id="selectAllCheckbox"> Select All
+                  </th>
                   <th>Name</th>
                   <th>Position</th>
                   <th>Department</th>
-                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -1138,7 +1112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_id'])) {
               </tbody>
             </table>
           </div>
-          <button type="submit" class="btn btn-danger w-100 mt-3" id="removeBtn" disabled>Remove Selected Candidate</button>
+
+          <button type="submit" class="btn btn-danger w-100 mt-3" id="removeBtn" disabled>Remove Selected Candidates</button>
         </form>
         <div id="removeCandidateMsg" class="mt-2"></div>
       </div>
@@ -1236,20 +1211,23 @@ document.getElementById('addCandidateForm').onsubmit = function(e) {
 };
 
 
-//Remove Candidate
-const removeCandidateModal = document.getElementById('removeCandidateModal');
 
-removeCandidateModal.addEventListener('shown.bs.modal', function () {
-  const tableBody = document.querySelector('#candidateTable tbody');
-  const selectedInput = document.getElementById('selectedCandidateId');
-  const removeBtn = document.getElementById('removeBtn');
-  const msg = document.getElementById('removeCandidateMsg');
-  
-  // Reset
+// Remove Candidate Modal Setup
+const removeCandidateModal = document.getElementById('removeCandidateModal');
+const tableBody = document.querySelector('#candidateTable tbody');
+const selectedInput = document.getElementById('selectedCandidateId');
+const removeBtn = document.getElementById('removeBtn');
+const msg = document.getElementById('removeCandidateMsg');
+const searchInput = document.getElementById('searchCandidate');
+const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+
+// Fetch and render candidates
+function loadCandidateTable(searchQuery = '') {
   tableBody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
   selectedInput.value = '';
   removeBtn.disabled = true;
   msg.textContent = '';
+  msg.className = '';
 
   fetch('fetch_candidates.php')
     .then(response => response.json())
@@ -1257,27 +1235,21 @@ removeCandidateModal.addEventListener('shown.bs.modal', function () {
       if (data.success && Array.isArray(data.candidates) && data.candidates.length > 0) {
         tableBody.innerHTML = '';
         data.candidates.forEach(candidate => {
+          if (!candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) return; // Filter by search
+
           const row = document.createElement('tr');
           row.innerHTML = `
+            <td><input type="checkbox" class="candidateCheckbox" data-id="${candidate.candidate_id}"></td>
             <td>${candidate.name}</td>
             <td>${candidate.position}</td>
             <td>${candidate.department}</td>
-            <td><button type="button" class="btn btn-sm btn-outline-danger select-btn" data-id="${candidate.candidate_id}">Select</button></td>
           `;
           tableBody.appendChild(row);
         });
 
-        // Add click listener to each "Select" button
-        document.querySelectorAll('.select-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
-            selectedInput.value = id;
-            removeBtn.disabled = false;
-
-            // Visually mark selected row
-            document.querySelectorAll('#candidateTable tbody tr').forEach(tr => tr.classList.remove('table-active'));
-            btn.closest('tr').classList.add('table-active');
-          });
+        // Handle selecting/unselecting individual candidates
+        document.querySelectorAll('.candidateCheckbox').forEach(checkbox => {
+          checkbox.addEventListener('change', updateSelectedCandidates);
         });
       } else {
         tableBody.innerHTML = '<tr><td colspan="4">No candidates found</td></tr>';
@@ -1287,16 +1259,46 @@ removeCandidateModal.addEventListener('shown.bs.modal', function () {
       console.error('Error fetching candidates:', error);
       tableBody.innerHTML = '<tr><td colspan="4">Error loading candidates</td></tr>';
     });
+}
+
+// Reload candidates when modal is shown
+removeCandidateModal.addEventListener('shown.bs.modal', () => loadCandidateTable());
+
+// Handle search input
+searchInput.addEventListener('input', (e) => {
+  loadCandidateTable(e.target.value);
 });
 
-// Handle removal
+// Select All candidates
+selectAllCheckbox.addEventListener('change', () => {
+  const checkboxes = document.querySelectorAll('.candidateCheckbox');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = selectAllCheckbox.checked;
+  });
+  updateSelectedCandidates(); // Update remove button state based on selection
+});
+
+// Update selected candidates and enable/remove the remove button
+function updateSelectedCandidates() {
+  const selectedCandidates = [];
+  document.querySelectorAll('.candidateCheckbox:checked').forEach(checkbox => {
+    selectedCandidates.push(checkbox.getAttribute('data-id'));
+  });
+
+  selectedInput.value = selectedCandidates.join(',');
+  removeBtn.disabled = selectedCandidates.length === 0;
+}
+
+// Handle Candidate Removal
 document.getElementById('removeCandidateForm').onsubmit = function (e) {
   e.preventDefault();
 
-  const form = this;
-  const msg = document.getElementById('removeCandidateMsg');
   msg.textContent = '';
-  const formData = new FormData(form);
+  msg.className = '';
+  removeBtn.disabled = true;
+
+  const formData = new FormData(this);
+  formData.append('candidate_id', selectedInput.value); // Append selected candidates
 
   fetch('remove_candidate.php', {
     method: 'POST',
@@ -1305,23 +1307,24 @@ document.getElementById('removeCandidateForm').onsubmit = function (e) {
     .then(r => r.json())
     .then(response => {
       if (response.success) {
-        msg.textContent = response.message || 'Candidate removed successfully!';
+        msg.textContent = response.message || 'Candidates removed successfully!';
         msg.className = 'text-success mt-2';
-        form.reset();
-        document.getElementById('removeBtn').disabled = true;
-
-        // Refresh the candidate list
-        removeCandidateModal.dispatchEvent(new CustomEvent('shown.bs.modal'));
+        this.reset();
+        selectedInput.value = '';
+        loadCandidateTable(); // Refresh table
       } else {
-        msg.textContent = response.message || 'Error removing candidate.';
+        msg.textContent = response.message || 'Error removing candidate(s).';
         msg.className = 'text-danger mt-2';
+        removeBtn.disabled = false;
       }
     })
     .catch(() => {
       msg.textContent = 'Error connecting to server.';
       msg.className = 'text-danger mt-2';
+      removeBtn.disabled = false;
     });
 };
+
 
 
 
