@@ -994,6 +994,22 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
       navbar.classList.remove('faded');
     }
   });
+  function updateTotalVoters() {
+    fetch('../src/get_total_voters.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('totalVoters').textContent = data.total_voters;
+            } else {
+                document.getElementById('totalVoters').textContent = 'Error';
+            }
+        })
+        .catch(error => {
+            document.getElementById('totalVoters').textContent = 'Error';
+            console.error('Error fetching total voters:', error);
+        });
+  }
+  updateTotalVoters();
   </script>
 </body>
 </html>
