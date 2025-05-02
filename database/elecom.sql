@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 01, 2025 at 06:16 PM
+-- Generation Time: May 02, 2025 at 08:12 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -114,19 +114,23 @@ CREATE TABLE `user_profile` (
   `profile_picture` varchar(255) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `full_name` varchar(100) DEFAULT NULL
+  `full_name` varchar(100) DEFAULT NULL,
+  `section_name` varchar(100) DEFAULT NULL,
+  `program_name` varchar(100) DEFAULT NULL,
+  `year_level` int(11) DEFAULT NULL,
+  `gender` varchar(10) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user_profile`
 --
 
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`) VALUES
-('20230001', '20230001@example.com', NULL, NULL, '2025-05-01 15:32:12', '2025-05-01 15:32:12', NULL),
-('2023123456', 'maria.santos@example.com', '09171234567', NULL, '2025-05-01 16:09:15', '2025-05-01 16:09:15', 'Maria Clara D. Santos'),
-('2023304637', '2023304637@example.com', NULL, NULL, '2025-05-01 15:32:12', '2025-05-01 15:32:12', NULL),
-('officer01', 'officer01@example.com', '091234567891', 'officer01_68139b87981fe_Screenshot 2025-04-18 093816.png', '2025-05-01 15:32:12', '2025-05-01 16:04:23', NULL),
-('officer02', 'carlos.reyes@example.com', '09179876543', NULL, '2025-05-01 16:11:20', '2025-05-01 16:11:20', 'Carlos Miguel L. Reyes');
+INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+('20230001', '20230001@example.com', NULL, NULL, '2025-05-01 15:32:12', '2025-05-01 15:32:12', NULL, NULL, NULL, NULL, NULL),
+('2023123456', 'maria.santos@example.com', '09171234567', NULL, '2025-05-01 16:09:15', '2025-05-01 16:09:15', 'Maria Clara D. Santos', NULL, NULL, NULL, NULL),
+('2023304637', '2023304637@example.com', NULL, NULL, '2025-05-01 15:32:12', '2025-05-01 15:32:12', NULL, NULL, NULL, NULL, NULL),
+('officer01', 'officer01@example.com', '091234567891', 'officer01_68139b87981fe_Screenshot 2025-04-18 093816.png', '2025-05-01 15:32:12', '2025-05-01 16:04:23', NULL, NULL, NULL, NULL, NULL),
+('officer02', 'carlos.reyes@example.com', '09179876543', NULL, '2025-05-01 16:11:20', '2025-05-01 16:11:20', 'Carlos Miguel L. Reyes', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
