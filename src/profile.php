@@ -149,6 +149,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->close();
         }
     }
+
+    // Delete photo if requested
+    if (
+        isset($_POST['delete_photo']) && $_POST['delete_photo'] == '1'
+    ) {
+        // Only handle photo deletion
+        $stmt = $mysqli->prepare("SELECT profile_picture FROM user_profile WHERE user_id = ?");
+        $stmt->bind_param("s", $logged_user_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $profile = $result->fetch_assoc();
+        $stmt->close();
+        if ($profile && !empty($profile['profile_picture'])) {
+            $file = __DIR__ . '/../uploads/profile_pictures/' . $profile['profile_picture'];
+            if (file_exists($file)) {
+                unlink($file);
+            }
+            $stmt = $mysqli->prepare("UPDATE user_profile SET profile_picture = NULL WHERE user_id = ?");
+            $stmt->bind_param("s", $logged_user_id);
+            $stmt->execute();
+            $stmt->close();
+        }
+        header("Location: profile.php");
+        exit();
+    }
 }
 
 // Fetch profile for display
@@ -169,6 +194,7 @@ $stmt->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - Electoral Commission</title>
+    <link rel="icon" href="../img/icon.png"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
     <style>
@@ -176,8 +202,11 @@ $stmt->close();
             background: white;
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            padding: 2rem;
+            padding: 2.5rem 2rem;
             margin-top: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
         }
         .profile-avatar {
             width: 150px;
@@ -185,16 +214,36 @@ $stmt->close();
             border-radius: 50%;
             margin: 0 auto 1.5rem;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
             background: #f8f9fa;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        @media (max-width: 575.98px) {
+            .profile-card {
+                padding: 1.2rem 0.5rem;
+                margin-top: 1rem;
+                max-width: 98vw;
+            }
+            .profile-avatar {
+                width: 100px;
+                height: 100px;
+                margin-bottom: 1rem;
+            }
+            .btn-edit-avatar {
+                bottom: 2px;
+                right: 2px;
+                font-size: 0.95rem;
+                padding: 0.3rem 0.4rem;
+            }
+        }
         .profile-avatar img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            border-radius: 50%;
+            display: block;
         }
         .profile-avatar .upload-overlay {
             position: absolute;
@@ -236,12 +285,66 @@ $stmt->close();
             transform: translateY(-2px) scale(1.03);
             text-decoration: none !important;
         }
+        .btn-edit-avatar {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            border-radius: 50%;
+            padding: 0.5rem 0.6rem;
+            font-size: 1.1rem;
+            z-index: 2;
+            background: #fff;
+            color: #2563eb;
+            border: 1px solid #e0e7ef;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        }
+        .btn-edit-avatar:hover, .btn-edit-avatar:focus {
+            background: #2563eb;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(37,99,235,0.18);
+        }
+        #editPhotoOptions.dropdown-menu {
+            display: block;
+            opacity: 1;
+            pointer-events: auto;
+            min-width: 170px;
+            border-radius: 12px;
+            margin-top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 8px 32px rgba(37,99,235,0.12);
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            z-index: 1055;
+            position: absolute;
+            top: 100%;
+        }
+        #editPhotoOptions.d-none {
+            display: none !important;
+        }
+        #editPhotoOptions .dropdown-item {
+            border-radius: 8px;
+            transition: background 0.15s, color 0.15s;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+        }
+        #editPhotoOptions .dropdown-item:hover, #editPhotoOptions .dropdown-item:focus {
+            background: #f1f5f9;
+            color: #2563eb;
+        }
+        #editPhotoOptions .dropdown-item.text-danger:hover {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .simple-back-btn {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-primary shadow-sm sticky-top" style="min-height:60px; z-index: 1050;">
         <div class="container d-flex justify-content-start">
-            <a href="dashboard_officer.php" class="btn btn-outline-secondary btn-sm bg-white text-dark border-0 d-flex align-items-center gap-2 px-2 py-1 simple-back-btn" style="margin:-90px; border-radius: 50px;">
+            <a href="dashboard_officer.php" class="btn btn-outline-secondary btn-sm bg-white text-dark border-0 d-flex align-items-center gap-2 px-2 py-1 simple-back-btn" style=" border-radius: 50px;">
                 <i class="bi bi-arrow-left fs-6"></i>
                 <span class="fw-semibold" style="font-size:1rem;">Back</span>
             </a>
@@ -253,18 +356,17 @@ $stmt->close();
             <div class="col-md-8 col-lg-6">
                 <div class="profile-card">
                     <div class="text-center mb-4">
-                        <div class="profile-avatar">
+                        <div class="profile-avatar position-relative mx-auto">
                             <?php if (!empty($user['profile_picture'])): ?>
-                                <img src="<?php echo '../uploads/profile_pictures/' . htmlspecialchars($user['profile_picture']); ?>" 
-                                     alt="Profile Picture">
+                                <img src="<?php echo '../uploads/profile_pictures/' . htmlspecialchars($user['profile_picture']); ?>" alt="Profile Picture">
                             <?php else: ?>
                                 <i class="bi bi-person-circle" style="font-size: 4rem; color: #6c757d;"></i>
                             <?php endif; ?>
-                            <label for="profile-picture-input" class="upload-overlay mb-0">
-                                <i class="bi bi-camera-fill"></i> Change Photo
-                            </label>
+                            <button type="button" class="btn btn-light btn-edit-avatar shadow" id="editProfilePicBtn" title="Edit Photo">
+                                <i class="bi bi-pencil"></i>
+                            </button>
                         </div>
-                        <h4 class="mb-1"><?php echo !empty($user['full_name']) ? htmlspecialchars($user['full_name']) : htmlspecialchars($user['user_id']); ?></h4>
+                        <h4 class="mb-1 mt-3"><?php echo htmlspecialchars($user['full_name'] ?? ''); ?></h4>
                         <p class="text-muted"><?php echo htmlspecialchars($user['role']); ?></p>
                     </div>
 
@@ -352,39 +454,65 @@ $stmt->close();
         </div>
     </div>
 
+    <!-- Delete Photo Modal -->
+    <div class="modal fade" id="deletePhotoModal" tabindex="-1" aria-labelledby="deletePhotoModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deletePhotoModalLabel">Delete Profile Photo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete your profile photo?
+                </div>
+                <div class="modal-footer">
+                    <form method="POST" action="" class="m-0">
+                        <input type="hidden" name="delete_photo" value="1">
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Profile picture preview
-        document.getElementById('profile-picture-input').addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const avatar = document.querySelector('.profile-avatar');
-                    avatar.innerHTML = `
-                        <img src="${e.target.result}" alt="Profile Picture">
-                        <label for="profile-picture-input" class="upload-overlay mb-0">
-                            <i class="bi bi-camera-fill"></i> Change Photo
-                        </label>
-                    `;
-                };
-                reader.readAsDataURL(this.files[0]);
+        document.addEventListener('DOMContentLoaded', function() {
+            const editBtn = document.getElementById('editProfilePicBtn');
+            const fileInput = document.getElementById('profile-picture-input');
+            const avatar = document.querySelector('.profile-avatar img');
+            const avatarIcon = document.querySelector('.profile-avatar i.bi-person-circle');
+            const deleteModal = new bootstrap.Modal(document.getElementById('deletePhotoModal'));
+
+            if (editBtn) {
+                editBtn.addEventListener('click', function(e) {
+                    fileInput.click();
+                });
             }
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            if (avatar) {
+                                avatar.src = e.target.result;
+                            } else if (avatarIcon) {
+                                // Replace icon with image if no previous image
+                                avatarIcon.outerHTML = `<img src='${e.target.result}' alt='Profile Picture' style='width:100%;height:100%;object-fit:cover;border-radius:50%;'>`;
+                            }
+                        };
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+            }
+            // Hide options when clicking outside
+            document.addEventListener('click', function(e) {
+                if (fileInput && !fileInput.classList.contains('d-none') && !fileInput.contains(e.target) && e.target !== editBtn) {
+                    fileInput.classList.add('d-none');
+                }
+            });
         });
-
-        // Password confirmation validation
-        const newPassword = document.getElementById('new_password');
-        const confirmPassword = document.getElementById('confirm_password');
-
-        function validatePassword() {
-            if (confirmPassword.value !== newPassword.value) {
-                confirmPassword.setCustomValidity("Passwords don't match");
-            } else {
-                confirmPassword.setCustomValidity('');
-            }
-        }
-
-        newPassword.addEventListener('change', validatePassword);
-        confirmPassword.addEventListener('change', validatePassword);
     </script>
 </body>
 </html>

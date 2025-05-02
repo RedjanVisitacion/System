@@ -655,6 +655,45 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
     #addCandidateModal .modal-body {
       padding: 1.5rem;
     }
+
+    .profile-avatar-container {
+      width: 160px;
+      margin: 0 auto;
+      position: relative;
+    }
+    .profile-avatar {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      border: 4px solid #2563eb;
+      background: #f8f9fa;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(37,99,235,0.10);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .profile-avatar:hover {
+      box-shadow: 0 8px 32px rgba(37,99,235,0.18);
+      transform: scale(1.03);
+    }
+    .btn-edit-avatar {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      border-radius: 50%;
+      padding: 0.5rem 0.6rem;
+      font-size: 1.1rem;
+      z-index: 2;
+    }
+    .profile-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 4px 24px rgba(37,99,235,0.07);
+      padding: 2.5rem 2rem;
+      margin-top: 2rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   </style>
 </head>
 <body>
@@ -828,19 +867,25 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         </div>
         <div class="modal-body">
           <form id="addCandidateForm">
-            <div class="mb-3">
-              <label for="candidateName" class="form-label">Candidate Name</label>
-              <input type="text" class="form-control" id="candidateName" name="name" required>
-            </div>
-            <div class="mb-3">
-              <label for="candidatePosition" class="form-label">Position</label>
-              <select class="form-select" id="candidatePosition" name="position" required>
-                <option value="">Select Position</option>
-                <option value="president">President</option>
-                <option value="vice_president">Vice President</option>
-                <option value="secretary">Secretary</option>
-                <option value="treasurer">Treasurer</option>
-              </select>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="full_name" class="form-label">Full Name</label>
+                <input type="text" class="form-control" id="full_name" name="full_name" required>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="section_name" class="form-label">Section Name</label>
+                <input type="text" class="form-control" id="section_name" name="section_name" required>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="candidatePosition" class="form-label">Position</label>
+                <select class="form-select" id="candidatePosition" name="position" required>
+                  <option value="">Select Position</option>
+                  <option value="president">President</option>
+                  <option value="vice_president">Vice President</option>
+                  <option value="secretary">Secretary</option>
+                  <option value="treasurer">Treasurer</option>
+                </select>
+              </div>
             </div>
             <button type="submit" class="btn btn-primary w-100">Add Candidate</button>
           </form>
@@ -1010,6 +1055,50 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         });
   }
   updateTotalVoters();
+  document.addEventListener('DOMContentLoaded', function() {
+    const editBtn = document.getElementById('editProfilePicBtn');
+    const options = document.getElementById('editPhotoOptions');
+    const changeBtn = document.getElementById('changePhotoBtn');
+    const cancelBtn = document.getElementById('cancelEditPhotoBtn');
+    const fileInput = document.getElementById('profile-picture-input');
+    const deleteBtn = document.getElementById('deletePhotoBtn');
+    const deleteModal = document.getElementById('deletePhotoModal') ? new bootstrap.Modal(document.getElementById('deletePhotoModal')) : null;
+
+    if (editBtn) {
+        if (options) {
+            editBtn.addEventListener('click', function(e) {
+                options.classList.toggle('d-none');
+            });
+        } else {
+            editBtn.addEventListener('click', function(e) {
+                fileInput.click();
+            });
+        }
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', function(e) {
+            options.classList.add('d-none');
+        });
+    }
+    if (changeBtn) {
+        changeBtn.addEventListener('click', function(e) {
+            fileInput.click();
+            options.classList.add('d-none');
+        });
+    }
+    if (deleteBtn && deleteModal) {
+        deleteBtn.addEventListener('click', function(e) {
+            options.classList.add('d-none');
+            deleteModal.show();
+        });
+    }
+    // Hide options when clicking outside
+    document.addEventListener('click', function(e) {
+        if (options && !options.classList.contains('d-none') && !options.contains(e.target) && e.target !== editBtn) {
+            options.classList.add('d-none');
+        }
+    });
+  });
   </script>
 </body>
 </html>
