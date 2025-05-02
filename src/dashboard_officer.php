@@ -1,6 +1,6 @@
 <?php
 require_once 'check_session.php';
-require_once 'connection.php'; // Make sure this is included
+require_once 'connection.php';
 
 // Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
@@ -57,7 +57,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     }
     exit;
 }
+
+// ✅ Remove Candidate Logic
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_id'])) {
+  header('Content-Type: application/json');
+  
+  $candidate_id = trim($_POST['candidate_id']);
+
+  if (empty($candidate_id)) {
+      echo json_encode(['success' => false, 'message' => 'No candidate selected.']);
+      exit;
+  }
+
+  // Ensure candidate_id is numeric to avoid injection
+  if (!ctype_digit($candidate_id)) {
+      echo json_encode(['success' => false, 'message' => 'Invalid candidate ID.']);
+      exit;
+  }
+
+  // Prepare and execute the delete query
+  $stmt = $con->prepare("DELETE FROM candidate WHERE candidate_id = ?");
+  $stmt->bind_param("i", $candidate_id);
+
+  if ($stmt->execute()) {
+      if ($stmt->affected_rows > 0) {
+          echo json_encode(['success' => true, 'message' => 'Candidate removed successfully.']);
+      } else {
+          echo json_encode(['success' => false, 'message' => 'Candidate not found or already removed.']);
+      }
+  } else {
+      echo json_encode(['success' => false, 'message' => 'Failed to remove candidate.']);
+  }
+
+  $stmt->close();
+  exit;
+}
+
 ?>
+
 
 
 <!DOCTYPE html>
@@ -930,11 +967,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="remove_candidate.php">
-              <i class="bi bi-trash"></i>
-              <span class="sidebar-text">Remove Candidate</span>
+            <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#removeCandidateModal" onclick="if(window.innerWidth <= 991.98){document.getElementById('sidebar').classList.remove('active');document.getElementById('sidebarOverlay').classList.remove('active');document.getElementById('mobileMenuBtn').classList.remove('active');}">
+               <i class="bi bi-trash"></i>
+                <span class="sidebar-text">Remove Candidate</span>
             </a>
           </li>
+
           <li class="nav-item">
             <a class="nav-link text-white d-flex align-items-center" href="results.php">
               <i class="bi bi-list-check"></i>
@@ -1073,6 +1111,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
   </div>
 </div>
 
+
+<!-- Remove Candidate Modal -->
+<div class="modal fade" id="removeCandidateModal" tabindex="-1" aria-labelledby="removeCandidateModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="removeCandidateModalLabel">Remove Candidate</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="removeCandidateForm">
+          <input type="hidden" name="candidate_id" id="selectedCandidateId" required>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover" id="candidateTable">
+              <thead class="table-light">
+                <tr>
+                  <th>Name</th>
+                  <th>Position</th>
+                  <th>Department</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Rows will be populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+          <button type="submit" class="btn btn-danger w-100 mt-3" id="removeBtn" disabled>Remove Selected Candidate</button>
+        </form>
+        <div id="removeCandidateMsg" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
   <script>
   const departmentSelect = document.getElementById("department");
 const positionSelect = document.getElementById("candidatePosition");
@@ -1159,6 +1234,96 @@ document.getElementById('addCandidateForm').onsubmit = function(e) {
     msg.className = 'text-danger mt-2';
   });
 };
+
+
+//Remove Candidate
+const removeCandidateModal = document.getElementById('removeCandidateModal');
+
+removeCandidateModal.addEventListener('shown.bs.modal', function () {
+  const tableBody = document.querySelector('#candidateTable tbody');
+  const selectedInput = document.getElementById('selectedCandidateId');
+  const removeBtn = document.getElementById('removeBtn');
+  const msg = document.getElementById('removeCandidateMsg');
+  
+  // Reset
+  tableBody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+  selectedInput.value = '';
+  removeBtn.disabled = true;
+  msg.textContent = '';
+
+  fetch('fetch_candidates.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.candidates) && data.candidates.length > 0) {
+        tableBody.innerHTML = '';
+        data.candidates.forEach(candidate => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${candidate.name}</td>
+            <td>${candidate.position}</td>
+            <td>${candidate.department}</td>
+            <td><button type="button" class="btn btn-sm btn-outline-danger select-btn" data-id="${candidate.candidate_id}">Select</button></td>
+          `;
+          tableBody.appendChild(row);
+        });
+
+        // Add click listener to each "Select" button
+        document.querySelectorAll('.select-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            selectedInput.value = id;
+            removeBtn.disabled = false;
+
+            // Visually mark selected row
+            document.querySelectorAll('#candidateTable tbody tr').forEach(tr => tr.classList.remove('table-active'));
+            btn.closest('tr').classList.add('table-active');
+          });
+        });
+      } else {
+        tableBody.innerHTML = '<tr><td colspan="4">No candidates found</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching candidates:', error);
+      tableBody.innerHTML = '<tr><td colspan="4">Error loading candidates</td></tr>';
+    });
+});
+
+// Handle removal
+document.getElementById('removeCandidateForm').onsubmit = function (e) {
+  e.preventDefault();
+
+  const form = this;
+  const msg = document.getElementById('removeCandidateMsg');
+  msg.textContent = '';
+  const formData = new FormData(form);
+
+  fetch('remove_candidate.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(response => {
+      if (response.success) {
+        msg.textContent = response.message || 'Candidate removed successfully!';
+        msg.className = 'text-success mt-2';
+        form.reset();
+        document.getElementById('removeBtn').disabled = true;
+
+        // Refresh the candidate list
+        removeCandidateModal.dispatchEvent(new CustomEvent('shown.bs.modal'));
+      } else {
+        msg.textContent = response.message || 'Error removing candidate.';
+        msg.className = 'text-danger mt-2';
+      }
+    })
+    .catch(() => {
+      msg.textContent = 'Error connecting to server.';
+      msg.className = 'text-danger mt-2';
+    });
+};
+
+
 
 
   //Sidebar Function
