@@ -45,13 +45,14 @@ if ($candidate_id) {
 
 
 // ✅ Add Candidate Submission Logic
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'], $_POST['info'], $_FILES['profile_pic'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'],$_POST['age'], $_POST['age'], $_POST['info'], $_FILES['profile_pic'])) {
     header('Content-Type: application/json');
 
     $name = trim($_POST['full_name']);
     $department = trim($_POST['department']);
     $position = ucwords(strtolower(trim($_POST['position']))); // Capitalize only the position
     $platform = trim($_POST['info']);
+    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
 
     // Profile Picture Handling (same process as for the candidate)
     $photo = $_FILES['profile_pic'];
@@ -79,11 +80,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
         exit;
     }
 
+      $age = (int) $_POST['age'];
+      if ($age <= 0) {
+          echo json_encode(['success' => false, 'message' => 'Invalid age provided.']);
+          exit;
+      }
+
+
     // Check if the candidate already exists
     $check_stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE name = ? AND department = ? AND position = ?");
     $check_stmt->bind_param("sss", $name, $department, $position);
     $check_stmt->execute();
     $check_result = $check_stmt->get_result();
+    $age = filter_var($_POST['age'], FILTER_VALIDATE_INT);
 
     if ($check_result->num_rows > 0) {
         echo json_encode(['success' => false, 'message' => 'Candidate with this name, department, and position already exists.']);
@@ -91,9 +100,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     }
 
     // Insert candidate data along with profile picture into the database
-    $stmt = $con->prepare("INSERT INTO candidate (name, department, position, platform, photo) VALUES (?, ?, ?, ?, ?)");
+    $stmt = $con->prepare("INSERT INTO candidate (name, department, position,age, platform, photo) VALUES (?, ?, ?, ?, ?, ?)");
     if ($stmt) {
-        $stmt->bind_param("sssss", $name, $department, $position, $platform, $photoPath);
+        $stmt->bind_param("ssssss", $name, $department, $position,$age, $platform, $photoPath);
         if ($stmt->execute()) {
             echo json_encode(['success' => true, 'message' => 'Candidate added successfully.']);
         } else {
@@ -1149,6 +1158,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <label for="full_name" class="form-label">Full Name</label>
               <input type="text" class="form-control" id="full_name" name="full_name" required>
             </div>
+            <div class="col-12 col-md-6">
+              <label for="age" class="form-label">Age</label>
+              <input type="number" class="form-control" id="age" name="age" min="1" required>
+            </div>
+
             <div class="col-12 col-md-6">
               <label for="department" class="form-label">Department</label>
               <select class="form-select" id="department" name="department" required>
