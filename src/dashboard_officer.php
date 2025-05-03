@@ -11,9 +11,38 @@ $result = $stmt->get_result();
 $user_profile = $result->fetch_assoc();
 $stmt->close();
 
-$profile_picture = !empty($user_profile['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user_profile['profile_picture'])
+$profile_picture = (!empty($user_profile['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user_profile['profile_picture']))
     ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture'])
     : null;
+
+
+
+// Fetch candidate's photo only
+$candidate_id = $_GET['candidate_id'] ?? null;
+$candidate_photo = null;
+
+if ($candidate_id) {
+    $stmt = $con->prepare("SELECT photo FROM candidate WHERE candidate_id = ?");
+    $stmt->bind_param("i", $candidate_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $candidate = $result->fetch_assoc();
+    $stmt->close();
+
+    // Fetch the filename from the database directly
+    $photo_filename = $candidate['photo'] ?? null;
+
+    // If the photo filename exists and it's not empty, use it to display the photo
+    if (!empty($photo_filename)) {
+        // Set the photo path for the image (stored in profile_pictures directory)
+        $candidate_photo = '../uploads/profile_pictures/' . htmlspecialchars($photo_filename);
+    }
+}
+
+
+
+
+
 
 // ✅ Add Candidate Submission Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'], $_POST['info'], $_FILES['profile_pic'])) {
@@ -27,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     // Profile Picture Handling (same process as for the candidate)
     $photo = $_FILES['profile_pic'];
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // Allowed file types
-    $uploadDirectory = '../uploads/profile_pictures/'; // Directory where the profile pictures will be stored
+    $uploadDirectory = '../uploads/profile_pictures'; // Directory where the profile pictures will be stored
 
     // Check if the file is an allowed image type
     if (!in_array($photo['type'], $allowedTypes)) {
@@ -76,6 +105,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     }
     exit;
 }
+
+
 
 // Fetch and display candidate details (with photo)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
@@ -1246,7 +1277,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       <div class="modal-header d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
           <!-- Display candidate photo here -->
-          <img src="" id="candidatePhoto" class="rounded-circle" alt="Candidate's Photo" width="40" height="40">
+          
+
+          <?php if (!empty($candidate_photo)): ?>
+              <img src="<?php echo $candidate_photo; ?>" id="candidatePhoto" class="rounded-circle" alt="Candidate Photo" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff;">
+          <?php else: ?>
+              <i class="bi bi-person-circle" style="font-size: 40px;"></i>
+          <?php endif; ?>
+
           <h5 class="modal-title mb-0" id="candidateProfileModalLabel">Candidate Name</h5>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1600,7 +1638,7 @@ function showCandidateProfile(candidate) {
   const profilePosition = document.getElementById('profilePosition');
   const profilePlatform = document.getElementById('profilePlatform');
 
-  const candidatePhoto = document.getElementById('candidatePhoto');  // Get the image element
+
 
   // Set modal title to the candidate's name
   const profileModalTitle = document.getElementById('candidateProfileModalLabel');
@@ -1612,10 +1650,7 @@ function showCandidateProfile(candidate) {
   profilePosition.textContent = candidate.position || 'N/A';
   profilePlatform.textContent = candidate.platform || 'N/A';
 
-  // Set the candidate's photo (if available)
-  const photoPath = candidate.photoPath ? candidate.photoPath : '../img/icon.png'; // Fallback to default image
-  candidatePhoto.src = photoPath;
-  candidatePhoto.alt = candidate.name + "'s Photo";
+
 
   // Hide the candidate list modal (if open)
   const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCandidatesModal'));

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 03, 2025 at 03:45 AM
+-- Generation Time: May 03, 2025 at 05:18 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -33,20 +33,30 @@ CREATE TABLE `candidate` (
   `department` varchar(20) NOT NULL,
   `position` varchar(50) NOT NULL,
   `platform` text NOT NULL,
-  `platform` varchar NOT NULL
+  `photo` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `candidate`
 --
 
-INSERT INTO `candidate` (`candidate_id`, `name`, `department`, `position`, `platform`) VALUES
-(21, 'Redjan Phil S. Visitacion', 'USG', 'Bsit Representative', 'I deserve this win'),
-(22, 'Janu Gig', 'USG', 'President', 'I deserve this Win'),
-(23, 'Katana Ebugar', 'BTLED', 'Associate Secretary', 'Na pugos'),
-(24, 'Janu Gig', 'BTLED', 'President', 's'),
-(25, 'Katrina', 'BSIT', 'General Secretary', 'ad'),
-(26, 'Katrina', 'BSIT', 'President', 'dcd');
+INSERT INTO `candidate` (`candidate_id`, `name`, `department`, `position`, `platform`, `photo`) VALUES
+(21, 'Redjan Phil S. Visitacion', 'USG', 'Bsit Representative', 'I deserve this win', NULL),
+(23, 'Katana Ebugar', 'BTLED', 'Associate Secretary', 'Na pugos', NULL),
+(26, 'Katrina', 'BSIT', 'President', 'dcd', NULL),
+(29, 'Phil S. Visitacion', 'USG', 'Btled Representative', 'I want to be', NULL),
+(30, 'Jessa', 'BSIT', 'President', 'fgbvdxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx', NULL),
+(31, 'Jessa', 'USG', 'Bsit Representative', 'ZAX', NULL),
+(32, 'Jess Phil S. Visitacion', 'BFPT', 'Pio', 'dfvsdzf', NULL),
+(33, 'Jess Phil S. Visitacion', 'USG', 'Btled Representative', 'aef', NULL),
+(34, 'Jessa', 'BFPT', 'Vice-president', 'sacd', '../uploads/profile_pictures/1746246896_Screenshot 2025-05-02 014819.png'),
+(35, 'Carlos Miguel L. Reyes', 'USG', 'President', 'I am redjan phil', '../uploads/profile_pictures/1746247077_2023304637_68157543a0d22_436c058e-38b0-4859-9d22-c5d1995c42bd (1) (2).jpg'),
+(37, 'Jessa', 'BTLED', 'General Secretary', 'SZC', '../uploads/profile_pictures/1746247318_Screenshot 2025-05-02 014819.png'),
+(38, 'Banana', 'BSIT', 'Associate Secretary', 'ac', '../uploads/profile_pictures/1746247409_Screenshot 2025-05-02 025846.png'),
+(39, 'Bella Cruz', 'USG', 'Btled Representative', 'Oks', '../uploads/profile_pictures/1746253301_votE.jpg'),
+(40, 'RPSVCODES', 'USG', 'Bsit Representative', 'oKSAAA', '../uploads/profile_pictures/1746254479_3d-render-abstract-network-communications-background-design.jpg'),
+(41, 'Redjan Phil S. Visitacion', 'USG', 'Pio', 'af', '../uploads/profile_pictures/1746254997_Screenshot 2025-05-02 020706.png'),
+(42, 'Jessa', 'BFPT', 'President', 'acf', '1746258240_462542395_944403454241271_3556197381098363006_n-modified.png');
 
 -- --------------------------------------------------------
 
@@ -1533,7 +1543,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('4-2019400371', '4-2019400371@example.com', '1234567890', 'default.jpg', '2025-05-02 07:13:58', '2025-05-02 07:13:58', 'DAQUIPIL, JONATHAN JR', 'BSIT 3F', 'Bachelor of Science in Information Technology', 3, 'M'),
 ('4-6160033', '4-6160033@example.com', '1234567890', 'default.jpg', '2025-05-02 07:13:58', '2025-05-02 07:13:58', 'GALINDO, QUEENIE HO', 'BSIT 4A', 'Bachelor of Science in Information Technology', 4, 'F'),
 ('officer01', 'officer01@example.com', '091234567891', 'officer01_681496e31122d_Screenshot 2025-05-01 124957.png', '2025-05-01 15:32:12', '2025-05-02 09:56:51', 'Redjan Phil S. Visitacion', '2A', 'BSIT', 2, 'Male'),
-('officer02', 'visitacionredjanphils@gmail.com', '09534181760', 'officer02_6815060f6ecd7_Screenshot_2025-04-13_105025-removebg-preview.png', '2025-05-01 16:11:20', '2025-05-02 17:51:11', 'Redjan Phil S. Visitacion', '2A', 'BSIT', 2, 'Male');
+('officer02', 'visitacionredjanphils@gmail.com', '09534181760', 'officer02_6815c14c788d7_Screenshot 2025-05-02 024344.png', '2025-05-01 16:11:20', '2025-05-03 07:10:04', 'Redjan Phil S. Visitacion', '2A', 'BSIT', 2, 'Male');
 
 -- --------------------------------------------------------
 
@@ -1600,7 +1610,7 @@ ALTER TABLE `vote`
 -- AUTO_INCREMENT for table `candidate`
 --
 ALTER TABLE `candidate`
-  MODIFY `candidate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `candidate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `department`
