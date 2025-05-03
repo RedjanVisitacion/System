@@ -77,6 +77,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     exit;
 }
 
+// Fetch and display candidate details (with photo)
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
+  $candidate_id = $_GET['candidate_id'];
+
+  // Fetch candidate details including photo
+  $stmt = $con->prepare("SELECT name, department, position, platform, photo FROM candidate WHERE candidate_id = ?");
+  $stmt->bind_param("i", $candidate_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $candidate = $result->fetch_assoc();
+  $stmt->close();
+
+  if ($candidate) {
+      // If photo exists, use the photo path, else fallback to a default image
+      $photoPath = !empty($candidate['photo']) && file_exists($candidate['photo'])
+          ? $candidate['photo']
+          : 'path/to/default/photo.png';  // Default photo
+
+      // Send the candidate data with the photo path
+      echo json_encode([
+          'success' => true,
+          'candidate' => $candidate,
+          'photo' => $photoPath
+      ]);
+  } else {
+      echo json_encode(['success' => false, 'message' => 'Candidate not found.']);
+  }
+  exit;
+}
+
+
+
 ?>
 
 
@@ -1213,7 +1245,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     <div class="modal-content p-3">
       <div class="modal-header d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
-          <i class="bi bi-person-circle fs-4 text-primary"></i>
+          <!-- Display candidate photo here -->
+          <img src="" id="candidatePhoto" class="rounded-circle" alt="Candidate's Photo" width="40" height="40">
           <h5 class="modal-title mb-0" id="candidateProfileModalLabel">Candidate Name</h5>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1234,6 +1267,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     </div>
   </div>
 </div>
+
 
  
 
@@ -1532,6 +1566,8 @@ viewSearchInput.addEventListener('input', (e) => {
   loadViewCandidateTable(e.target.value);
 });
 
+
+
 // Show Candidate Profile Function
 function showCandidateProfile(candidate) {
   const profileName = document.getElementById('profileName');
@@ -1539,6 +1575,8 @@ function showCandidateProfile(candidate) {
   const profileDept = document.getElementById('profileDept');
   const profilePosition = document.getElementById('profilePosition');
   const profilePlatform = document.getElementById('profilePlatform');
+
+  const candidatePhoto = document.getElementById('candidatePhoto');  // Get the image element
 
   // Set modal title to the candidate's name
   const profileModalTitle = document.getElementById('candidateProfileModalLabel');
@@ -1550,7 +1588,12 @@ function showCandidateProfile(candidate) {
   profilePosition.textContent = candidate.position || 'N/A';
   profilePlatform.textContent = candidate.platform || 'N/A';
 
-  // Hide the candidate list modal
+  // Set the candidate's photo (if available)
+  const photoPath = candidate.photoPath ? candidate.photoPath : '../img/icon.png'; // Fallback to default image
+  candidatePhoto.src = photoPath;
+  candidatePhoto.alt = candidate.name + "'s Photo";
+
+  // Hide the candidate list modal (if open)
   const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCandidatesModal'));
   if (viewModal) {
     viewModal.hide();
@@ -1560,12 +1603,6 @@ function showCandidateProfile(candidate) {
   const profileModal = new bootstrap.Modal(document.getElementById('candidateProfileModal'));
   profileModal.show();
 }
-
-
-
-
-
-
 
 
 

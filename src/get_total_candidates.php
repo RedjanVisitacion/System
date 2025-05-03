@@ -2,7 +2,6 @@
 require_once 'connection.php';
 header('Content-Type: application/json');
 
-// Query to count total candidates
 $query = "SELECT COUNT(*) as total_candidates FROM candidate";
 $result = $con->query($query);
 
@@ -14,4 +13,4 @@ if ($result) {
 }
 
 $con->close();
-?> 
+?>

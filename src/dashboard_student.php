@@ -1,5 +1,6 @@
 <?php
 require_once 'check_session.php';
+require_once 'connection.php';
 
 // Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
@@ -13,7 +14,44 @@ $stmt->close();
 $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user_profile['profile_picture'])
     ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture'])
     : null;
+
+
+
+    // Fetch and display candidate details (with photo)
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
+  $candidate_id = $_GET['candidate_id'];
+
+  // Fetch candidate details including photo
+  $stmt = $con->prepare("SELECT name, department, position, platform, photo FROM candidate WHERE candidate_id = ?");
+  $stmt->bind_param("i", $candidate_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $candidate = $result->fetch_assoc();
+  $stmt->close();
+
+  if ($candidate) {
+      // If photo exists, use the photo path, else fallback to a default image
+      $photoPath = !empty($candidate['photo']) && file_exists($candidate['photo'])
+          ? $candidate['photo']
+          : 'path/to/default/photo.png';  // Default photo
+
+      // Send the candidate data with the photo path
+      echo json_encode([
+          'success' => true,
+          'candidate' => $candidate,
+          'photo' => $photoPath
+      ]);
+  } else {
+      echo json_encode(['success' => false, 'message' => 'Candidate not found.']);
+  }
+  exit;
+}
+
+
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -800,6 +838,12 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         padding: 0.75rem 1rem;
       }
     }
+
+    #viewCandidateTable tbody tr:hover {
+    background-color:rgb(193, 196, 197);
+    
+    }
+
   </style>
 </head>
 <body>
@@ -871,8 +915,14 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
               <span class="sidebar-text">Home</span>
             </a>
           </li>
+          <!-- Sidebar Nav Item -->
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="candidates.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#viewCandidatesModal"
+              onclick="if(window.innerWidth <= 991.98){
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+                document.getElementById('mobileMenuBtn').classList.remove('active');
+              }">
               <i class="bi bi-people"></i>
               <span class="sidebar-text">View Candidates</span>
             </a>
@@ -962,10 +1012,190 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
       </div>
     </div>
   </div>
+
+
+
+  
+<!-- View Candidates Modal -->
+<div class="modal fade" id="viewCandidatesModal" tabindex="-1" aria-labelledby="viewCandidatesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewCandidatesModalLabel">All Candidates</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Search Input -->
+        <div class="mb-3">
+          <label for="searchViewCandidate" class="form-label">Search by Name</label>
+          <input type="text" class="form-control" id="searchViewCandidate" placeholder="Search Candidate">
+        </div>
+
+        <!-- Scrollable Table -->
+        <div style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-bordered" id="viewCandidateTable">
+          <thead class="table-light">
+            <tr>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Candidates will be inserted here -->
+          </tbody>
+        </table>
+
+        </div>
+
+        <div id="viewCandidateMsg" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Candidate Profile Modal -->
+<div class="modal fade" id="candidateProfileModal" tabindex="-1" aria-labelledby="candidateProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <!-- Display candidate photo here -->
+          <img src="" id="candidatePhoto" class="rounded-circle" alt="Candidate's Photo" width="40" height="40">
+          <h5 class="modal-title mb-0" id="candidateProfileModalLabel">Candidate Name</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="candidateProfileCard" class="card shadow rounded-4 border-0">
+          <div class="card-body">
+            <p class="mb-2"><strong>ID:</strong> <span id="profileId"></span></p>
+            <p class="mb-2"><strong>Department:</strong> <span id="profileDept"></span></p>
+            <p class="mb-2"><strong>Position:</strong> <span id="profilePosition"></span></p>
+            <div>
+              <strong>Platform:</strong>
+              <p id="profilePlatform" class="mt-1 mb-0"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../function/dashboard.js"></script>
   <script>
+
+
+
+
+
+// View Candidate Modal Setup
+const viewCandidateModal = document.getElementById('viewCandidatesModal');
+const viewTableBody = document.querySelector('#viewCandidateTable tbody');
+const viewMsg = document.getElementById('viewCandidateMsg');
+const viewSearchInput = document.getElementById('searchViewCandidate');
+
+// Fetch and render candidates
+function loadViewCandidateTable(searchQuery = '') {
+  viewTableBody.innerHTML = '<tr><td>Loading...</td></tr>';
+  viewMsg.textContent = '';
+  viewMsg.className = '';
+
+  fetch('fetch_candidates.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.candidates) && data.candidates.length > 0) {
+        viewTableBody.innerHTML = '';
+        let hasMatch = false;
+
+        data.candidates.forEach(candidate => {
+          if (!candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
+
+          const row = document.createElement('tr');
+          row.style.cursor = 'pointer'; // Make it look clickable
+          row.innerHTML = `<td>${candidate.name}</td>`; // Remove button
+          row.onclick = () => showCandidateProfile(candidate); // Attach click handler to row
+          viewTableBody.appendChild(row);
+          hasMatch = true;
+        });
+
+
+        if (!hasMatch) {
+          viewTableBody.innerHTML = '<tr><td>No matching candidates found.</td></tr>';
+        }
+
+      } else {
+        viewTableBody.innerHTML = '<tr><td>No candidates found.</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching candidates:', error);
+      viewTableBody.innerHTML = '<tr><td>Error loading candidates.</td></tr>';
+    });
+}
+
+// Reload candidates when modal is shown
+viewCandidateModal.addEventListener('shown.bs.modal', () => loadViewCandidateTable());
+
+// Handle search input
+viewSearchInput.addEventListener('input', (e) => {
+  loadViewCandidateTable(e.target.value);
+});
+
+
+
+// Show Candidate Profile Function
+function showCandidateProfile(candidate) {
+  const profileName = document.getElementById('profileName');
+  const profileId = document.getElementById('profileId');
+  const profileDept = document.getElementById('profileDept');
+  const profilePosition = document.getElementById('profilePosition');
+  const profilePlatform = document.getElementById('profilePlatform');
+
+  const candidatePhoto = document.getElementById('candidatePhoto');  // Get the image element
+
+  // Set modal title to the candidate's name
+  const profileModalTitle = document.getElementById('candidateProfileModalLabel');
+  profileModalTitle.textContent = candidate.name || 'Candidate Profile';
+
+  // Populate profile fields
+  profileId.textContent = candidate.candidate_id || 'N/A';
+  profileDept.textContent = candidate.department || 'N/A';
+  profilePosition.textContent = candidate.position || 'N/A';
+  profilePlatform.textContent = candidate.platform || 'N/A';
+
+  // Set the candidate's photo (if available)
+  const photoPath = candidate.photoPath ? candidate.photoPath : '../img/icon.png'; // Fallback to default image
+  candidatePhoto.src = photoPath;
+  candidatePhoto.alt = candidate.name + "'s Photo";
+
+  // Hide the candidate list modal (if open)
+  const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCandidatesModal'));
+  if (viewModal) {
+    viewModal.hide();
+  }
+
+  // Show the candidate profile modal
+  const profileModal = new bootstrap.Modal(document.getElementById('candidateProfileModal'));
+  profileModal.show();
+}
+
+
+
+
+
+
+
+
+
+
     // Sidebar toggle functionality
     document.getElementById('sidebarToggle').onclick = function() {
       var sidebar = document.getElementById('sidebar');
@@ -1093,6 +1323,27 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         updateTotalVotesCast();
       }, 30000);
     });
+
+
+
+    function updateTotalCandidates() {
+    fetch('../src/get_total_candidates.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('totalCandidates').textContent = data.total;
+            } else {
+                document.getElementById('totalCandidates').textContent = 'Error';
+            }
+        })
+        .catch(error => {
+            document.getElementById('totalCandidates').textContent = 'Error';
+            console.error('Error fetching total candidates:', error);
+        });
+}
+
+updateTotalCandidates();
+
 L  </script>
 </body>
 </html>
