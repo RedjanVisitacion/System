@@ -130,11 +130,13 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         margin: 0;
         padding: 0;
         min-height: 100vh;
-        overflow-x: hidden;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
       }
 
       .navbar {
-        position: sticky !important;
+        position: fixed !important;
         top: 0 !important;
         left: 0;
         width: 100%;
@@ -146,54 +148,83 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         align-items: center;
       }
 
-      .navbar .container-fluid {
-        padding: 0 !important;
-        margin: 0 !important;
-        width: 100%;
-      }
-
-      .electoral-commission-title {
-        font-size: 1rem !important;
-        margin: 0 !important;
-        color: white !important;
-        -webkit-text-fill-color: white !important;
-        text-shadow: none !important;
-        background: none !important;
-      }
-
-      .mobile-menu-btn {
-        display: block !important;
-        padding: 4px !important;
-        margin-right: 8px !important;
-      }
-
-      .mobile-menu-btn i {
-        font-size: 1.75rem !important;
-        transition: transform 0.3s ease;
-      }
-
-      .mobile-menu-btn.active i {
-        transform: rotate(45deg);
-      }
-
-      .mobile-menu-btn.active i::before {
-        content: '\F659' !important;
-      }
-
-      .elecom-logo {
-        display: none !important;
-      }
-
-      .profile-button {
-        display: none !important;
-      }
-
       .main-content {
         margin: 0 !important;
         padding: 0.75rem !important;
-        min-height: calc(100vh - 56px);
+        height: calc(100vh - 56px);
         background: #f8fafc;
         width: 100%;
+        overflow-y: auto;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+      }
+
+      #sidebar {
+        position: fixed;
+        right: -240px;
+        left: auto;
+        top: 56px;
+        height: calc(100vh - 56px);
+        z-index: 1102;
+        transform: translateX(0);
+        transition: right 0.3s cubic-bezier(0.4,0.2,0.2,1);
+        box-shadow: -2px 0 8px rgba(0,0,0,0.10);
+        width: 240px !important;
+        min-width: 60px !important;
+        background: linear-gradient(135deg, #232526 0%, #2563eb 100%) !important;
+        padding: 1.5rem 1rem 1rem 1rem !important;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      #sidebar.active {
+        right: 0;
+        left: auto;
+      }
+
+      #sidebar .sidebar-header-container {
+        flex-shrink: 0;
+        margin-bottom: 1rem;
+      }
+
+      #sidebar .nav {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding-right: 0.5rem;
+        margin: 0 -0.5rem;
+      }
+
+      #sidebar .nav::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      #sidebar .nav::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      #sidebar .nav::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.3);
+        border-radius: 2px;
+      }
+
+      .sidebar-overlay {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1101;
+        display: none;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
       }
 
       .row.g-4 {
@@ -226,51 +257,40 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         height: auto;
       }
 
-      .dashboard-card .icon {
-        width: 40px;
-        height: 40px;
-        background: #e0e7ff;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 0.5rem;
-        color: #2563eb;
+      .mobile-menu-btn {
+        display: block !important;
+        padding: 4px !important;
+        margin-right: 8px !important;
       }
 
-      .dashboard-card .icon i {
-        font-size: 1.25rem;
+      .mobile-menu-btn i {
+        font-size: 1.75rem !important;
+        transition: transform 0.3s ease;
       }
 
-      .dashboard-card h3 {
-        font-size: 0.875rem;
-        color: #4b5563;
-        margin-bottom: 0.25rem;
-        margin-top: 0;
+      .mobile-menu-btn.active i {
+        transform: rotate(45deg);
       }
 
-      .dashboard-card .fs-4 {
-        font-size: 1.25rem !important;
-        font-weight: 600;
-        color: #2563eb;
-        margin: 0;
+      .mobile-menu-btn.active i::before {
+        content: '\F659' !important;
       }
 
-      .calendar-card {
+      .elecom-logo {
         display: none !important;
       }
 
-      #sidebar {
-        width: 240px !important;
-        transform: translateX(-100%);
+      .profile-button {
+        display: none !important;
       }
 
-      #sidebar.active {
-        transform: translateX(0);
-      }
-
-      .sidebar-overlay.active {
-        background: rgba(0, 0, 0, 0.3);
+      .electoral-commission-title {
+        font-size: 1rem !important;
+        margin: 0 !important;
+        color: white !important;
+        -webkit-text-fill-color: white !important;
+        text-shadow: none !important;
+        background: none !important;
       }
     }
     @media (min-width: 576px) {
@@ -480,13 +500,14 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
 
       #sidebar {
         position: fixed;
-        left: 0;
+        right: -240px;
+        left: auto;
         top: 60px;
         height: calc(100vh - 60px);
         z-index: 1102;
-        transform: translateX(-100%);
-        transition: transform 0.3s cubic-bezier(0.4,0.2,0.2,1);
-        box-shadow: 2px 0 8px rgba(0,0,0,0.10);
+        transform: translateX(0);
+        transition: right 0.3s cubic-bezier(0.4,0.2,0.2,1);
+        box-shadow: -2px 0 8px rgba(0,0,0,0.10);
         width: 240px !important;
         min-width: 60px !important;
         background: linear-gradient(135deg, #232526 0%, #2563eb 100%) !important;
@@ -494,7 +515,8 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
       }
 
       #sidebar.active {
-        transform: translateX(0);
+        right: 0;
+        left: auto;
       }
 
       .main-content {
@@ -748,15 +770,27 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
 <body>
   <!-- Top Bar -->
   <nav class="navbar navbar-expand-lg position-relative" style="background: #2563eb; height: 60px;">
-    <div class="container-fluid">
-      <div class="d-flex align-items-center">
-        <button class="mobile-menu-btn" id="mobileMenuBtn">
+    <div class="container-fluid px-2">
+      <div class="d-flex align-items-center justify-content-between w-100">
+        <div class="d-flex align-items-center">
+          <a href="profile.php" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;">
+            <?php if ($profile_picture): ?>
+              <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
+            <?php else: ?>
+              <i class="bi bi-person-circle"></i>
+            <?php endif; ?>
+            <span class="d-lg-none" style="font-size: 1rem; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
+              <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
+            </span>
+          </a>
+          <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo d-none d-lg-block" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
+          <span class="navbar-brand mb-0 h1 electoral-commission-title d-none d-lg-block" style="font-size:1.5rem;">Electoral Commission</span>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" style="padding: 0.25rem;">
           <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
         </button>
-        <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
-        <span class="navbar-brand mb-0 h1 electoral-commission-title" style="font-size:1.5rem;">Electoral Commission</span>
       </div>
-      <div class="profile-button">
+      <div class="profile-button d-none d-lg-block">
         <a href="profile.php" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500; min-width:120px;">
           <?php if ($profile_picture): ?>
             <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
