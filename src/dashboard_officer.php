@@ -16,45 +16,65 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
     : null;
 
 // ✅ Add Candidate Submission Logic
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'], $_POST['info'])) {
-  header('Content-Type: application/json');
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'], $_POST['info'], $_FILES['profile_pic'])) {
+    header('Content-Type: application/json');
 
-  $name = trim($_POST['full_name']);
-  $department = trim($_POST['department']);
-  $position = ucwords(strtolower(trim($_POST['position']))); // Capitalize only the position
-  $platform = trim($_POST['info']);
+    $name = trim($_POST['full_name']);
+    $department = trim($_POST['department']);
+    $position = ucwords(strtolower(trim($_POST['position']))); // Capitalize only the position
+    $platform = trim($_POST['info']);
 
-  // Check if any of the fields are empty
-  if ($name === '' || $department === '' || $position === '' || $platform === '') {
-      echo json_encode(['success' => false, 'message' => 'All fields are required.']);
-      exit;
-  }
+    // Profile Picture Handling (same process as for the candidate)
+    $photo = $_FILES['profile_pic'];
+    $allowedTypes = ['image/jpeg', 'image/png', 'image/gif']; // Allowed file types
+    $uploadDirectory = '../uploads/profile_pictures/'; // Directory where the profile pictures will be stored
 
-  // Check if the candidate already exists
-  $check_stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE name = ? AND department = ? AND position = ?");
-  $check_stmt->bind_param("sss", $name, $department, $position);
-  $check_stmt->execute();
-  $check_result = $check_stmt->get_result();
+    // Check if the file is an allowed image type
+    if (!in_array($photo['type'], $allowedTypes)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid file type. Only JPEG, PNG, and GIF are allowed.']);
+        exit;
+    }
 
-  if ($check_result->num_rows > 0) {
-      echo json_encode(['success' => false, 'message' => 'Candidate with this name, department, and position already exists.']);
-      exit;
-  }
+    // Generate a unique filename for the image
+    $photoPath = $uploadDirectory . time() . '_' . basename($photo['name']);
 
-  // Insert candidate
-  $stmt = $con->prepare("INSERT INTO candidate (name, department, position, platform) VALUES (?, ?, ?, ?)");
-  if ($stmt) {
-      $stmt->bind_param("ssss", $name, $department, $position, $platform);
-      if ($stmt->execute()) {
-          echo json_encode(['success' => true, 'message' => 'Candidate added successfully.']);
-      } else {
-          echo json_encode(['success' => false, 'message' => 'Failed to insert candidate.']);
-      }
-      $stmt->close();
-  } else {
-      echo json_encode(['success' => false, 'message' => 'Database error.']);
-  }
-  exit;
+    // Move the uploaded file to the target directory
+    if (!move_uploaded_file($photo['tmp_name'], $photoPath)) {
+        echo json_encode(['success' => false, 'message' => 'Failed to upload the profile picture.']);
+        exit;
+    }
+
+    // Check if any of the fields are empty
+    if ($name === '' || $department === '' || $position === '' || $platform === '') {
+        echo json_encode(['success' => false, 'message' => 'All fields are required.']);
+        exit;
+    }
+
+    // Check if the candidate already exists
+    $check_stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE name = ? AND department = ? AND position = ?");
+    $check_stmt->bind_param("sss", $name, $department, $position);
+    $check_stmt->execute();
+    $check_result = $check_stmt->get_result();
+
+    if ($check_result->num_rows > 0) {
+        echo json_encode(['success' => false, 'message' => 'Candidate with this name, department, and position already exists.']);
+        exit;
+    }
+
+    // Insert candidate data along with profile picture into the database
+    $stmt = $con->prepare("INSERT INTO candidate (name, department, position, platform, photo) VALUES (?, ?, ?, ?, ?)");
+    if ($stmt) {
+        $stmt->bind_param("sssss", $name, $department, $position, $platform, $photoPath);
+        if ($stmt->execute()) {
+            echo json_encode(['success' => true, 'message' => 'Candidate added successfully.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Failed to insert candidate.']);
+        }
+        $stmt->close();
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database error.']);
+    }
+    exit;
 }
 
 ?>
@@ -847,6 +867,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
         padding: 0.75rem 1rem;
       }
     }
+
+    #viewCandidateTable tbody tr:hover {
+    background-color:rgb(193, 196, 197);
+    
+    }
+
   </style>
 </head>
 <body>
@@ -913,17 +939,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
         </div>
         <ul class="nav flex-column gap-2">
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center active" href="officer_dashboard.php">
+            <a class="nav-link text-white d-flex align-items-center active" href="dashboard_officer.php">
               <i class="bi bi-house-door"></i>
               <span class="sidebar-text">Home</span>
             </a>
           </li>
+          <!-- Sidebar Nav Item -->
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="candidates.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#viewCandidatesModal"
+              onclick="if(window.innerWidth <= 991.98){
+                document.getElementById('sidebar').classList.remove('active');
+                document.getElementById('sidebarOverlay').classList.remove('active');
+                document.getElementById('mobileMenuBtn').classList.remove('active');
+              }">
               <i class="bi bi-people"></i>
-              <span class="sidebar-text">Candidates</span>
+              <span class="sidebar-text">View Candidates</span>
             </a>
           </li>
+
           <li class="nav-item">
             <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#addCandidateModal" onclick="if(window.innerWidth <= 991.98){document.getElementById('sidebar').classList.remove('active');document.getElementById('sidebarOverlay').classList.remove('active');document.getElementById('mobileMenuBtn').classList.remove('active');}">
               <i class="bi bi-plus-circle"></i>
@@ -931,7 +964,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#removeCandidateModal" onclick="if(window.innerWidth <= 991.98){document.getElementById('sidebar').classList.remove('active');document.getElementById('sidebarOverlay').classList.remove('active');document.getElementById('mobileMenuBtn').classList.remove('active');}">
+            <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#removeCandidateModal"
+                onclick="if(window.innerWidth <= 991.98){
+                    document.getElementById('sidebar').classList.remove('active');
+                    document.getElementById('sidebarOverlay').classList.remove('active');
+                    document.getElementById('mobileMenuBtn').classList.remove('active');
+                }">
                <i class="bi bi-trash"></i>
                 <span class="sidebar-text">Remove Candidate</span>
             </a>
@@ -1031,6 +1069,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../function/dashboard.js"></script>
+
+
   <!-- Add Candidate Modal -->
   <div class="modal fade" id="addCandidateModal" tabindex="-1" aria-labelledby="addCandidateModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -1040,7 +1080,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form id="addCandidateForm">
+        <form id="addCandidateForm" enctype="multipart/form-data">
           <div class="row g-3">
             <div class="col-12 col-md-6">
               <label for="full_name" class="form-label">Full Name</label>
@@ -1063,12 +1103,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
               </select>
             </div>
             <div class="col-12">
+              <label for="profile_pic" class="form-label">Profile Picture</label>
+              <input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/*" required>
+            </div>
+
+            <div class="col-12">
               <label for="info" class="form-label">Candidate Information</label>
               <textarea class="form-control" id="info" name="info" rows="3" placeholder="Brief background or platform..." required></textarea>
             </div>
+            
           </div>
           <button type="submit" class="btn btn-primary w-100 mt-3">Add Candidate</button>
         </form>
+
         <div id="addCandidateMsg" class="mt-2"></div>
       </div>
     </div>
@@ -1118,6 +1165,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     </div>
   </div>
 </div>
+
+
+<!-- View Candidates Modal -->
+<div class="modal fade" id="viewCandidatesModal" tabindex="-1" aria-labelledby="viewCandidatesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewCandidatesModalLabel">All Candidates</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Search Input -->
+        <div class="mb-3">
+          <label for="searchViewCandidate" class="form-label">Search by Name</label>
+          <input type="text" class="form-control" id="searchViewCandidate" placeholder="Search Candidate">
+        </div>
+
+        <!-- Scrollable Table -->
+        <div style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-bordered" id="viewCandidateTable">
+          <thead class="table-light">
+            <tr>
+              <th>Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Candidates will be inserted here -->
+          </tbody>
+        </table>
+
+        </div>
+
+        <div id="viewCandidateMsg" class="mt-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Candidate Profile Modal -->
+<div class="modal fade" id="candidateProfileModal" tabindex="-1" aria-labelledby="candidateProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-person-circle fs-4 text-primary"></i>
+          <h5 class="modal-title mb-0" id="candidateProfileModalLabel">Candidate Name</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="candidateProfileCard" class="card shadow rounded-4 border-0">
+          <div class="card-body">
+            <p class="mb-2"><strong>ID:</strong> <span id="profileId"></span></p>
+            <p class="mb-2"><strong>Department:</strong> <span id="profileDept"></span></p>
+            <p class="mb-2"><strong>Position:</strong> <span id="profilePosition"></span></p>
+            <div>
+              <strong>Platform:</strong>
+              <p id="profilePlatform" class="mt-1 mb-0"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+ 
+
+
+<!-- View Candidates Modal -->
+<div class="modal fade" id="viewCandidatesModal" tabindex="-1" aria-labelledby="viewCandidatesModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewCandidatesModalLabel">View Candidates</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Search input for candidates -->
+        <input type="text" class="form-control" id="searchViewCandidate" placeholder="Search candidates...">
+        <div class="mt-3" id="viewCandidateMsg"></div>
+
+        <!-- Dynamic container to group and display candidates -->
+        <div id="candidateGroups" class="mt-3">
+          <!-- Groups of candidates by department or organization will be rendered here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
 
 
 
@@ -1331,6 +1474,99 @@ document.getElementById('removeCandidateForm').onsubmit = function (e) {
       removeBtn.disabled = false;
     });
 };
+
+
+
+
+
+// View Candidate Modal Setup
+const viewCandidateModal = document.getElementById('viewCandidatesModal');
+const viewTableBody = document.querySelector('#viewCandidateTable tbody');
+const viewMsg = document.getElementById('viewCandidateMsg');
+const viewSearchInput = document.getElementById('searchViewCandidate');
+
+// Fetch and render candidates
+function loadViewCandidateTable(searchQuery = '') {
+  viewTableBody.innerHTML = '<tr><td>Loading...</td></tr>';
+  viewMsg.textContent = '';
+  viewMsg.className = '';
+
+  fetch('fetch_candidates.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.candidates) && data.candidates.length > 0) {
+        viewTableBody.innerHTML = '';
+        let hasMatch = false;
+
+        data.candidates.forEach(candidate => {
+          if (!candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
+
+          const row = document.createElement('tr');
+          row.style.cursor = 'pointer'; // Make it look clickable
+          row.innerHTML = `<td>${candidate.name}</td>`; // Remove button
+          row.onclick = () => showCandidateProfile(candidate); // Attach click handler to row
+          viewTableBody.appendChild(row);
+          hasMatch = true;
+        });
+
+
+        if (!hasMatch) {
+          viewTableBody.innerHTML = '<tr><td>No matching candidates found.</td></tr>';
+        }
+
+      } else {
+        viewTableBody.innerHTML = '<tr><td>No candidates found.</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching candidates:', error);
+      viewTableBody.innerHTML = '<tr><td>Error loading candidates.</td></tr>';
+    });
+}
+
+// Reload candidates when modal is shown
+viewCandidateModal.addEventListener('shown.bs.modal', () => loadViewCandidateTable());
+
+// Handle search input
+viewSearchInput.addEventListener('input', (e) => {
+  loadViewCandidateTable(e.target.value);
+});
+
+// Show Candidate Profile Function
+function showCandidateProfile(candidate) {
+  const profileName = document.getElementById('profileName');
+  const profileId = document.getElementById('profileId');
+  const profileDept = document.getElementById('profileDept');
+  const profilePosition = document.getElementById('profilePosition');
+  const profilePlatform = document.getElementById('profilePlatform');
+
+  // Set modal title to the candidate's name
+  const profileModalTitle = document.getElementById('candidateProfileModalLabel');
+  profileModalTitle.textContent = candidate.name || 'Candidate Profile';
+
+  // Populate profile fields
+  profileId.textContent = candidate.candidate_id || 'N/A';
+  profileDept.textContent = candidate.department || 'N/A';
+  profilePosition.textContent = candidate.position || 'N/A';
+  profilePlatform.textContent = candidate.platform || 'N/A';
+
+  // Hide the candidate list modal
+  const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCandidatesModal'));
+  if (viewModal) {
+    viewModal.hide();
+  }
+
+  // Show the candidate profile modal
+  const profileModal = new bootstrap.Modal(document.getElementById('candidateProfileModal'));
+  profileModal.show();
+}
+
+
+
+
+
+
+
 
 
 
