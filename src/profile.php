@@ -465,13 +465,11 @@ $stmt->close();
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:60px; z-index: 1050;">
-        <div class="back-btn-container">
-            <a href="dashboard_officer.php" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
+        <div class="container d-flex justify-content-start">
+            <a href="<?php echo $_SESSION['role'] === 'officer' ? 'dashboard_officer.php' : 'dashboard_student.php'; ?>" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
                 <i class="bi bi-arrow-left fs-6"></i>
                 <span class="fw-semibold" style="font-size:1rem;">Back</span>
             </a>
-        </div>
-        <div class="container d-flex justify-content-start">
         </div>
     </nav>
 
