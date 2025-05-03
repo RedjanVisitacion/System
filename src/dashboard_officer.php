@@ -765,6 +765,40 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         padding-right: 0.8rem;
       }
     }
+    .dropdown-menu {
+      border: none;
+      padding: 0.5rem;
+    }
+    
+    .dropdown-item {
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+    
+    .dropdown-item:hover {
+      background-color: #f8fafc;
+    }
+    
+    .dropdown-item i {
+      font-size: 1.1rem;
+    }
+    
+    .dropdown-divider {
+      margin: 0.5rem 0;
+      opacity: 0.1;
+    }
+    
+    @media (max-width: 575.98px) {
+      .dropdown-menu {
+        width: 200px;
+        margin-top: 0.5rem !important;
+      }
+      
+      .dropdown-item {
+        padding: 0.75rem 1rem;
+      }
+    }
   </style>
 </head>
 <body>
@@ -773,16 +807,23 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
-          <a href="profile.php" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;">
-            <?php if ($profile_picture): ?>
-              <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
-            <?php else: ?>
-              <i class="bi bi-person-circle"></i>
-            <?php endif; ?>
-            <span class="d-lg-none" style="font-size: 1rem; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
-              <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
-            </span>
-          </a>
+          <div class="dropdown">
+            <a href="#" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;" role="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+              <?php if ($profile_picture): ?>
+                <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
+              <?php else: ?>
+                <i class="bi bi-person-circle"></i>
+              <?php endif; ?>
+              <span class="d-lg-none" style="font-size: 1rem; font-weight: 500; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px;">
+                <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
+              </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown" style="margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+              <li><a class="dropdown-item d-flex align-items-center gap-2" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+            </ul>
+          </div>
           <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo d-none d-lg-block" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
           <span class="navbar-brand mb-0 h1 electoral-commission-title d-none d-lg-block" style="font-size:1.5rem;">Electoral Commission</span>
         </div>
@@ -791,18 +832,25 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
         </button>
       </div>
       <div class="profile-button d-none d-lg-block">
-        <a href="profile.php" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500; min-width:120px;">
-          <?php if ($profile_picture): ?>
-            <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
-          <?php else: ?>
-            <span class="d-flex align-items-center justify-content-center" style="width:32px; height:32px; background:#e0e7ef; border-radius:50%; margin-right:8px;">
-              <i class="bi bi-person-circle" style="font-size:1.5rem; color:#2563eb;"></i>
+        <div class="dropdown">
+          <a href="#" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500; min-width:120px;" role="button" id="desktopProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <?php if ($profile_picture): ?>
+              <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
+            <?php else: ?>
+              <span class="d-flex align-items-center justify-content-center" style="width:32px; height:32px; background:#e0e7ef; border-radius:50%; margin-right:8px;">
+                <i class="bi bi-person-circle" style="font-size:1.5rem; color:#2563eb;"></i>
+              </span>
+            <?php endif; ?>
+            <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70px; display:inline-block; vertical-align:middle;">
+              <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
             </span>
-          <?php endif; ?>
-          <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70px; display:inline-block; vertical-align:middle;">
-            <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
-          </span>
-        </a>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="desktopProfileDropdown" style="margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <li><a class="dropdown-item d-flex align-items-center gap-2" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+          </ul>
+        </div>
       </div>
     </div>
   </nav>
