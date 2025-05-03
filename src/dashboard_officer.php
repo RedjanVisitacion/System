@@ -146,6 +146,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 
 
 
+
 ?>
 
 
@@ -1074,8 +1075,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                   <p class="fs-4 text-center mb-0" id="totalCandidates">0</p>
                 </div>
               </div>
+              <!-- Total Voters Dashboard Card -->
               <div class="col-12 col-md-6">
-                <div class="dashboard-card p-4">
+                <div class="dashboard-card p-4" id="totalVotersCard" style="cursor: pointer;">
                   <div class="icon">
                     <i class="bi bi-person-check"></i>
                   </div>
@@ -1083,6 +1085,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                   <p class="fs-4 text-center mb-0" id="totalVoters">0</p>
                 </div>
               </div>
+
               <div class="col-12 col-md-6">
                 <div class="dashboard-card p-4">
                   <div class="icon">
@@ -1195,6 +1198,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     </div>
   </div>
 </div>
+
+
+
+<!-- Voters Modal -->
+<div class="modal fade" id="votersModal" tabindex="-1" aria-labelledby="votersModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="votersModalLabel">All Voters</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="voterSearchInput" class="form-label">Search Voters</label>
+          <input type="text" class="form-control" id="voterSearchInput" placeholder="Search by full name...">
+        </div>
+
+        <!-- Scrollable Table -->
+        <div style="max-height: 400px; overflow-y: auto;">
+          <table class="table table-bordered align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Full Name</th> <!-- Removed profile picture column -->
+              </tr>
+            </thead>
+            <tbody id="voterTableBody">
+              <!-- Filled dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 
 <!-- Remove Candidate Modal -->
@@ -1446,6 +1486,62 @@ document.getElementById('addCandidateModal')?.addEventListener('hidden.bs.modal'
 
 
 
+// DOM Elements
+const votersModal = new bootstrap.Modal(document.getElementById('votersModal'));
+const voterTableBody = document.getElementById('voterTableBody');
+const voterSearchInput = document.getElementById('voterSearchInput');
+const totalVotersCard = document.getElementById('totalVotersCard');
+const totalVotersCount = document.getElementById('totalVoters');
+
+let allVoters = []; // Store fetched data globally for filtering
+
+// Fetch and render voters
+function loadVotersTable(searchQuery = '') {
+  voterTableBody.innerHTML = '<tr><td>Loading...</td></tr>';
+
+  fetch('fetch_voters.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.voters)) {
+        allVoters = data.voters;
+        totalVotersCount.textContent = allVoters.length;
+        renderVoters(allVoters, searchQuery);
+      } else {
+        voterTableBody.innerHTML = '<tr><td>No voters found.</td></tr>';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching voters:', error);
+      voterTableBody.innerHTML = `<tr><td>Error loading voters: ${error.message}</td></tr>`;
+    });
+}
+
+// Render filtered voters
+function renderVoters(voters, searchQuery = '') {
+  const filtered = voters.filter(voter =>
+    voter.full_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  voterTableBody.innerHTML = filtered.length
+    ? filtered.map(voter => `<tr><td>${voter.full_name}</td></tr>`).join('')
+    : '<tr><td>No matching voters found.</td></tr>';
+}
+
+// Show modal and load voters when card is clicked
+totalVotersCard.addEventListener('click', () => {
+  votersModal.show();
+  loadVotersTable();
+});
+
+// Live search
+voterSearchInput.addEventListener('input', (e) => {
+  renderVoters(allVoters, e.target.value);
+});
+
+
+
+
+
 // Remove Candidate Modal Setup
 const removeCandidateModal = document.getElementById('removeCandidateModal');
 const tableBody = document.querySelector('#candidateTable tbody');
@@ -1576,6 +1672,9 @@ document.getElementById('removeCandidateForm').onsubmit = function (e) {
 };
 
 
+
+
+//Show all Candidates
 const viewCandidateModal = document.getElementById('viewCandidatesModal');
 const viewTableBody = document.querySelector('#viewCandidateTable tbody');
 const viewMsg = document.getElementById('viewCandidateMsg');
