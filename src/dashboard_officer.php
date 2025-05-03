@@ -1013,7 +1013,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <span class="sidebar-text">Home</span>
             </a>
           </li>
-          <!-- Sidebar Nav Item -->
           <li class="nav-item">
             <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#viewCandidatesModal"
               onclick="if(window.innerWidth <= 991.98){
@@ -1025,6 +1024,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <span class="sidebar-text">View Candidates</span>
             </a>
           </li>
+
 
           <li class="nav-item">
             <a class="nav-link text-white d-flex align-items-center" href="#" data-bs-toggle="modal" data-bs-target="#addCandidateModal" onclick="if(window.innerWidth <= 991.98){document.getElementById('sidebar').classList.remove('active');document.getElementById('sidebarOverlay').classList.remove('active');document.getElementById('mobileMenuBtn').classList.remove('active');}">
@@ -1241,7 +1241,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 </div>
 
 
-<!-- View Candidates Modal -->
 <div class="modal fade" id="viewCandidatesModal" tabindex="-1" aria-labelledby="viewCandidatesModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -1250,33 +1249,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-
-        <!-- Search Input -->
         <div class="mb-3">
           <label for="searchViewCandidate" class="form-label">Search by Name</label>
           <input type="text" class="form-control" id="searchViewCandidate" placeholder="Search Candidate">
         </div>
-
-        <!-- Scrollable Table -->
         <div style="max-height: 300px; overflow-y: auto;">
-        <table class="table table-bordered" id="viewCandidateTable">
-          <thead class="table-light">
-            <tr>
-              <th>Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Candidates will be inserted here -->
-          </tbody>
-        </table>
-
+          <table class="table table-bordered" id="viewCandidateTable">
+            <thead class="table-light">
+              <tr>
+                <th>Candidate ID</th>
+                <th>Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Candidate rows go here -->
+            </tbody>
+          </table>
         </div>
-
         <div id="viewCandidateMsg" class="mt-2"></div>
       </div>
     </div>
   </div>
 </div>
+
 
 
 
@@ -1581,10 +1576,6 @@ document.getElementById('removeCandidateForm').onsubmit = function (e) {
 };
 
 
-
-
-
-// View Candidate Modal Setup
 const viewCandidateModal = document.getElementById('viewCandidatesModal');
 const viewTableBody = document.querySelector('#viewCandidateTable tbody');
 const viewMsg = document.getElementById('viewCandidateMsg');
@@ -1592,7 +1583,7 @@ const viewSearchInput = document.getElementById('searchViewCandidate');
 
 // Fetch and render candidates
 function loadViewCandidateTable(searchQuery = '') {
-  viewTableBody.innerHTML = '<tr><td>Loading...</td></tr>';
+  viewTableBody.innerHTML = '<tr><td colspan="2">Loading...</td></tr>';
   viewMsg.textContent = '';
   viewMsg.className = '';
 
@@ -1607,35 +1598,38 @@ function loadViewCandidateTable(searchQuery = '') {
           if (!candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
 
           const row = document.createElement('tr');
-          row.style.cursor = 'pointer'; // Make it look clickable
-          row.innerHTML = `<td>${candidate.name}</td>`; // Remove button
-          row.onclick = () => showCandidateProfile(candidate); // Attach click handler to row
+          row.style.cursor = 'pointer';
+          row.innerHTML = `
+            <td>${candidate.candidate_id}</td>
+            <td>${candidate.name}</td>
+          `;
+          row.onclick = () => showCandidateProfile(candidate);
           viewTableBody.appendChild(row);
           hasMatch = true;
         });
 
-
         if (!hasMatch) {
-          viewTableBody.innerHTML = '<tr><td>No matching candidates found.</td></tr>';
+          viewTableBody.innerHTML = '<tr><td colspan="2">No matching candidates found.</td></tr>';
         }
 
       } else {
-        viewTableBody.innerHTML = '<tr><td>No candidates found.</td></tr>';
+        viewTableBody.innerHTML = '<tr><td colspan="2">No candidates found.</td></tr>';
       }
     })
     .catch(error => {
       console.error('Error fetching candidates:', error);
-      viewTableBody.innerHTML = '<tr><td>Error loading candidates.</td></tr>';
+      viewTableBody.innerHTML = '<tr><td colspan="2">Error loading candidates.</td></tr>';
     });
 }
 
-// Reload candidates when modal is shown
+// Load when modal is opened
 viewCandidateModal.addEventListener('shown.bs.modal', () => loadViewCandidateTable());
 
-// Handle search input
+// Live search
 viewSearchInput.addEventListener('input', (e) => {
   loadViewCandidateTable(e.target.value);
 });
+
 
 
 
