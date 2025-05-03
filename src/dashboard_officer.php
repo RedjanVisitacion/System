@@ -1345,11 +1345,14 @@ departmentSelect.addEventListener("change", () => {
 });
 
 // Handle form submission
-document.getElementById('addCandidateForm').onsubmit = function(e) {
+document.getElementById('addCandidateForm').onsubmit = function (e) {
   e.preventDefault();
 
   const form = this;
   const msg = document.getElementById('addCandidateMsg');
+  const positionSelect = document.getElementById('positionSelect'); // Make sure this exists in your HTML
+
+  // Clear previous messages
   msg.textContent = '';
   msg.className = '';
 
@@ -1359,23 +1362,44 @@ document.getElementById('addCandidateForm').onsubmit = function(e) {
     method: 'POST',
     body: formData
   })
-  .then(r => r.json())
-  .then(response => {
-    if (response.success) {
-      msg.textContent = response.message || 'Candidate added successfully!';
-      msg.className = 'text-success mt-2';
-      form.reset();  // Clear form on success
-      positionSelect.innerHTML = '<option value="">Select Position</option>'; // Reset positions
-    } else {
-      msg.textContent = response.message || 'Error adding candidate.';
+    .then(r => r.json())
+    .then(response => {
+      if (response.success) {
+        msg.textContent = response.message || 'Candidate added successfully!';
+        msg.className = 'text-success mt-2';
+        form.reset(); // Clear form on success
+        if (positionSelect) {
+          positionSelect.innerHTML = '<option value="">Select Position</option>'; // Reset positions
+        }
+      } else {
+        msg.textContent = response.message || 'Error adding candidate.';
+        msg.className = 'text-danger mt-2';
+      }
+    })
+    .catch(() => {
+      msg.textContent = 'Error connecting to server.';
       msg.className = 'text-danger mt-2';
-    }
-  })
-  .catch(() => {
-    msg.textContent = 'Error connecting to server.';
-    msg.className = 'text-danger mt-2';
-  });
+    });
 };
+
+// Reset message when modal is closed (assuming Bootstrap modal with ID 'addCandidateModal')
+document.getElementById('addCandidateModal')?.addEventListener('hidden.bs.modal', function () {
+  const msg = document.getElementById('addCandidateMsg');
+  if (msg) {
+    msg.textContent = '';
+    msg.className = '';
+  }
+
+  // Optional: also reset form and position dropdown when modal is closed
+  const form = document.getElementById('addCandidateForm');
+  form?.reset();
+
+  const positionSelect = document.getElementById('positionSelect');
+  if (positionSelect) {
+    positionSelect.innerHTML = '<option value="">Select Position</option>';
+  }
+});
+
 
 
 
