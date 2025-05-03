@@ -116,13 +116,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
 }
 
 
-
 // Fetch and display candidate details (with photo)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   $candidate_id = $_GET['candidate_id'];
 
-  // Fetch candidate details including photo
-  $stmt = $con->prepare("SELECT name, department, position, platform, photo FROM candidate WHERE candidate_id = ?");
+  // Fetch candidate details including photo and age
+  $stmt = $con->prepare("SELECT name, department, position, age, platform, photo FROM candidate WHERE candidate_id = ?");
   $stmt->bind_param("i", $candidate_id);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -130,12 +129,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   $stmt->close();
 
   if ($candidate) {
-      // If photo exists, use the photo path, else fallback to a default image
       $photoPath = !empty($candidate['photo']) && file_exists($candidate['photo'])
           ? $candidate['photo']
           : 'path/to/default/photo.png';  // Default photo
 
-      // Send the candidate data with the photo path
       echo json_encode([
           'success' => true,
           'candidate' => $candidate,
@@ -1291,8 +1288,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       <div class="modal-header d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
           <!-- Display candidate photo here -->
-          
-
           <?php if (!empty($candidate_photo)): ?>
               <img src="<?php echo $candidate_photo; ?>" id="candidatePhoto" class="rounded-circle" alt="Candidate Photo" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff;">
           <?php else: ?>
@@ -1306,7 +1301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       <div class="modal-body">
         <div id="candidateProfileCard" class="card shadow rounded-4 border-0">
           <div class="card-body">
-            <p class="mb-2"><strong>ID:</strong> <span id="profileId"></span></p>
+            <p class="mb-2"><strong>Age:</strong> <span id="profileAge"></span></p>
             <p class="mb-2"><strong>Department:</strong> <span id="profileDept"></span></p>
             <p class="mb-2"><strong>Position:</strong> <span id="profilePosition"></span></p>
             <div>
@@ -1646,24 +1641,17 @@ viewSearchInput.addEventListener('input', (e) => {
 
 // Show Candidate Profile Function
 function showCandidateProfile(candidate) {
-  const profileName = document.getElementById('profileName');
-  const profileId = document.getElementById('profileId');
+  const profileModalTitle = document.getElementById('candidateProfileModalLabel');
+  const profileAge = document.getElementById('profileAge');
   const profileDept = document.getElementById('profileDept');
   const profilePosition = document.getElementById('profilePosition');
   const profilePlatform = document.getElementById('profilePlatform');
 
-
-
-  // Set modal title to the candidate's name
-  const profileModalTitle = document.getElementById('candidateProfileModalLabel');
   profileModalTitle.textContent = candidate.name || 'Candidate Profile';
-
-  // Populate profile fields
-  profileId.textContent = candidate.candidate_id || 'N/A';
+  profileAge.textContent = candidate.age ? `${candidate.age} years old` : 'N/A';
   profileDept.textContent = candidate.department || 'N/A';
   profilePosition.textContent = candidate.position || 'N/A';
   profilePlatform.textContent = candidate.platform || 'N/A';
-
 
 
   // Hide the candidate list modal (if open)

@@ -4,7 +4,7 @@ require_once 'connection.php';
 
 header('Content-Type: application/json');
 
-$query = "SELECT candidate_id, name, position, department, platform FROM candidate ORDER BY name ASC";
+$query = "SELECT candidate_id, name, position, department, platform, age FROM candidate ORDER BY name ASC";
 $result = $con->query($query);
 
 if ($result) {
