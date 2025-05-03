@@ -714,7 +714,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       letter-spacing: 0.5px;
       text-transform: uppercase;
       background: linear-gradient(45deg, #ffffff, #e0e7ff);
-      /* -webkit-background-clip: text; */
+      -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
