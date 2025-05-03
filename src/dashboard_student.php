@@ -793,6 +793,7 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
       .dropdown-menu {
         width: 200px;
         margin-top: 0.5rem !important;
+        margin-left: -1rem !important;
       }
       
       .dropdown-item {
@@ -886,12 +887,6 @@ $profile_picture = !empty($user_profile['profile_picture']) && file_exists('../u
             <a class="nav-link text-white d-flex align-items-center" href="results.php">
               <i class="bi bi-list-check"></i>
               <span class="sidebar-text">View Results</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="logout.php">
-              <i class="bi bi-box-arrow-right"></i>
-              <span class="sidebar-text">Logout</span>
             </a>
           </li>
         </ul>

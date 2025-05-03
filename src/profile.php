@@ -548,24 +548,24 @@ $stmt->close();
                                 </select>
                             </div>
                             <div class="col-12 col-md-6 profile-form-row">
-                                <label for="email" class="form-label">Email Address</label>
+                            <label for="email" class="form-label">Email Address</label>
                                 <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
-                            </div>
+                        </div>
                             <div class="col-12 col-md-6 profile-form-row">
-                                <label for="phone" class="form-label">Phone Number</label>
+                            <label for="phone" class="form-label">Phone Number</label>
                                 <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
                             </div>
                         </div>
                         <div class="profile-password-section">
                             <h6>Change Password</h6>
-                            <div class="mb-3">
-                                <label for="new_password" class="form-label">New Password</label>
+                        <div class="mb-3">
+                            <label for="new_password" class="form-label">New Password</label>
                                 <input type="password" class="form-control" id="new_password" name="new_password" minlength="6">
-                                <div class="form-text">Leave blank to keep current password</div>
-                            </div>
+                            <div class="form-text">Leave blank to keep current password</div>
+                        </div>
                             <div class="mb-3">
-                                <label for="confirm_password" class="form-label">Confirm New Password</label>
-                                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
                             </div>
                         </div>
                         <div class="d-grid mt-4">
@@ -615,9 +615,9 @@ $stmt->close();
             }
             if (fileInput) {
                 fileInput.addEventListener('change', function(e) {
-                    if (this.files && this.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
                             if (avatar) {
                                 avatar.src = e.target.result;
                             } else if (avatarIcon) {
@@ -625,9 +625,9 @@ $stmt->close();
                                 avatarIcon.outerHTML = `<img src='${e.target.result}' alt='Profile Picture' style='width:100%;height:100%;object-fit:cover;border-radius:50%;'>`;
                             }
                         };
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
             }
             // Hide options when clicking outside
             document.addEventListener('click', function(e) {
