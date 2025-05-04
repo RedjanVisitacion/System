@@ -607,6 +607,168 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       font-size: 1rem;
       padding: 0.25rem;
     }
+
+
+
+
+    /* iPhone SE / older phones */
+@media (max-width: 320px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 50px;
+  }
+}
+
+/* iPhone 6/7/8 */
+@media (max-width: 375px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 70px;
+  }
+}
+
+/* iPhone XR / Pixel 3 XL */
+@media (max-width: 414px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 80px;
+  }
+}
+
+/* Galaxy S8/S9 */
+@media (max-width: 360px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 65px;
+  }
+}
+
+/* Pixel 5 */
+@media (max-width: 393px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 75px;
+  }
+}
+
+/* iPhone 12 Pro */
+@media (max-width: 390px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 73px;
+  }
+}
+
+/* OnePlus 9 */
+@media (max-width: 412px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 85px;
+  }
+}
+
+/* iPhone 13 Pro Max */
+@media (max-width: 430px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 90px;
+  }
+}
+
+/* Samsung Galaxy S20 Ultra */
+@media (max-width: 440px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 92px;
+  }
+}
+
+/* Generic medium phones */
+@media (max-width: 460px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 100px;
+  }
+}
+
+/* Large phones */
+@media (max-width: 480px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 105px;
+  }
+}
+
+/* Small phablets */
+@media (max-width: 500px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 110px;
+  }
+}
+
+/* Small tablets */
+@media (max-width: 540px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 115px;
+  }
+}
+
+@media (max-width: 568px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 118px;
+  }
+}
+
+@media (max-width: 600px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 120px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 125px;
+  }
+}
+
+@media (max-width: 667px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 128px;
+  }
+}
+
+@media (max-width: 720px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 135px;
+  }
+}
+
+@media (max-width: 820px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 140px;
+  }
+}
+
+
+
+
+  
+
     @media (max-width: 991.98px) {
       .mobile-menu-btn {
         display: block;

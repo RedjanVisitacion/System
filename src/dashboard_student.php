@@ -64,6 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="main.css">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons (if you're using bi-list) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body {
@@ -504,12 +510,179 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       font-size: 1rem;
       padding: 0.25rem;
     }
+
+
     @media (max-width: 991.98px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 130px;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 90px;
+  }
+}
+
+
+/* Base: hidden by default */
+.mobile-menu-btn {
+  display: none;
+}
+
+/* Tablet and smaller */
+@media (max-width: 991.98px) {
+  .mobile-menu-btn {
+    display: block;
+    margin-left: 130px;
+  }
+}
+
+/* Phones like itel A50 (<= 500px) */
+@media (max-width: 500px) {
+  .mobile-menu-btn {
+    margin-left: 90px;
+  }
+}
+
+
+
+
+
+
+ @media (max-width: 991.98px) {
       .mobile-menu-btn {
         display: block;
         margin-left: 130px;
       }
       
+
+      .mobile-menu-btn {
+        display: block;
+        margin-left: 90px; /* Adjust as needed for other devices */
+      }
+
+
+      .elecom-logo {
+        margin-left: 0;
+      }
+      
+      .electoral-commission-title {
+        font-size: 1.1rem !important;
+      }
+
+      .navbar .container-fluid {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding-right: 56px !important;
+        position: relative;
+      }
+
+      .navbar .d-flex.align-items-center {
+        flex-direction: row;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .navbar-brand {
+        font-size: 1.1rem !important;
+      }
+
+      #sidebar {
+        position: fixed;
+        right: -240px;
+        left: auto;
+        top: 60px;
+        height: calc(100vh - 60px);
+        z-index: 1102;
+        transform: translateX(0);
+        transition: right 0.3s cubic-bezier(0.4,0.2,0.2,1);
+        box-shadow: -2px 0 8px rgba(0,0,0,0.10);
+        width: 240px !important;
+        min-width: 60px !important;
+        background: linear-gradient(135deg, #232526 0%, #2563eb 100%) !important;
+        padding-top: 1.5rem !important;
+      }
+
+      #sidebar.active {
+        right: 0;
+        left: auto;
+      }
+
+      .main-content {
+        margin-left: 0;
+        margin-top: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        width: 100%;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      .main-content .row.g-4 {
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        margin: 0;
+      }
+
+      .dashboard-card, .calendar-card {
+        width: 95vw;
+        max-width: 400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .col-12, .col-lg-8, .col-lg-4 {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 0 0 100% !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      .calendar-card {
+        margin-top: 1.5rem;
+      }
+
+      #sidebar .nav-link {
+        font-size: 1.1rem;
+        padding: 16px 18px;
+      }
+
+      #sidebar .sidebar-header {
+        font-size: 1.1rem;
+      }
+
+      .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.25);
+        z-index: 1100;
+      }
+
+      .sidebar-overlay.active {
+        display: block;
+      }
+    }
+
+
+
+
+
+    @media (max-width: 991.98px) {
+      .mobile-menu-btn {
+        display: block;
+        margin-left: 130px;
+      }
+
       .elecom-logo {
         margin-left: 0;
       }
@@ -872,9 +1045,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
           <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo d-none d-lg-block" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
           <span class="navbar-brand mb-0 h1 electoral-commission-title d-none d-lg-block" style="font-size:1.5rem;">Electoral Commission</span>
         </div>
-        <button class="mobile-menu-btn" id="mobileMenuBtn" style="padding: 0.25rem;">
+        <!-- Add this inside your navbar or header -->
+        <!-- Shows only on small screens and below -->
+        <button class="btn d-lg-none mobile-menu-btn" id="mobileMenuBtn">
           <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
         </button>
+
+
       </div>
       <div class="profile-button d-none d-lg-block">
         <div class="dropdown">
