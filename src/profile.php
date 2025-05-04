@@ -197,6 +197,14 @@ $stmt->close();
     <link rel="icon" href="../img/icon.png"/>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+
+ 
+    <!-- Cropper.js CSS -->
+    <link  href="https://unpkg.com/cropperjs/dist/cropper.min.css" rel="stylesheet">
+    <!-- Cropper.js JS -->
+    <script src="https://unpkg.com/cropperjs"></script>
+
+
     <style>
         .profile-card {
             background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
@@ -474,108 +482,172 @@ $stmt->close();
     </nav>
 
     <div class="container py-4">
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-10 col-lg-8">
-                <div class="profile-card">
-                    <div class="text-center mb-4">
-                        <div class="profile-avatar position-relative mx-auto">
-                            <?php if (!empty($user['profile_picture'])): ?>
-                                <img src="<?php echo '../uploads/profile_pictures/' . htmlspecialchars($user['profile_picture']); ?>" alt="Profile Picture">
-                            <?php else: ?>
-                                <i class="bi bi-person-circle" style="font-size: 4rem; color: #6c757d;"></i>
-                            <?php endif; ?>
-                            <button type="button" class="btn btn-light btn-edit-avatar shadow" id="editProfilePicBtn" title="Edit Photo">
-                                <i class="bi bi-pencil"></i>
-                            </button>
-                        </div>
-                        <div class="profile-divider"></div>
-                        <h4 class="mb-1 mt-3 text-center fw-bold">
-                            <?php echo htmlspecialchars($user['full_name'] ?? ''); ?>
-                        </h4>
-                        <p class="text-muted text-center mb-4">
-                            <?php echo htmlspecialchars($user['role']); ?>
-                        </p>
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="profile-card">
+                <div class="text-center mb-4">
+                    <div class="profile-avatar position-relative mx-auto">
+                        <?php 
+                        $profileSrc = (!empty($user['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user['profile_picture']))
+                            ? '../uploads/profile_pictures/' . htmlspecialchars($user['profile_picture'])
+                            : '../img/icon.png';
+                        ?>
+                        <img src="<?php echo $profileSrc; ?>" alt="Profile Picture" class="img-fluid rounded-circle" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#profilePicModal">
+
+                        <!-- Edit Button -->
+                        <button type="button" class="btn btn-light btn-edit-avatar shadow position-absolute" id="editProfilePicBtn" title="Edit Photo" style="bottom: 0; right: 0; transform: translate(20%, 10%); padding: 1.0em; font-size: 0.1rem;">
+                            <i class="bi bi-camera-fill" style="font-size: 1.1rem;"></i>
+                        </button>
                     </div>
 
-                    <?php if (!empty($errors)): ?>
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                <?php foreach ($errors as $error): ?>
-                                    <li><?php echo htmlspecialchars($error); ?></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
-                    <?php endif; ?>
+                    <div class="profile-divider my-3"></div>
+                    <h4 class="mb-1 mt-3 text-center fw-bold">
+                        <?php echo htmlspecialchars($user['full_name'] ?? ''); ?>
+                    </h4>
+                    <p class="text-muted text-center mb-4">
+                        <?php echo htmlspecialchars($user['role'] ?? ''); ?>
+                    </p>
+                </div>
 
-                    <?php if ($success): ?>
-                        <div class="alert alert-success">
-                            Profile updated successfully!
-                        </div>
-                    <?php endif; ?>
+                <?php if (!empty($errors)): ?>
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            <?php foreach ($errors as $error): ?>
+                                <li><?php echo htmlspecialchars($error); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endif; ?>
 
-                    <form method="POST" action="" enctype="multipart/form-data">
-                        <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*" class="d-none">
-                        <div class="row g-3">
-                            <div class="col-12 col-md-6 profile-form-row">
-                                <label for="full_name" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>">
-                            </div>
-                            <div class="col-12 col-md-6 profile-form-row">
-                                <label for="section_name" class="form-label">Section Name</label>
-                                <input type="text" class="form-control" id="section_name" name="section_name" value="<?php echo htmlspecialchars($user['section_name'] ?? ''); ?>">
-                            </div>
-                            <div class="col-12 col-md-6 profile-form-row">
-                                <label for="program_name" class="form-label">Program Name</label>
-                                <input type="text" class="form-control" id="program_name" name="program_name" value="<?php echo htmlspecialchars($user['program_name'] ?? ''); ?>">
-                            </div>
-                            <div class="col-12 col-md-6 profile-form-row">
-                                <label for="year_level" class="form-label">Year Level</label>
-                                <select class="form-select" id="year_level" name="year_level">
-                                    <option value="">Select Year Level</option>
-                                    <option value="1" <?php if (($user['year_level'] ?? '') == '1') echo 'selected'; ?>>1st Year</option>
-                                    <option value="2" <?php if (($user['year_level'] ?? '') == '2') echo 'selected'; ?>>2nd Year</option>
-                                    <option value="3" <?php if (($user['year_level'] ?? '') == '3') echo 'selected'; ?>>3rd Year</option>
-                                    <option value="4" <?php if (($user['year_level'] ?? '') == '4') echo 'selected'; ?>>4th Year</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-6 profile-form-row">
-                                <label for="gender" class="form-label">Gender</label>
-                                <select class="form-select" id="gender" name="gender">
-                                    <option value="">Select Gender</option>
-                                    <option value="Male" <?php if (($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
-                                    <option value="Female" <?php if (($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
-                                    <option value="Other" <?php if (($user['gender'] ?? '') == 'Other') echo 'selected'; ?>>Other</option>
-                                </select>
-                            </div>
-                            <div class="col-12 col-md-6 profile-form-row">
+                <?php if ($success): ?>
+                    <div class="alert alert-success">
+                        Profile updated successfully!
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST" action="" enctype="multipart/form-data">
+                    <!-- Hidden File Input for Profile Picture -->
+                    <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*" class="d-none">
+                    <div class="row g-3">
+                        <!-- Full Name Input -->
+                        <div class="col-12 col-md-6 profile-form-row">
+                            <label for="full_name" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="full_name" name="full_name" value="<?php echo htmlspecialchars($user['full_name'] ?? ''); ?>" required>
+                        </div>
+                        
+                        <!-- Section Name Input -->
+                        <div class="col-12 col-md-6 profile-form-row">
+                            <label for="section_name" class="form-label">Section Name</label>
+                            <input type="text" class="form-control" id="section_name" name="section_name" value="<?php echo htmlspecialchars($user['section_name'] ?? ''); ?>">
+                        </div>
+                        
+                        <!-- Program Name Input -->
+                        <div class="col-12 col-md-6 profile-form-row">
+                            <label for="program_name" class="form-label">Program Name</label>
+                            <input type="text" class="form-control" id="program_name" name="program_name" value="<?php echo htmlspecialchars($user['program_name'] ?? ''); ?>">
+                        </div>
+                        
+                        <!-- Year Level Select -->
+                        <div class="col-12 col-md-6 profile-form-row">
+                            <label for="year_level" class="form-label">Year Level</label>
+                            <select class="form-select" id="year_level" name="year_level" required>
+                                <option value="">Select Year Level</option>
+                                <option value="1" <?php if (($user['year_level'] ?? '') == '1') echo 'selected'; ?>>1st Year</option>
+                                <option value="2" <?php if (($user['year_level'] ?? '') == '2') echo 'selected'; ?>>2nd Year</option>
+                                <option value="3" <?php if (($user['year_level'] ?? '') == '3') echo 'selected'; ?>>3rd Year</option>
+                                <option value="4" <?php if (($user['year_level'] ?? '') == '4') echo 'selected'; ?>>4th Year</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Gender Select -->
+                        <div class="col-12 col-md-6 profile-form-row">
+                            <label for="gender" class="form-label">Gender</label>
+                            <select class="form-select" id="gender" name="gender" required>
+                                <option value="">Select Gender</option>
+                                <option value="Male" <?php if (($user['gender'] ?? '') == 'Male') echo 'selected'; ?>>Male</option>
+                                <option value="Female" <?php if (($user['gender'] ?? '') == 'Female') echo 'selected'; ?>>Female</option>
+                                <option value="Other" <?php if (($user['gender'] ?? '') == 'Other') echo 'selected'; ?>>Other</option>
+                            </select>
+                        </div>
+
+                        <!-- Email Input -->
+                        <div class="col-12 col-md-6 profile-form-row">
                             <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
+                            <input type="email" class="form-control" id="email" name="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                         </div>
-                            <div class="col-12 col-md-6 profile-form-row">
+                        
+                        <!-- Phone Number Input -->
+                        <div class="col-12 col-md-6 profile-form-row">
                             <label for="phone" class="form-label">Phone Number</label>
-                                <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
-                            </div>
+                            <input type="tel" class="form-control" id="phone" name="phone" value="<?php echo htmlspecialchars($user['phone'] ?? ''); ?>">
                         </div>
-                        <div class="profile-password-section">
-                            <h6>Change Password</h6>
+                    </div>
+
+                    <!-- Password Section -->
+                    <div class="profile-password-section mt-4">
+                        <h6>Change Password</h6>
                         <div class="mb-3">
                             <label for="new_password" class="form-label">New Password</label>
-                                <input type="password" class="form-control" id="new_password" name="new_password" minlength="6">
-                            <div class="form-text">Leave blank to keep current password</div>
+                            <input type="password" class="form-control" id="new_password" name="new_password" minlength="6">
+                            <div class="form-text">Leave blank to keep the current password</div>
                         </div>
-                            <div class="mb-3">
+                        <div class="mb-3">
                             <label for="confirm_password" class="form-label">Confirm New Password</label>
                             <input type="password" class="form-control" id="confirm_password" name="confirm_password">
-                            </div>
                         </div>
-                        <div class="d-grid mt-4">
-                            <button type="submit" class="btn btn-primary">Update Profile</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary">Update Profile</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+</div>
+
+
+<!-- Profile Picture Modal -->
+<div class="modal fade" id="profilePicModal" tabindex="-1" aria-labelledby="profilePicModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-body position-relative p-3">
+        <!-- Close Button -->
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-2" data-bs-dismiss="modal" aria-label="Close"></button>
+        
+        <!-- Bordered Container -->
+        <div class="border border-secondary rounded p-2 bg-white text-center">
+          <img src="<?php echo $profileSrc; ?>" 
+               class="img-fluid rounded" 
+               style="max-width: 100%; max-height: 80vh; object-fit: contain;" 
+               alt="Enlarged Profile Picture">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Crop Modal -->
+<div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="cropModalLabel">Crop Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        <img id="cropperImage" src="" style="max-width: 100%; display: block; margin: auto;">
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="cropAndSave" class="btn btn-primary">Crop & Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
     <!-- Delete Photo Modal -->
     <div class="modal fade" id="deletePhotoModal" tabindex="-1" aria-labelledby="deletePhotoModalLabel" aria-hidden="true">
@@ -601,41 +673,109 @@ $stmt->close();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+
+
+
+
+
+
+
+        document.addEventListener('DOMContentLoaded', function () {
             const editBtn = document.getElementById('editProfilePicBtn');
             const fileInput = document.getElementById('profile-picture-input');
-            const avatar = document.querySelector('.profile-avatar img');
-            const avatarIcon = document.querySelector('.profile-avatar i.bi-person-circle');
+            const avatarContainer = document.querySelector('.profile-avatar');
+            let avatar = avatarContainer.querySelector('img');
+            let avatarIcon = avatarContainer.querySelector('i.bi-person-circle');
             const deleteModal = new bootstrap.Modal(document.getElementById('deletePhotoModal'));
 
-            if (editBtn) {
-                editBtn.addEventListener('click', function(e) {
+            // Determine if there's no image or it's using the default
+            const isImageMissingOrDefault = !avatar || avatar.src.includes('../img/icon.png') || avatar.src.trim() === '' || avatar.src === window.location.origin + './img/icon.png';
+
+            if (isImageMissingOrDefault) {
+                avatarContainer.innerHTML = `<i class="bi bi-person-circle" style="font-size: 80px;"></i>`;
+                avatarIcon = avatarContainer.querySelector('i.bi-person-circle'); // Update reference
+                avatar = null;
+            }
+
+            // Handle edit button click
+            if (editBtn && fileInput) {
+                editBtn.addEventListener('click', function () {
                     fileInput.click();
                 });
             }
+
+            // Handle file input change
             if (fileInput) {
-                fileInput.addEventListener('change', function(e) {
-            if (this.files && this.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                            if (avatar) {
-                                avatar.src = e.target.result;
-                            } else if (avatarIcon) {
-                                // Replace icon with image if no previous image
-                                avatarIcon.outerHTML = `<img src='${e.target.result}' alt='Profile Picture' style='width:100%;height:100%;object-fit:cover;border-radius:50%;'>`;
-                            }
+                fileInput.addEventListener('change', function () {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            const imageTag = `<img src='${e.target.result}' alt='Profile Picture' style='width:100%;height:100%;object-fit:cover;border-radius:50%;'>`;
+
+                            avatarContainer.innerHTML = imageTag;
+                            avatar = avatarContainer.querySelector('img'); // Update reference
+                            avatarIcon = null;
                         };
-                reader.readAsDataURL(this.files[0]);
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
             }
-        });
-            }
-            // Hide options when clicking outside
-            document.addEventListener('click', function(e) {
-                if (fileInput && !fileInput.classList.contains('d-none') && !fileInput.contains(e.target) && e.target !== editBtn) {
+
+            // Optional: Hide file input when clicking outside
+            document.addEventListener('click', function (e) {
+                if (fileInput && !fileInput.classList.contains('d-none') &&
+                    !fileInput.contains(e.target) && e.target !== editBtn) {
                     fileInput.classList.add('d-none');
                 }
             });
         });
+
+        let cropper;
+        const cropperModal = new bootstrap.Modal(document.getElementById('cropModal'));
+        const cropperImage = document.getElementById('cropperImage');
+        const cropAndSaveBtn = document.getElementById('cropAndSave');
+
+        fileInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    cropperImage.src = e.target.result;
+                    cropperModal.show();
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        document.getElementById('cropModal').addEventListener('shown.bs.modal', function () {
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                movable: false,
+                zoomable: false,
+                rotatable: false,
+                scalable: false,
+                cropBoxResizable: true,
+                dragMode: 'move'
+            });
+        });
+
+        document.getElementById('cropModal').addEventListener('hidden.bs.modal', function () {
+            cropper.destroy();
+            cropper = null;
+        });
+
+        cropAndSaveBtn.addEventListener('click', function () {
+            const canvas = cropper.getCroppedCanvas({
+                width: 300,
+                height: 300,
+            });
+
+            const dataURL = canvas.toDataURL();
+            avatarContainer.innerHTML = `<img src="${dataURL}" alt="Cropped Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            cropperModal.hide();
+        });
+
+
     </script>
 </body>
 </html>
