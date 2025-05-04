@@ -507,7 +507,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     @media (max-width: 991.98px) {
       .mobile-menu-btn {
         display: block;
-        margin-right: 10px;
+        margin-left: 130px;
       }
       
       .elecom-logo {
