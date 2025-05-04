@@ -11,9 +11,13 @@ $result = $stmt->get_result();
 $user_profile = $result->fetch_assoc();
 $stmt->close();
 
+// Check if the user has a profile picture, otherwise use a default icon
 $profile_picture = (!empty($user_profile['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user_profile['profile_picture']))
     ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture'])
-    : null;
+    : '../img/icon.png'; // Default icon path if no profile picture
+
+// Optionally, you can also return the user's full name if needed
+$full_name = $user_profile['full_name'] ?? 'Unknown User';
 
 
 
@@ -943,6 +947,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     
     }
 
+    tr:hover {
+    background-color:rgb(193, 196, 197);
+    
+    }
+
   </style>
 </head>
 <body>
@@ -1378,6 +1387,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 
 
 
+<!-- Voter Profile Modal -->
+<div class="modal fade" id="voterProfileModal" tabindex="-1" aria-labelledby="voterProfileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content p-3">
+      <div class="modal-header d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <img id="voterPhoto" class="rounded-circle" alt="Voter Photo"
+               style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff;">
+          <h5 class="modal-title mb-0" id="voterProfileModalLabel">Voter Name</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="voterProfileCard" class="card shadow rounded-4 border-0">
+          <div class="card-body">
+            <p class="mb-2"><strong>Student ID:</strong> <span id="voterId"></span></p>
+            <p class="mb-2"><strong>Section:</strong> <span id="voterSection"></span></p>
+            <p class="mb-2"><strong>Program:</strong> <span id="voterProgram"></span></p>
+            <p class="mb-2"><strong>Gender:</strong> <span id="voterGender"></span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 
 
   <script>
@@ -1485,17 +1522,17 @@ document.getElementById('addCandidateModal')?.addEventListener('hidden.bs.modal'
 
 
 
-
 // DOM Elements
-const votersModal = new bootstrap.Modal(document.getElementById('votersModal'));
+const votersModalElement = document.getElementById('votersModal');
+const votersModal = new bootstrap.Modal(votersModalElement);
 const voterTableBody = document.getElementById('voterTableBody');
 const voterSearchInput = document.getElementById('voterSearchInput');
 const totalVotersCard = document.getElementById('totalVotersCard');
 const totalVotersCount = document.getElementById('totalVoters');
 
-let allVoters = []; // Store fetched data globally for filtering
+let allVoters = [];
+let filteredVoters = [];
 
-// Fetch and render voters
 function loadVotersTable(searchQuery = '') {
   voterTableBody.innerHTML = '<tr><td>Loading...</td></tr>';
 
@@ -1516,28 +1553,53 @@ function loadVotersTable(searchQuery = '') {
     });
 }
 
-// Render filtered voters
 function renderVoters(voters, searchQuery = '') {
-  const filtered = voters.filter(voter =>
+  filteredVoters = voters.filter(voter =>
     voter.full_name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  voterTableBody.innerHTML = filtered.length
-    ? filtered.map(voter => `<tr><td>${voter.full_name}</td></tr>`).join('')
+  voterTableBody.innerHTML = filteredVoters.length
+    ? filteredVoters.map((voter, index) => `
+      <tr style="cursor: pointer;" onclick="showVoterProfile(${index})">
+        <td>${voter.full_name}</td>
+      </tr>
+    `).join('')
     : '<tr><td>No matching voters found.</td></tr>';
 }
 
-// Show modal and load voters when card is clicked
+function showVoterProfile(index) {
+  const voter = filteredVoters[index];
+  if (!voter) return;
+
+  document.getElementById('voterProfileModalLabel').textContent = voter.full_name || 'Voter Profile';
+  document.getElementById('voterId').textContent = voter.user_id || 'N/A';
+  document.getElementById('voterSection').textContent = voter.section_name || 'N/A';
+  document.getElementById('voterProgram').textContent = voter.program_name || 'N/A';
+  document.getElementById('voterGender').textContent = voter.gender || 'N/A';
+
+  const photoElement = document.getElementById('voterPhoto');
+  photoElement.src = voter.profile_picture && voter.profile_picture !== ''
+    ? voter.profile_picture
+    : '../img/icon.png';
+
+  const votersModalInstance = bootstrap.Modal.getInstance(votersModalElement);
+  if (votersModalInstance) {
+    votersModalInstance.hide();
+  }
+
+  const profileModal = new bootstrap.Modal(document.getElementById('voterProfileModal'));
+  profileModal.show();
+}
+
+// Triggers
 totalVotersCard.addEventListener('click', () => {
   votersModal.show();
   loadVotersTable();
 });
 
-// Live search
 voterSearchInput.addEventListener('input', (e) => {
   renderVoters(allVoters, e.target.value);
 });
-
 
 
 
@@ -1943,5 +2005,6 @@ function showCandidateProfile(candidate) {
     });
   });
   </script>
+  
 </body>
 </html>

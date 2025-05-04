@@ -7,7 +7,6 @@ session_start();
 include_once 'connection.php';
 header('Content-Type: application/json');
 
-// Check if database connection is successful
 if ($con->connect_error) {
     echo json_encode(['success' => false, 'message' => 'Database connection failed: ' . $con->connect_error]);
     exit;
@@ -21,28 +20,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    $userId = trim($con->real_escape_string($data['userId']));
-    $password = trim($con->real_escape_string($data['password']));
+    $userId = trim($data['userId']);
+    $password = trim($data['password']);
 
-    $sql = "SELECT * FROM user WHERE user_id = '$userId' AND password = '$password'";
-    $result = $con->query($sql);
+    $stmt = $con->prepare("SELECT * FROM user WHERE user_id = ?");
+    $stmt->bind_param("s", $userId);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result && $result->num_rows > 0) {
         $user = $result->fetch_assoc();
-        $_SESSION['user_id'] = $user['user_id'];
-        $_SESSION['role'] = $user['role']; // Assuming you have a role column in your user table
-        $_SESSION['logged_in'] = true;
-        
-        echo json_encode([
-            'success' => true, 
-            'message' => 'Login successful',
-            'role' => $user['role']
-        ]);
+        $storedPassword = $user['password'];
+
+        // Check if the stored password is hashed (starts with $2y$ for bcrypt)
+        if (
+            (strlen($storedPassword) === 60 && str_starts_with($storedPassword, '$2y$')) &&
+            password_verify($password, $storedPassword)
+        ) {
+            // Hashed password and verified
+            loginSuccess($user);
+        } elseif ($password === $storedPassword) {
+            // Plain-text password match
+            // Migrate to hashed password
+            $newHash = password_hash($password, PASSWORD_DEFAULT);
+            $update = $con->prepare("UPDATE user SET password = ? WHERE user_id = ?");
+            $update->bind_param("ss", $newHash, $userId);
+            $update->execute();
+            $update->close();
+
+            loginSuccess($user);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Invalid password']);
+        }
     } else {
-        echo json_encode(['success' => false, 'message' => 'Account not found']);
+        echo json_encode(['success' => false, 'message' => 'User not found']);
     }
+
+    $stmt->close();
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 }
+
 $con->close();
-?> 
+
+function loginSuccess($user) {
+    $_SESSION['user_id'] = $user['user_id'];
+    $_SESSION['role'] = $user['role'];
+    $_SESSION['logged_in'] = true;
+
+    echo json_encode([
+        'success' => true,
+        'message' => 'Login successful',
+        'role' => $user['role']
+    ]);
+}
+?>
