@@ -207,273 +207,317 @@ $stmt->close();
 
     <style>
         .profile-card {
-            background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
-            border-radius: 24px;
-            box-shadow: 0 8px 32px rgba(37,99,235,0.10);
-            padding: 2.8rem 2.2rem 2.2rem 2.2rem;
-            margin-top: 2.5rem;
-            width: 100%;
-            max-width: 430px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        @media (min-width: 992px) {
-            .profile-card {
-                max-width: 650px;
-                padding: 3rem 2.5rem 2.5rem 2.5rem;
-            }
-        }
-        @media (max-width: 575.98px) {
-            .profile-card {
-                padding: 1.5rem 1rem 1.2rem 1rem;
-                margin-top: 1rem;
-                border-radius: 16px;
-            }
-        }
-        .profile-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            margin: 0 auto 1.2rem;
-            position: relative;
-            background: linear-gradient(135deg, #2563eb 40%, #60a5fa 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 24px rgba(37,99,235,0.10);
-            border: 4px solid #fff;
-        }
-        @media (max-width: 575.98px) {
-            .profile-avatar {
-                width: 100px;
-                height: 100px;
-                margin-bottom: 1rem;
-            }
-        }
-        .profile-avatar img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 50%;
-            border: 3px solid #2563eb;
-            background: #fff;
-        }
-        .btn-edit-avatar {
-            position: absolute;
-            bottom: -18px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 50%;
-            padding: 0.6rem 0.7rem;
-            font-size: 1.2rem;
-            z-index: 2;
-            background: #2563eb;
-            color: #fff;
-            border: none;
-            box-shadow: 0 2px 8px rgba(37,99,235,0.10);
-            transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-        }
-        @media (max-width: 575.98px) {
-            .btn-edit-avatar {
-                bottom: -12px;
-                padding: 0.4rem 0.5rem;
-                font-size: 1rem;
-            }
-        }
-        .profile-divider {
-            width: 60px;
-            height: 3px;
-            background: #2563eb;
-            border-radius: 2px;
-            margin: 2.2rem auto;
-            opacity: 0.18;
-        }
-        @media (max-width: 575.98px) {
-            .profile-divider {
-                margin: 1.5rem auto;
-            }
-        }
-        .profile-card h4 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-bottom: 0.2rem;
-        }
-        @media (max-width: 575.98px) {
-            .profile-card h4 {
-                font-size: 1.2rem;
-            }
-        }
-        .profile-card p.text-muted {
-            font-size: 1.08rem;
-            margin-bottom: 0.5rem;
-        }
-        @media (max-width: 575.98px) {
-            .profile-card p.text-muted {
-                font-size: 1rem;
-            }
-        }
-        .profile-form-row {
-            margin-bottom: 1.1rem;
-        }
-        @media (max-width: 575.98px) {
-            .profile-form-row {
-                margin-bottom: 0.8rem;
-            }
-        }
-        .form-label {
-            font-weight: 500;
-            margin-bottom: 0.3rem;
-            font-size: 0.95rem;
-        }
-        .form-control, .form-select {
-            border-radius: 12px;
-            padding: 0.6rem 1rem;
-            font-size: 1.04rem;
-            box-shadow: none;
-            border: 1px solid #e5e7eb;
-        }
-        @media (max-width: 575.98px) {
-            .form-control, .form-select {
-                padding: 0.5rem 0.8rem;
-                font-size: 0.95rem;
-            }
-        }
-        .profile-password-section {
-            margin-top: 2.2rem;
-            padding-top: 1.2rem;
-            border-top: 1.5px solid #e5e7eb;
-        }
-        @media (max-width: 575.98px) {
-            .profile-password-section {
-                margin-top: 1.5rem;
-                padding-top: 1rem;
-            }
-        }
-        .profile-password-section h6 {
-            font-size: 1.08rem;
-            font-weight: 600;
-            color: #2563eb;
-            margin-bottom: 1.1rem;
-            letter-spacing: 0.5px;
-        }
-        @media (max-width: 575.98px) {
-            .profile-password-section h6 {
-                font-size: 1rem;
-                margin-bottom: 0.8rem;
-            }
-        }
-        .btn-primary {
-            background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
-            border: none;
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: 1.1rem;
-            padding: 0.7rem 0;
-            margin-top: 0.7rem;
-            box-shadow: 0 2px 8px rgba(37,99,235,0.08);
-            transition: background 0.2s, box-shadow 0.2s;
-        }
-        @media (max-width: 575.98px) {
-            .btn-primary {
-                font-size: 1rem;
-                padding: 0.6rem 0;
-                margin-top: 0.5rem;
-            }
-        }
-        .alert {
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        @media (max-width: 575.98px) {
-            .alert {
-                padding: 0.8rem;
-                margin-bottom: 1rem;
-                font-size: 0.95rem;
-            }
-        }
-        .form-text {
-            font-size: 0.85rem;
-            color: #6b7280;
-        }
-        @media (max-width: 575.98px) {
-            .form-text {
-                font-size: 0.8rem;
-            }
-        }
-        .row.g-3 {
-            margin: 0 -0.5rem;
-        }
-        .row.g-3 > * {
-            padding: 0 0.5rem;
-        }
-        @media (max-width: 575.98px) {
-            .row.g-3 {
-                margin: 0 -0.3rem;
-            }
-            .row.g-3 > * {
-                padding: 0 0.3rem;
-            }
-        }
-        .simple-back-btn {
-            margin-left: 10px;
-            position: static;
-            display: inline-flex;
-        }
-        @media (min-width: 992px) {
-            .simple-back-btn {
-                position: absolute;
-                left: 10px;
-                top: 10px;
-                margin-left: 0;
-                margin-bottom: 0;
-                z-index: 10;
-            }
-            .profile-card {
-                position: relative;
-            }
-        }
-        .navbar {
-            position: relative;
-            min-height: 60px;
-        }
-        .back-btn-container {
-            position: relative;
-            margin: 10px;
-        }
-        @media (max-width: 575.98px) {
-            .navbar {
-                min-height: 45px;
-                padding: 0;
-            }
-            .back-btn-container {
-                margin: 5px;
-            }
-            .back-btn-container .btn {
-                padding: 0.3rem 0.8rem;
-                font-size: 0.9rem;
-            }
-            .back-btn-container .btn i {
-                font-size: 0.9rem;
-            }
-        }
-        @media (min-width: 992px) {
-            .back-btn-container {
-                position: absolute;
-                left: 10px;
-                top: 10px;
-                margin: 0;
-            }
-            .navbar {
-                padding-left: 60px;
-            }
-        }
+    background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+    border-radius: 24px;
+    box-shadow: 0 8px 32px rgba(37,99,235,0.10);
+    padding: 2.8rem 2.2rem 2.2rem;
+    margin: 2.5rem auto 0;
+    width: 100%;
+    max-width: 430px;
+    position: relative;
+}
+
+@media (min-width: 992px) {
+    .profile-card {
+        max-width: 650px;
+        padding: 3rem 2.5rem 2.5rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .profile-card {
+        padding: 1.5rem 1rem 1.2rem;
+        margin-top: 1rem;
+        border-radius: 16px;
+    }
+}
+
+/* Profile Avatar */
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    margin: 0 auto 1.2rem;
+    background: linear-gradient(135deg, #2563eb 40%, #60a5fa 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 24px rgba(37,99,235,0.10);
+    border: 4px solid #fff;
+}
+
+@media (max-width: 575.98px) {
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 1rem;
+    }
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #2563eb;
+    background: #fff;
+}
+
+.btn-edit-avatar {
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    padding: 0.6rem 0.7rem;
+    font-size: 1.2rem;
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.10);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+@media (max-width: 575.98px) {
+    .btn-edit-avatar {
+        bottom: -12px;
+        padding: 0.4rem 0.5rem;
+        font-size: 1rem;
+    }
+}
+
+.profile-divider {
+    width: 60px;
+    height: 3px;
+    background: #2563eb;
+    border-radius: 2px;
+    margin: 2.2rem auto;
+    opacity: 0.18;
+}
+
+@media (max-width: 575.98px) {
+    .profile-divider {
+        margin: 1.5rem auto;
+    }
+}
+
+/* Text Styles */
+.profile-card h4 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 0.2rem;
+}
+
+@media (max-width: 575.98px) {
+    .profile-card h4 {
+        font-size: 1.2rem;
+    }
+}
+
+.profile-card p.text-muted {
+    font-size: 1.08rem;
+    margin-bottom: 0.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .profile-card p.text-muted {
+        font-size: 1rem;
+    }
+}
+
+/* Form Styling */
+.profile-form-row {
+    margin-bottom: 1.1rem;
+}
+
+@media (max-width: 575.98px) {
+    .profile-form-row {
+        margin-bottom: 0.8rem;
+    }
+}
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    font-size: 0.95rem;
+}
+
+.form-control,
+.form-select {
+    border-radius: 12px;
+    padding: 0.6rem 1rem;
+    font-size: 1.04rem;
+    border: 1px solid #e5e7eb;
+}
+
+@media (max-width: 575.98px) {
+    .form-control,
+    .form-select {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.95rem;
+    }
+}
+
+/* Password Section */
+.profile-password-section {
+    margin-top: 2.2rem;
+    padding-top: 1.2rem;
+    border-top: 1.5px solid #e5e7eb;
+}
+
+@media (max-width: 575.98px) {
+    .profile-password-section {
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+    }
+}
+
+.profile-password-section h6 {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: #2563eb;
+    margin-bottom: 1.1rem;
+}
+
+@media (max-width: 575.98px) {
+    .profile-password-section h6 {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+    }
+}
+
+/* Primary Button */
+.btn-primary {
+    background: linear-gradient(90deg, #2563eb 60%, #1e40af 100%);
+    border: none;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.7rem 0;
+    margin-top: 0.7rem;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.08);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+@media (max-width: 575.98px) {
+    .btn-primary {
+        font-size: 1rem;
+        padding: 0.6rem 0;
+        margin-top: 0.5rem;
+    }
+}
+
+.alert {
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .alert {
+        padding: 0.8rem;
+        margin-bottom: 1rem;
+        font-size: 0.95rem;
+    }
+}
+
+.form-text {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+@media (max-width: 575.98px) {
+    .form-text {
+        font-size: 0.8rem;
+    }
+}
+
+.row.g-3 {
+    margin: 0 -0.5rem;
+}
+
+.row.g-3 > * {
+    padding: 0 0.5rem;
+}
+
+@media (max-width: 575.98px) {
+    .row.g-3 {
+        margin: 0 -0.3rem;
+    }
+
+    .row.g-3 > * {
+        padding: 0 0.3rem;
+    }
+}
+
+/* Back Button */
+.back-btn-container {
+    margin-left: 100px;
+    margin-top: 10px;
+    position: relative;
+}
+
+@media (min-width: 992px) {
+    .back-btn-container {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        margin: 0;
+    }
+}
+
+.simple-back-btn {
+    display: inline-flex;
+}
+
+@media (min-width: 992px) {
+    .simple-back-btn {
+        position: absolute;
+        left: 10px;
+        top: 10px;
+        margin-left: 0;
+        z-index: 10;
+    }
+}
+
+/* Navbar Fix */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    position: relative;
+    padding-left: 15px;
+    margin-left: 0;
+    min-height: 0;
+}
+
+@media (max-width: 575.98px) {
+    .navbar {
+        min-height: 45px;
+        padding-left: 15px;
+    }
+
+    .back-btn-container {
+        margin: 5px;
+    }
+
+    .back-btn-container .btn {
+        padding: 0.3rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .back-btn-container .btn i {
+        font-size: 0.9rem;
+    }
+}
+
+
+        
     </style>
 </head>
 <body class="bg-light">
     <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:60px; z-index: 1050;">
-        <div class="container d-flex justify-content-start">
+        <div class="">
             <a href="<?php echo $_SESSION['role'] === 'officer' ? 'dashboard_officer.php' : 'dashboard_student.php'; ?>" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
                 <i class="bi bi-arrow-left fs-6"></i>
                 <span class="fw-semibold" style="font-size:1rem;">Back</span>

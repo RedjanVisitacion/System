@@ -8,3 +8,17 @@
 @import "../node_modules/bootstrap/scss/bootstrap";
 
 // Then add additional custom code here
+
+.back-btn-container {
+    margin-left: 0px;
+    margin-top: 0px;
+    }
+
+     
+    .navbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding-left: 0;
+        margin-left: 0;
+    }
