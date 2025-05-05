@@ -401,7 +401,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       .mobile-menu-btn {
         display: block !important;
         padding: 4px !important;
-        margin-right: 8px !important;
       }
 
       .mobile-menu-btn i {
@@ -615,7 +614,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 320px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 50px;
   }
 }
 
@@ -623,7 +621,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 375px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 70px;
   }
 }
 
@@ -631,7 +628,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 414px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 80px;
   }
 }
 
@@ -639,7 +635,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 360px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 65px;
   }
 }
 
@@ -647,7 +642,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 393px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 75px;
   }
 }
 
@@ -655,7 +649,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 390px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 73px;
   }
 }
 
@@ -663,7 +656,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 412px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 85px;
   }
 }
 
@@ -671,7 +663,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 430px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 90px;
   }
 }
 
@@ -679,7 +670,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 440px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 92px;
   }
 }
 
@@ -687,7 +677,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 460px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 100px;
   }
 }
 
@@ -695,7 +684,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 480px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 105px;
   }
 }
 
@@ -703,7 +691,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 500px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 110px;
   }
 }
 
@@ -711,56 +698,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 540px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 115px;
   }
 }
 
 @media (max-width: 568px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 118px;
   }
 }
 
 @media (max-width: 600px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 120px;
   }
 }
 
 @media (max-width: 640px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 125px;
   }
 }
 
 @media (max-width: 667px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 128px;
   }
 }
 
 @media (max-width: 720px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 130px;
   }
 }
 
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 135px;
   }
 }
 
 @media (max-width: 820px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 140px;
   }
 }
 
@@ -1122,7 +1101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
-          <div class="dropdown">
+          <div class="dropdown d-flex align-items-center gap-2">
             <a href="#" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;" role="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
               <?php if ($profile_picture): ?>
                 <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
@@ -1133,6 +1112,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                 <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
               </span>
             </a>
+            <button class="btn d-lg-none mobile-menu-btn" id="mobileMenuBtn">
+              <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
+            </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown" style="margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
               <li><a class="dropdown-item d-flex align-items-center gap-2" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -1238,7 +1220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             <div class="row g-4 justify-content-center">
               <!-- Dashboard Cards -->
               <div class="col-12 col-md-6">
-                <div class="dashboard-card p-4">
+                <div class="dashboard-card p-4" id="totalCandidatesCard" style="cursor: pointer;">
                   <div class="icon">
                     <i class="bi bi-people"></i>
                   </div>
@@ -2165,6 +2147,12 @@ function showCandidateProfile(candidate) {
             options.classList.add('d-none');
         }
     });
+  });
+  const totalCandidatesCard = document.getElementById('totalCandidatesCard');
+  const viewCandidatesModal = new bootstrap.Modal(document.getElementById('viewCandidatesModal'));
+  totalCandidatesCard.addEventListener('click', () => {
+    viewCandidatesModal.show();
+    loadViewCandidateTable();
   });
   </script>
   

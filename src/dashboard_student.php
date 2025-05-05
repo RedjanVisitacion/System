@@ -304,7 +304,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       .mobile-menu-btn {
         display: block !important;
         padding: 4px !important;
-        margin-right: 8px !important;
       }
 
       .mobile-menu-btn i {
@@ -1025,7 +1024,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
-          <div class="dropdown">
+          <div class="dropdown d-flex align-items-center gap-2">
             <a href="#" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;" role="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
               <?php if ($profile_picture): ?>
                 <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
@@ -1036,6 +1035,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                 <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
               </span>
             </a>
+            <button class="btn d-lg-none mobile-menu-btn" id="mobileMenuBtn">
+              <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
+            </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown" style="margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
               <li><a class="dropdown-item d-flex align-items-center gap-2" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -1045,13 +1047,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
           <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo d-none d-lg-block" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
           <span class="navbar-brand mb-0 h1 electoral-commission-title d-none d-lg-block" style="font-size:1.5rem;">Electoral Commission</span>
         </div>
-        <!-- Add this inside your navbar or header -->
-        <!-- Shows only on small screens and below -->
-        <button class="btn d-lg-none mobile-menu-btn" id="mobileMenuBtn">
-          <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
-        </button>
-
-
       </div>
       <div class="profile-button d-none d-lg-block">
         <div class="dropdown">
@@ -1144,7 +1139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                 </div>
               </div>
               <div class="col-12 col-md-6">
-                <div class="dashboard-card p-4">
+                <div class="dashboard-card p-4" id="totalCandidatesCard" style="cursor: pointer;">
                   <div class="icon">
                     <i class="bi bi-people"></i>
                   </div>
@@ -1492,6 +1487,13 @@ function showCandidateProfile(candidate) {
         updateTotalCandidates();
         updateTotalVotesCast();
       }, 30000);
+
+      const totalCandidatesCard = document.getElementById('totalCandidatesCard');
+      const viewCandidatesModal = new bootstrap.Modal(document.getElementById('viewCandidatesModal'));
+      totalCandidatesCard.addEventListener('click', () => {
+        viewCandidatesModal.show();
+        loadViewCandidateTable();
+      });
     });
 
 
