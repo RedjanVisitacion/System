@@ -1114,6 +1114,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     
     }
 
+    @media (max-width: 575.98px) {
+      .dropdown-menu[aria-labelledby="mobileProfileDropdown"] {
+        left: 10px !important;
+        right: auto !important;
+        min-width: 180px;
+        margin-top: 8px !important;
+        transform: none !important;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+      }
+    }
+
   </style>
 </head>
 <body>
