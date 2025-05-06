@@ -597,14 +597,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
       padding: 1.5rem;
       margin-top: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .calendar-table th, .calendar-table td {
-      min-width: 32px;
+    .calendar-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.12);
+    }
+    .timeline-events {
+      position: relative;
+    }
+    .timeline-events::before {
+      content: '';
+      position: absolute;
+      left: 1.25rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+    .event-item {
+      position: relative;
+      z-index: 1;
+    }
+    .event-icon {
+      width: 32px;
       height: 32px;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 1rem;
-      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .event-title {
+      font-size: 0.95rem;
+      color: #4b5563;
+      line-height: 1.4;
+    }
+    @media (max-width: 991.98px) {
+      .calendar-card {
+        display: none !important;
+      }
     }
 
 
@@ -1262,32 +1294,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               </div>
             </div>
           </div>
-          <!-- Calendar Card -->
-          <div class="col-12 col-lg-4 d-none d-lg-block">
-            <div class="calendar-card">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Calendar</h5>
-                <div class="btn-group">
-                  <button class="btn btn-sm btn-outline-primary" id="prevMonthBtn"><i class="bi bi-chevron-left"></i></button>
-                  <button class="btn btn-sm btn-outline-primary" id="todayBtn">Today</button>
-                  <button class="btn btn-sm btn-outline-primary" id="nextMonthBtn"><i class="bi bi-chevron-right"></i></button>
-                </div>
+         <!-- Election Dates Card -->
+         <div class="col-12 col-lg-4">
+            <div class="dashboard-card p-4">
+              <div class="icon">
+                <i class="bi bi-calendar-event"></i>
               </div>
-              <h6 class="text-center mb-3" id="calendarMonthYear"></h6>
-              <table class="table table-bordered calendar-table">
-                <thead>
-                  <tr>
-                    <th>Su</th>
-                    <th>Mo</th>
-                    <th>Tu</th>
-                    <th>We</th>
-                    <th>Th</th>
-                    <th>Fr</th>
-                    <th>Sa</th>
-                  </tr>
-                </thead>
-                <tbody id="calendarBody"></tbody>
-              </table>
+              <h3 class="fw-bold text-center mb-4">Election Dates</h3>
+              <form id="electionDatesForm">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date</label>
+                  <input type="datetime-local" class="form-control" id="startDate" required>
+                </div>
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date</label>
+                  <input type="datetime-local" class="form-control" id="endDate" required>
+                </div>
+                <div class="mb-3">
+                  <label for="resultsDate" class="form-label">Results Date</label>
+                  <input type="datetime-local" class="form-control" id="resultsDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Update Dates</button>
+              </form>
             </div>
           </div>
         </div>
