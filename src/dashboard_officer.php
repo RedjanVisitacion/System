@@ -401,7 +401,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       .mobile-menu-btn {
         display: block !important;
         padding: 4px !important;
-        margin-right: 8px !important;
       }
 
       .mobile-menu-btn i {
@@ -598,14 +597,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       box-shadow: 0 4px 24px rgba(37, 99, 235, 0.07);
       padding: 1.5rem;
       margin-top: 2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
-    .calendar-table th, .calendar-table td {
-      min-width: 32px;
+    .calendar-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 32px rgba(37, 99, 235, 0.12);
+    }
+    .timeline-events {
+      position: relative;
+    }
+    .timeline-events::before {
+      content: '';
+      position: absolute;
+      left: 1.25rem;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+    .event-item {
+      position: relative;
+      z-index: 1;
+    }
+    .event-icon {
+      width: 32px;
       height: 32px;
-      text-align: center;
-      vertical-align: middle;
-      font-size: 1rem;
-      padding: 0.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+    .event-title {
+      font-size: 0.95rem;
+      color: #4b5563;
+      line-height: 1.4;
+    }
+    @media (max-width: 991.98px) {
+      .calendar-card {
+        display: none !important;
+      }
     }
 
 
@@ -615,7 +646,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 320px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 50px;
   }
 }
 
@@ -623,7 +653,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 375px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 70px;
   }
 }
 
@@ -631,7 +660,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 414px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 80px;
   }
 }
 
@@ -639,7 +667,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 360px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 65px;
   }
 }
 
@@ -647,7 +674,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 393px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 75px;
   }
 }
 
@@ -655,7 +681,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 390px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 73px;
   }
 }
 
@@ -663,7 +688,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 412px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 85px;
   }
 }
 
@@ -671,7 +695,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 430px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 90px;
   }
 }
 
@@ -679,7 +702,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 440px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 92px;
   }
 }
 
@@ -687,7 +709,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 460px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 100px;
   }
 }
 
@@ -695,7 +716,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 480px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 105px;
   }
 }
 
@@ -703,7 +723,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 500px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 110px;
   }
 }
 
@@ -711,56 +730,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 @media (max-width: 540px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 115px;
   }
 }
 
 @media (max-width: 568px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 118px;
   }
 }
 
 @media (max-width: 600px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 120px;
   }
 }
 
 @media (max-width: 640px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 125px;
   }
 }
 
 @media (max-width: 667px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 128px;
   }
 }
 
 @media (max-width: 720px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 130px;
   }
 }
 
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 135px;
   }
 }
 
 @media (max-width: 820px) {
   .mobile-menu-btn {
     display: block;
-    margin-left: 140px;
   }
 }
 
@@ -1095,13 +1106,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     
     @media (max-width: 575.98px) {
       .dropdown-menu {
-        width: 200px;
+        left: 0 !important;
+        right: auto !important;
+        min-width: 180px;
+        top: 48px !important; /* Adjust if needed to sit just below the icon */
+        transform: none !important;
+        margin-left: 0 !important;
         margin-top: 0.5rem !important;
-        margin-left: -1rem !important;
       }
-      
-      .dropdown-item {
-        padding: 0.75rem 1rem;
+      .dropdown {
+        position: relative;
       }
     }
 
@@ -1123,7 +1137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
-          <div class="dropdown">
+          <div class="dropdown d-flex align-items-center gap-2">
             <a href="#" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;" role="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
               <?php if ($profile_picture): ?>
                 <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
@@ -1134,6 +1148,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                 <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
               </span>
             </a>
+            <button class="btn d-lg-none mobile-menu-btn" id="mobileMenuBtn">
+              <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
+            </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown" style="margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
               <li><a class="dropdown-item d-flex align-items-center gap-2" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -1218,13 +1235,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
           </li>
 
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="results.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" id="allResultsLink">
               <i class="bi bi-list-check"></i>
               <span class="sidebar-text">All Results</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="generate_report.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" id="generateReportLink">
               <i class="bi bi-file-earmark-bar-graph"></i>
               <span class="sidebar-text">Generate Report</span>
             </a>
@@ -1239,7 +1256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             <div class="row g-4 justify-content-center">
               <!-- Dashboard Cards -->
               <div class="col-12 col-md-6">
-                <div class="dashboard-card p-4">
+                <div class="dashboard-card p-4" id="totalCandidatesCard" style="cursor: pointer;">
                   <div class="icon">
                     <i class="bi bi-people"></i>
                   </div>
@@ -1278,32 +1295,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               </div>
             </div>
           </div>
-          <!-- Calendar Card -->
-          <div class="col-12 col-lg-4 d-none d-lg-block">
-            <div class="calendar-card">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Calendar</h5>
-                <div class="btn-group">
-                  <button class="btn btn-sm btn-outline-primary" id="prevMonthBtn"><i class="bi bi-chevron-left"></i></button>
-                  <button class="btn btn-sm btn-outline-primary" id="todayBtn">Today</button>
-                  <button class="btn btn-sm btn-outline-primary" id="nextMonthBtn"><i class="bi bi-chevron-right"></i></button>
-                </div>
+         <!-- Election Dates Card -->
+         <div class="col-12 col-lg-4">
+            <div class="dashboard-card p-4">
+              <div class="icon">
+                <i class="bi bi-calendar-event"></i>
               </div>
-              <h6 class="text-center mb-3" id="calendarMonthYear"></h6>
-              <table class="table table-bordered calendar-table">
-                <thead>
-                  <tr>
-                    <th>Su</th>
-                    <th>Mo</th>
-                    <th>Tu</th>
-                    <th>We</th>
-                    <th>Th</th>
-                    <th>Fr</th>
-                    <th>Sa</th>
-                  </tr>
-                </thead>
-                <tbody id="calendarBody"></tbody>
-              </table>
+              <h3 class="fw-bold text-center mb-4">Election Dates</h3>
+              <form id="electionDatesForm">
+                <div class="mb-3">
+                  <label for="startDate" class="form-label">Start Date</label>
+                  <input type="datetime-local" class="form-control" id="startDate" required>
+                </div>
+                <div class="mb-3">
+                  <label for="endDate" class="form-label">End Date</label>
+                  <input type="datetime-local" class="form-control" id="endDate" required>
+                </div>
+                <div class="mb-3">
+                  <label for="resultsDate" class="form-label">Results Date</label>
+                  <input type="datetime-local" class="form-control" id="resultsDate" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Update Dates</button>
+              </form>
             </div>
           </div>
         </div>
@@ -2166,8 +2179,58 @@ function showCandidateProfile(candidate) {
             options.classList.add('d-none');
         }
     });
+    // Add prompt for All Results (under construction)
+    const allResultsLink = document.getElementById('allResultsLink');
+    if (allResultsLink) {
+      allResultsLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('The All Results feature is under construction.');
+      });
+    }
+    // Add prompt for Generate Report (under construction)
+    const generateReportLink = document.getElementById('generateReportLink');
+    if (generateReportLink) {
+      generateReportLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('The Generate Report feature is under construction.');
+      });
+    }
+    // Add prompt for Cast Vote (under construction) if present
+    const castVoteLink = document.getElementById('castVoteLink');
+    if (castVoteLink) {
+      castVoteLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('The Cast Vote feature is under construction.');
+      });
+    }
+  });
+  const totalCandidatesCard = document.getElementById('totalCandidatesCard');
+  const viewCandidatesModal = new bootstrap.Modal(document.getElementById('viewCandidatesModal'));
+  totalCandidatesCard.addEventListener('click', () => {
+    viewCandidatesModal.show();
+    loadViewCandidateTable();
   });
   </script>
   
 </body>
 </html>
+
+<!-- Custom Under Construction Modal -->
+<div class="modal fade" id="underConstructionModal" tabindex="-1" aria-labelledby="underConstructionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header border-0">
+        <h5 class="modal-title w-100" id="underConstructionModalLabel">
+          <i class="bi bi-tools text-warning" style="font-size:2rem;"></i>
+        </h5>
+      </div>
+      <div class="modal-body">
+        <h5 class="mb-2">Feature Under Construction</h5>
+        <p id="underConstructionMessage" class="mb-0 text-muted">This feature is not yet available. Please check back soon!</p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center">
+        <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
