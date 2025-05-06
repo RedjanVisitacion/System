@@ -1175,9 +1175,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               </div>
             </div>
           </div>
-          <!-- Calendar Card -->
+    
+          <!-- Election Timeline -->
           <div class="col-12 col-lg-4 d-none d-lg-block">
-            <div class="calendar-card">
+  <div class="calendar-card">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">Election Timeline</h5>
               </div>
@@ -1197,6 +1198,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </div>
@@ -1475,21 +1477,30 @@ function showCandidateProfile(candidate) {
         });
     }
 
-    // Update election dates
-    function updateElectionDates() {
-      fetch('../src/get_election_dates.php')
-        .then(response => response.json())
-        .then(data => {
-          if (data.success) {
-            document.getElementById('electionStartDate').textContent = data.start_date;
-            document.getElementById('electionEndDate').textContent = data.end_date;
-            document.getElementById('resultsDate').textContent = data.results_date;
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching election dates:', error);
-        });
-    }
+
+
+    //Election date
+  document.addEventListener('DOMContentLoaded', function () {
+  updateElectionDates();
+});
+
+function updateElectionDates() {
+  fetch('../src/get_election_dates.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('electionStartDate').textContent = data.start_date;
+        document.getElementById('electionEndDate').textContent = data.end_date;
+        document.getElementById('resultsDate').textContent = data.results_date;
+      } else {
+        console.error('Failed to load dates:', data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching election dates:', error);
+    });
+}
+
 
     // Initialize all updates
     document.addEventListener('DOMContentLoaded', function() {

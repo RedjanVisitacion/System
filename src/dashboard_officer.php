@@ -1290,33 +1290,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             </div>
           </div>
           <!-- Calendar Card -->
-          <div class="col-12 col-lg-4 d-none d-lg-block">
-            <div class="calendar-card">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Calendar</h5>
-                <div class="btn-group">
-                  <button class="btn btn-sm btn-outline-primary" id="prevMonthBtn"><i class="bi bi-chevron-left"></i></button>
-                  <button class="btn btn-sm btn-outline-primary" id="todayBtn">Today</button>
-                  <button class="btn btn-sm btn-outline-primary" id="nextMonthBtn"><i class="bi bi-chevron-right"></i></button>
-                </div>
-              </div>
-              <h6 class="text-center mb-3" id="calendarMonthYear"></h6>
-              <table class="table table-bordered calendar-table">
-                <thead>
-                  <tr>
-                    <th>Su</th>
-                    <th>Mo</th>
-                    <th>Tu</th>
-                    <th>We</th>
-                    <th>Th</th>
-                    <th>Fr</th>
-                    <th>Sa</th>
-                  </tr>
-                </thead>
-                <tbody id="calendarBody"></tbody>
-              </table>
+          <div class="election-date-form card p-4 mb-4">
+            <h5 class="mb-3">Set Election Dates</h5>
+            
+            <div class="mb-3">
+              <label for="startDate" class="form-label">Start Date & Time</label>
+              <input type="datetime-local" id="startDate" class="form-control" required>
             </div>
+            <div class="mb-3">
+              <label for="endDate" class="form-label">End Date & Time</label>
+              <input type="datetime-local" id="endDate" class="form-control" required>
+            </div>
+            <div class="mb-3">
+              <label for="resultsDate" class="form-label">Results Date & Time</label>
+              <input type="datetime-local" id="resultsDate" class="form-control" required>
+            </div>
+            
+            <button class="btn btn-primary" onclick="setElectionDates()">Save Dates</button>
           </div>
+
         </div>
       </div>
     </div>
@@ -2014,74 +2006,46 @@ function showCandidateProfile(candidate) {
       document.body.classList.remove('body-sidebar-collapsed');
     }
   };
-  // Calendar functionality
-  const calendarMonthYear = document.getElementById('calendarMonthYear');
-  const calendarBody = document.getElementById('calendarBody');
-  const prevMonthBtn = document.getElementById('prevMonthBtn');
-  const nextMonthBtn = document.getElementById('nextMonthBtn');
-  const todayBtn = document.getElementById('todayBtn');
 
-  let today = new Date();
-  let currentMonth = today.getMonth();
-  let currentYear = today.getFullYear();
 
-  function renderCalendar(month, year) {
-    const monthNames = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    calendarMonthYear.textContent = `${monthNames[month]} ${year}`;
+ //Election date
+ function setElectionDates() {
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+  const resultsDate = document.getElementById('resultsDate').value;
 
-    // First day of the month
-    const firstDay = new Date(year, month, 1).getDay();
-    // Number of days in the month
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-    let date = 1;
-    let rows = '';
-    for (let i = 0; i < 6; i++) { // 6 weeks max
-      let row = '<tr>';
-      for (let j = 0; j < 7; j++) {
-        if (i === 0 && j < firstDay) {
-          row += '<td class="bg-light rounded-2"></td>';
-        } else if (date > daysInMonth) {
-          row += '<td class="bg-light rounded-2"></td>';
-        } else {
-          let isToday = (date === today.getDate() && month === today.getMonth() && year === today.getFullYear());
-          row += `<td class="${isToday ? 'bg-primary text-white rounded-2' : 'bg-light rounded-2'}">${date}</td>`;
-          date++;
-        }
-      }
-      row += '</tr>';
-      rows += row;
-      if (date > daysInMonth) break;
-    }
-    calendarBody.innerHTML = rows;
+  if (!startDate || !endDate || !resultsDate) {
+    alert('Please fill in all date fields.');
+    return;
   }
 
-  renderCalendar(currentMonth, currentYear);
+  fetch('../src/get_election_dates.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      action: 'update_dates',
+      start_date: startDate,
+      end_date: endDate,
+      results_date: resultsDate
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    alert(data.message);
+    if (data.success && typeof updateElectionDates === 'function') {
+      updateElectionDates(); // Optional refresh function
+    }
+  })
+  .catch(error => {
+    console.error('Error updating dates:', error);
+    alert('Something went wrong while updating the dates.');
+  });
+}
 
-  prevMonthBtn.onclick = function() {
-    currentMonth--;
-    if (currentMonth < 0) {
-      currentMonth = 11;
-      currentYear--;
-    }
-    renderCalendar(currentMonth, currentYear);
-  };
-  nextMonthBtn.onclick = function() {
-    currentMonth++;
-    if (currentMonth > 11) {
-      currentMonth = 0;
-      currentYear++;
-    }
-    renderCalendar(currentMonth, currentYear);
-  };
-  todayBtn.onclick = function() {
-    currentMonth = today.getMonth();
-    currentYear = today.getFullYear();
-    renderCalendar(currentMonth, currentYear);
-  };
+
+
+
   // Mobile menu functionality
   const mobileMenuBtn = document.getElementById('mobileMenuBtn');
   const sidebar = document.getElementById('sidebar');
