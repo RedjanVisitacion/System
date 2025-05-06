@@ -1291,27 +1291,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 
             </div>
           </div>
-          <!-- Calendar Card -->
+          <!-- Calendar Card (desktop only) -->
           <div class="col-12 col-lg-4 d-none d-lg-block">
-  <div class="calendar-card">
-            <h5 class="mb-3">Set Election Dates</h5>
-            
-            <div class="mb-3">
-              <label for="startDate" class="form-label">Start Date & Time</label>
-              <input type="datetime-local" id="startDate" class="form-control" required>
+            <div class="calendar-card">
+              <h5 class="mb-3">Set Election Dates</h5>
+              
+              <div class="mb-3">
+                <label for="startDate" class="form-label">Start Date & Time</label>
+                <input type="datetime-local" id="startDate" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="endDate" class="form-label">End Date & Time</label>
+                <input type="datetime-local" id="endDate" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="resultsDate" class="form-label">Results Date & Time</label>
+                <input type="datetime-local" id="resultsDate" class="form-control" required>
+              </div>
+              
+              <button class="btn btn-primary" onclick="setElectionDates()">Save Dates</button>
             </div>
-            <div class="mb-3">
-              <label for="endDate" class="form-label">End Date & Time</label>
-              <input type="datetime-local" id="endDate" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label for="resultsDate" class="form-label">Results Date & Time</label>
-              <input type="datetime-local" id="resultsDate" class="form-control" required>
-            </div>
-            
-            <button class="btn btn-primary" onclick="setElectionDates()">Save Dates</button>
           </div>
-
+          <!-- Election Timeline Card for Mobile (visible only on mobile/tablet) -->
+          <div class="col-12 d-block d-lg-none mb-3">
+            <div class="calendar-card">
+              <h5 class="mb-3">Set Election Dates</h5>
+              <div class="mb-3">
+                <label for="startDateMobile" class="form-label">Start Date & Time</label>
+                <input type="datetime-local" id="startDateMobile" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="endDateMobile" class="form-label">End Date & Time</label>
+                <input type="datetime-local" id="endDateMobile" class="form-control" required>
+              </div>
+              <div class="mb-3">
+                <label for="resultsDateMobile" class="form-label">Results Date & Time</label>
+                <input type="datetime-local" id="resultsDateMobile" class="form-control" required>
+              </div>
+              <button class="btn btn-primary" onclick="setElectionDatesMobile()">Save Dates</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
