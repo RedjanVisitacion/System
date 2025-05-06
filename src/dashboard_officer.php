@@ -1292,7 +1292,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             </div>
           </div>
           <!-- Calendar Card -->
-          <div class="election-date-form card p-4 mb-4">
+          <div class="col-12 col-lg-4 d-none d-lg-block">
+  <div class="calendar-card">
             <h5 class="mb-3">Set Election Dates</h5>
             
             <div class="mb-3">
@@ -2049,7 +2050,6 @@ function showCandidateProfile(candidate) {
 
 
 //RealTime Countdown
-
 
 let countdownInterval;
 
