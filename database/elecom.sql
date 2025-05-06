@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2025 at 08:24 AM
+-- Generation Time: May 06, 2025 at 10:50 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -67,6 +67,28 @@ INSERT INTO `department` (`department_id`, `name`) VALUES
 (3, 'BFPT'),
 (2, 'BTLED'),
 (1, 'IT');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `election_dates`
+--
+
+CREATE TABLE `election_dates` (
+  `id` int(11) NOT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `results_date` datetime NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `election_dates`
+--
+
+INSERT INTO `election_dates` (`id`, `start_date`, `end_date`, `results_date`, `created_at`, `updated_at`) VALUES
+(1, '2025-05-05 00:42:00', '2025-05-06 00:44:00', '2025-05-07 00:42:00', '2025-05-06 07:31:06', '2025-05-06 08:42:54');
 
 -- --------------------------------------------------------
 
@@ -1565,6 +1587,12 @@ ALTER TABLE `department`
   ADD UNIQUE KEY `name` (`name`);
 
 --
+-- Indexes for table `election_dates`
+--
+ALTER TABLE `election_dates`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `result`
 --
 ALTER TABLE `result`
@@ -1606,6 +1634,12 @@ ALTER TABLE `candidate`
 --
 ALTER TABLE `department`
   MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `election_dates`
+--
+ALTER TABLE `election_dates`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `result`

@@ -2046,6 +2046,18 @@ function showCandidateProfile(candidate) {
   });
 }
 
+  // Load Dates into Inputs
+  document.addEventListener('DOMContentLoaded', () => {
+    fetch('../src/get_election_dates.php')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('startDate').value = new Date(data.start_date).toISOString().slice(0, 16);
+          document.getElementById('endDate').value = new Date(data.end_date).toISOString().slice(0, 16);
+          document.getElementById('resultsDate').value = new Date(data.results_date).toISOString().slice(0, 16);
+        }
+      });
+  });
 
 
 
