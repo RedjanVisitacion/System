@@ -1238,7 +1238,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             <div class="row g-4 justify-content-center">
               <!-- Dashboard Cards -->
               <div class="col-12 col-md-6">
-                <div class="dashboard-card p-4">
+                <div class="dashboard-card p-4" id="totalCandidatesCard" style="cursor: pointer;">
                   <div class="icon">
                     <i class="bi bi-people"></i>
                   </div>
@@ -2165,6 +2165,13 @@ function showCandidateProfile(candidate) {
             options.classList.add('d-none');
         }
     });
+  });
+
+  // Add click handler for total candidates card
+  document.getElementById('totalCandidatesCard').addEventListener('click', () => {
+    const viewCandidatesModal = new bootstrap.Modal(document.getElementById('viewCandidatesModal'));
+    viewCandidatesModal.show();
+    loadViewCandidateTable();
   });
   </script>
   
