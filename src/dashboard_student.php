@@ -1118,12 +1118,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <span class="sidebar-text">All Results</span>
             </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="#" id="generateReportLink">
-              <i class="bi bi-file-earmark-bar-graph"></i>
-              <span class="sidebar-text">Generate Report</span>
-            </a>
-          </li>
         </ul>
       </div>
       <!-- Main Content -->
@@ -1513,14 +1507,6 @@ function showCandidateProfile(candidate) {
         viewResultsLink.addEventListener('click', function(e) {
           e.preventDefault();
           alert('The All Results feature is under construction.');
-        });
-      }
-      // Add prompt for Generate Report (under construction)
-      const generateReportLink = document.getElementById('generateReportLink');
-      if (generateReportLink) {
-        generateReportLink.addEventListener('click', function(e) {
-          e.preventDefault();
-          alert('The Generate Report feature is under construction.');
         });
       }
       // Add prompt for Cast Vote (under construction)
