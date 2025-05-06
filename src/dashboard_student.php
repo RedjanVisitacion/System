@@ -978,6 +978,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     .dropdown-menu {
       border: none;
       padding: 0.5rem;
+      margin-top: 0.5rem !important;
+      margin-left: -1rem !important;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     
     .dropdown-item {
@@ -1001,13 +1005,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     
     @media (max-width: 575.98px) {
       .dropdown-menu {
-        width: 200px;
+        left: 0 !important;
+        right: auto !important;
+        min-width: 180px;
+        top: 48px !important; /* Adjust if needed to sit just below the icon */
+        transform: none !important;
+        margin-left: 0 !important;
         margin-top: 0.5rem !important;
-        margin-left: -1rem !important;
       }
-      
-      .dropdown-item {
-        padding: 0.75rem 1rem;
+      .dropdown {
+        position: relative;
       }
     }
 
@@ -1038,7 +1045,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             <button class="btn d-lg-none mobile-menu-btn" id="mobileMenuBtn">
               <i class="bi bi-list text-white" style="font-size: 2rem;"></i>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown" style="margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mobileProfileDropdown">
               <li><a class="dropdown-item d-flex align-items-center gap-2" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
@@ -1062,7 +1069,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
             </span>
           </a>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="desktopProfileDropdown" style="margin-top: 0.5rem; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="desktopProfileDropdown">
             <li><a class="dropdown-item d-flex align-items-center gap-2" href="profile.php"><i class="bi bi-person"></i> Profile</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
@@ -1100,15 +1107,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="vote.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" id="castVoteLink">
               <i class="bi bi-check-circle"></i>
               <span class="sidebar-text">Cast Vote</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="results.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" id="viewResultsLink">
               <i class="bi bi-list-check"></i>
-              <span class="sidebar-text">View Results</span>
+              <span class="sidebar-text">All Results</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white d-flex align-items-center" href="#" id="generateReportLink">
+              <i class="bi bi-file-earmark-bar-graph"></i>
+              <span class="sidebar-text">Generate Report</span>
             </a>
           </li>
         </ul>
@@ -1148,7 +1161,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                 </div>
               </div>
               <div class="col-12 col-md-6">
-                <div class="dashboard-card p-4">
+                <div class="dashboard-card p-4" id="votesCastCard" style="cursor: pointer;">
                   <div class="icon">
                     <i class="bi bi-person-check"></i>
                   </div>
@@ -1494,6 +1507,30 @@ function showCandidateProfile(candidate) {
         viewCandidatesModal.show();
         loadViewCandidateTable();
       });
+      // Add prompt for All Results (under construction)
+      const viewResultsLink = document.getElementById('viewResultsLink');
+      if (viewResultsLink) {
+        viewResultsLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          alert('The All Results feature is under construction.');
+        });
+      }
+      // Add prompt for Generate Report (under construction)
+      const generateReportLink = document.getElementById('generateReportLink');
+      if (generateReportLink) {
+        generateReportLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          alert('The Generate Report feature is under construction.');
+        });
+      }
+      // Add prompt for Cast Vote (under construction)
+      const castVoteLink = document.getElementById('castVoteLink');
+      if (castVoteLink) {
+        castVoteLink.addEventListener('click', function(e) {
+          e.preventDefault();
+          alert('The Cast Vote feature is under construction.');
+        });
+      }
     });
 
 

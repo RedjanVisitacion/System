@@ -1073,13 +1073,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     
     @media (max-width: 575.98px) {
       .dropdown-menu {
-        width: 200px;
+        left: 0 !important;
+        right: auto !important;
+        min-width: 180px;
+        top: 48px !important; /* Adjust if needed to sit just below the icon */
+        transform: none !important;
+        margin-left: 0 !important;
         margin-top: 0.5rem !important;
-        margin-left: -1rem !important;
       }
-      
-      .dropdown-item {
-        padding: 0.75rem 1rem;
+      .dropdown {
+        position: relative;
       }
     }
 
@@ -1199,13 +1202,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
           </li>
 
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="results.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" id="allResultsLink">
               <i class="bi bi-list-check"></i>
               <span class="sidebar-text">All Results</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="generate_report.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" id="generateReportLink">
               <i class="bi bi-file-earmark-bar-graph"></i>
               <span class="sidebar-text">Generate Report</span>
             </a>
@@ -2147,6 +2150,30 @@ function showCandidateProfile(candidate) {
             options.classList.add('d-none');
         }
     });
+    // Add prompt for All Results (under construction)
+    const allResultsLink = document.getElementById('allResultsLink');
+    if (allResultsLink) {
+      allResultsLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('The All Results feature is under construction.');
+      });
+    }
+    // Add prompt for Generate Report (under construction)
+    const generateReportLink = document.getElementById('generateReportLink');
+    if (generateReportLink) {
+      generateReportLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('The Generate Report feature is under construction.');
+      });
+    }
+    // Add prompt for Cast Vote (under construction) if present
+    const castVoteLink = document.getElementById('castVoteLink');
+    if (castVoteLink) {
+      castVoteLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('The Cast Vote feature is under construction.');
+      });
+    }
   });
   const totalCandidatesCard = document.getElementById('totalCandidatesCard');
   const viewCandidatesModal = new bootstrap.Modal(document.getElementById('viewCandidatesModal'));
@@ -2158,3 +2185,23 @@ function showCandidateProfile(candidate) {
   
 </body>
 </html>
+
+<!-- Custom Under Construction Modal -->
+<div class="modal fade" id="underConstructionModal" tabindex="-1" aria-labelledby="underConstructionModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content text-center">
+      <div class="modal-header border-0">
+        <h5 class="modal-title w-100" id="underConstructionModalLabel">
+          <i class="bi bi-tools text-warning" style="font-size:2rem;"></i>
+        </h5>
+      </div>
+      <div class="modal-body">
+        <h5 class="mb-2">Feature Under Construction</h5>
+        <p id="underConstructionMessage" class="mb-0 text-muted">This feature is not yet available. Please check back soon!</p>
+      </div>
+      <div class="modal-footer border-0 justify-content-center">
+        <button type="button" class="btn btn-primary px-4" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
