@@ -1083,6 +1083,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       background-color: #f8fafc;
     }
     
+    
     .dropdown-item i {
       font-size: 1.1rem;
     }
