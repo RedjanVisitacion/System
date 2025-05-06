@@ -1284,9 +1284,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                     <i class="bi bi-clock"></i>
                   </div>
                   <h3 class="fw-bold text-center">Time Remaining</h3>
-                  <p class="fs-4 text-center mb-0" id="timeRemaining">--:--:--</p>
+                  <p class="fs-4 text-center mb-0" id="timeRemaining">Loading...</p>
                 </div>
               </div>
+
+
             </div>
           </div>
           <!-- Calendar Card -->
@@ -2042,6 +2044,80 @@ function showCandidateProfile(candidate) {
     alert('Something went wrong while updating the dates.');
   });
 }
+
+
+
+
+//RealTime Countdown
+
+
+let countdownInterval;
+
+function fetchElectionDatesAndStartCountdown() {
+  fetch('../src/get_election_dates.php')
+    .then(response => response.json())
+    .then(data => {
+      const timeEl = document.getElementById('timeRemaining');
+
+      if (data.success && data.start_date && data.end_date) {
+        const startDate = new Date(data.start_date);
+        const endDate = new Date(data.end_date);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+          timeEl.textContent = 'Invalid date format';
+          timeEl.style.color = 'orange';
+          return;
+        }
+
+        startDynamicCountdown(startDate, endDate);
+      } else {
+        timeEl.textContent = 'Dates not set';
+        timeEl.style.color = 'orange';
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching election dates:', error);
+      const timeEl = document.getElementById('timeRemaining');
+      timeEl.textContent = 'Error loading timer';
+      timeEl.style.color = 'orange';
+    });
+}
+
+function startDynamicCountdown(startTime, endTime) {
+  clearInterval(countdownInterval);
+  const timeEl = document.getElementById('timeRemaining');
+
+  function updateCountdown() {
+    const now = new Date();
+    let diff, label;
+
+    if (now < startTime) {
+      diff = startTime - now;
+      label = 'Voting starts in ';
+      timeEl.style.color = ''; // default
+    } else if (now >= startTime && now < endTime) {
+      diff = endTime - now;
+      label = 'Voting ends in ';
+      timeEl.style.color = ''; // default
+    } else {
+      timeEl.textContent = 'Voting has ended';
+      timeEl.style.color = 'red';
+      clearInterval(countdownInterval);
+      return;
+    }
+
+    const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+    const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+
+    timeEl.textContent = label + `${hours}:${minutes}:${seconds}`;
+  }
+
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 1000);
+}
+
+document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdown);
 
 
 
