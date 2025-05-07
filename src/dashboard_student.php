@@ -1088,73 +1088,152 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 
     .candidate-card {
       background: #fff;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 0.5rem;
       cursor: pointer;
       transition: all 0.2s ease;
       display: flex;
-      gap: 0.75rem;
+      gap: 0.5rem;
       align-items: center;
+      position: relative;
+      overflow: hidden;
     }
 
-    .candidate-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      border-color: #2563eb;
+    .candidate-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(37, 99, 235, 0.05),
+        rgba(37, 99, 235, 0.05) 10px,
+        rgba(37, 99, 235, 0.1) 10px,
+        rgba(37, 99, 235, 0.1) 20px
+      );
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .candidate-card:hover::before {
+      opacity: 1;
     }
 
     .candidate-card.selected {
       border-color: #2563eb;
-      background: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
+      background: #f8fafc;
     }
 
-    .candidate-photo-container {
-      flex-shrink: 0;
+    .candidate-card.selected::before {
+      opacity: 1;
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(37, 99, 235, 0.1),
+        rgba(37, 99, 235, 0.1) 10px,
+        rgba(37, 99, 235, 0.15) 10px,
+        rgba(37, 99, 235, 0.15) 20px
+      );
+    }
+
+    .candidate-card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      color: #2563eb;
+      font-weight: bold;
+      font-size: 1.2rem;
+      background: #fff;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
     }
 
     .candidate-photo {
-      width: 50px;
-      height: 50px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid #e5e7eb;
+      border: 1px solid #e5e7eb;
       transition: all 0.2s ease;
+      position: relative;
+      z-index: 1;
     }
 
     .candidate-card.selected .candidate-photo {
       border-color: #2563eb;
-      transform: scale(1.05);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
     }
 
     .candidate-info {
       flex: 1;
+      position: relative;
+      z-index: 1;
     }
 
     .candidate-name {
       font-weight: 600;
       color: #1f2937;
-      font-size: 0.95rem;
-      margin-bottom: 0.15rem;
+      font-size: 0.85rem;
+      margin-bottom: 0.1rem;
     }
 
     .candidate-department {
       color: #6b7280;
-      font-size: 0.8rem;
-      margin-bottom: 0.25rem;
+      font-size: 0.75rem;
+      margin-bottom: 0.15rem;
     }
 
     .candidate-platform {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #4b5563;
-      padding-top: 0.25rem;
+      padding-top: 0.15rem;
       border-top: 1px solid #e5e7eb;
     }
 
-    .badge {
-      font-size: 0.75rem;
-      padding: 0.25rem 0.5rem;
+    /* Add styles for the position section to enhance ballot feel */
+    .position-section {
+      background: #f8fafc;
+      padding: 0.75rem;
       border-radius: 6px;
+      margin-bottom: 0.75rem;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .position-header {
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px dashed #e5e7eb;
+    }
+
+    .position-title {
+      font-size: 0.9rem;
+      margin-bottom: 0.15rem;
+      color: #1f2937;
+      font-weight: 600;
+    }
+
+    .position-subtitle {
+      font-size: 0.7rem;
+      color: #6b7280;
+    }
+
+    /* Update the badge style */
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      background: rgba(37, 99, 235, 0.1);
+      color: #2563eb;
       font-weight: 500;
     }
 
@@ -1273,6 +1352,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       font-size: 0.65rem;
       padding: 0.15rem 0.35rem;
       border-radius: 4px;
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateY(-10px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
     }
   </style>
 </head>
@@ -2039,6 +2135,14 @@ function loadCandidates() {
             'Public Information Officer'
           ]
         };
+
+        // Define default profile images for each department
+        const defaultProfiles = {
+          'USG': '../img/USG.jpg',
+          'AFPROTECHS': '../img/AFPROTECHS.jpg',
+          'SITE': '../img/SITE.jpg',
+          'PAFE': '../img/PAFE.jpg'
+        };
         
         // Group candidates by department
         const departments = {
@@ -2093,7 +2197,7 @@ function loadCandidates() {
                       <div class="candidate-card" 
                            onclick="selectCandidate(this, '${department}-${position}', ${candidate.candidate_id}, ${maxVotes})">
                         <div class="candidate-photo-container">
-                          <img src="${candidate.photo || '../img/default-avatar.png'}" 
+                          <img src="${candidate.photo || defaultProfiles[department]}" 
                                alt="${candidate.name}" 
                                class="candidate-photo">
                         </div>
@@ -2134,24 +2238,40 @@ function selectCandidate(element, positionKey, candidateId, maxVotes) {
   const currentSelections = selectedCandidates.get(positionKey) || [];
   
   if (element.classList.contains('selected')) {
-    // Deselect candidate
+    // Deselect candidate with animation
+    element.style.transition = 'all 0.3s ease';
     element.classList.remove('selected');
     selectedCandidates.set(positionKey, currentSelections.filter(id => id !== candidateId));
   } else {
     // Check if can select more candidates
     if (currentSelections.length < maxVotes) {
+      // Add selection with animation
+      element.style.transition = 'all 0.3s ease';
       element.classList.add('selected');
       selectedCandidates.set(positionKey, [...currentSelections, candidateId]);
+      
+      // Add subtle animation
+      element.style.transform = 'scale(1.02)';
+      setTimeout(() => {
+        element.style.transform = 'scale(1)';
+      }, 200);
     } else {
-      // Show max votes reached warning
+      // Show max votes reached warning with animation
       const alertDiv = document.createElement('div');
       alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+      alertDiv.style.animation = 'slideIn 0.3s ease';
       alertDiv.innerHTML = `
         <i class="bi bi-exclamation-circle me-2"></i>
         You can only select ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for ${position} in ${department}.
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       `;
       document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#voteForm'));
+      
+      // Add shake animation to the card
+      element.style.animation = 'shake 0.5s ease';
+      setTimeout(() => {
+        element.style.animation = '';
+      }, 500);
       
       setTimeout(() => alertDiv.remove(), 3000);
       return;
