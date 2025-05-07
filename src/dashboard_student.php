@@ -1559,7 +1559,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-
         <!-- Search Input -->
         <div class="mb-3">
           <label for="searchViewCandidate" class="form-label">Search by Name</label>
@@ -1568,17 +1567,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 
         <!-- Scrollable Table -->
         <div style="max-height: 300px; overflow-y: auto;">
-        <table class="table table-bordered" id="viewCandidateTable">
-          <thead class="table-light">
-            <tr>
-              <th>Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Candidates will be inserted here -->
-          </tbody>
-        </table>
-
+          <table class="table table-bordered" id="viewCandidateTable">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Candidates will be inserted here -->
+            </tbody>
+          </table>
         </div>
 
         <div id="viewCandidateMsg" class="mt-2"></div>
@@ -1596,13 +1596,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <div class="modal-content p-3">
       <div class="modal-header d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
-          <!-- Display candidate photo here -->
-          <?php if (!empty($candidate_photo)): ?>
-              <img src="<?php echo $candidate_photo; ?>" id="candidatePhoto" class="rounded-circle" alt="Candidate Photo" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff;">
-          <?php else: ?>
-              <i class="bi bi-person-circle" style="font-size: 40px;"></i>
-          <?php endif; ?>
-
+          <img id="candidatePhoto" class="rounded-circle" alt="Candidate Photo"
+               style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff;">
           <h5 class="modal-title mb-0" id="candidateProfileModalLabel">Candidate Name</h5>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1643,53 +1638,75 @@ const viewSearchInput = document.getElementById('searchViewCandidate');
 
 // Fetch and render candidates
 function loadViewCandidateTable(searchQuery = '') {
-  viewTableBody.innerHTML = '<tr><td>Loading...</td></tr>';
-  viewMsg.textContent = '';
-  viewMsg.className = '';
-
-  fetch('fetch_candidates.php')
-    .then(response => response.json())
+  // Show loading message
+  viewTableBody.innerHTML = '<tr><td colspan="3" class="text-center">Loading candidates...</td></tr>';
+  
+  fetch('../src/fetch_candidates.php')
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then(data => {
-      if (data.success && Array.isArray(data.candidates) && data.candidates.length > 0) {
-        viewTableBody.innerHTML = '';
-        let hasMatch = false;
+      // Check if data has the expected structure
+      if (!data || !data.candidates || !Array.isArray(data.candidates)) {
+        throw new Error('Invalid data format received');
+      }
+      
+      viewTableBody.innerHTML = '';
+      
+      if (data.candidates.length === 0) {
+        viewTableBody.innerHTML = '<tr><td colspan="3" class="text-center">No candidates found</td></tr>';
+        return;
+      }
 
-        data.candidates.forEach(candidate => {
-          if (!candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) return;
-
+      data.candidates.forEach(candidate => {
+        if (candidate.name.toLowerCase().includes(searchQuery.toLowerCase())) {
           const row = document.createElement('tr');
-          row.style.cursor = 'pointer'; // Make it look clickable
-          row.innerHTML = `<td>${candidate.name}</td>`; // Remove button
-          row.onclick = () => showCandidateProfile(candidate); // Attach click handler to row
+          row.style.cursor = 'pointer';
+          row.onclick = () => showCandidateProfile(candidate);
+          row.innerHTML = `
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <img src="${candidate.photo || '../img/icon.png'}" 
+                     class="rounded-circle" 
+                     alt="${candidate.name}"
+                     style="width: 32px; height: 32px; object-fit: cover;">
+                ${candidate.name}
+              </div>
+            </td>
+            <td>${candidate.department || 'N/A'}</td>
+            <td>${candidate.position || 'N/A'}</td>
+          `;
           viewTableBody.appendChild(row);
-          hasMatch = true;
-        });
-
-
-        if (!hasMatch) {
-          viewTableBody.innerHTML = '<tr><td>No matching candidates found.</td></tr>';
         }
+      });
 
-      } else {
-        viewTableBody.innerHTML = '<tr><td>No candidates found.</td></tr>';
+      // If no candidates match the search
+      if (viewTableBody.children.length === 0) {
+        viewTableBody.innerHTML = '<tr><td colspan="3" class="text-center">No matching candidates found</td></tr>';
       }
     })
     .catch(error => {
       console.error('Error fetching candidates:', error);
-      viewTableBody.innerHTML = '<tr><td>Error loading candidates.</td></tr>';
+      viewTableBody.innerHTML = '<tr><td colspan="3" class="text-center text-danger">Error loading candidates. Please try again.</td></tr>';
     });
 }
 
 // Reload candidates when modal is shown
-viewCandidateModal.addEventListener('shown.bs.modal', () => loadViewCandidateTable());
-
-// Handle search input
-viewSearchInput.addEventListener('input', (e) => {
-  loadViewCandidateTable(e.target.value);
+viewCandidateModal.addEventListener('shown.bs.modal', () => {
+  loadViewCandidateTable();
 });
 
-
-
+// Handle search input with debounce
+let searchTimeout;
+viewSearchInput.addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    loadViewCandidateTable(e.target.value);
+  }, 300);
+});
 
 // Show Candidate Profile Function
 function showCandidateProfile(candidate) {
@@ -1698,6 +1715,7 @@ function showCandidateProfile(candidate) {
   const profileDept = document.getElementById('profileDept');
   const profilePosition = document.getElementById('profilePosition');
   const profilePlatform = document.getElementById('profilePlatform');
+  const candidatePhoto = document.getElementById('candidatePhoto');
 
   profileModalTitle.textContent = candidate.name || 'Candidate Profile';
   profileAge.textContent = candidate.age ? `${candidate.age} years old` : 'N/A';
@@ -1705,6 +1723,12 @@ function showCandidateProfile(candidate) {
   profilePosition.textContent = candidate.position || 'N/A';
   profilePlatform.textContent = candidate.platform || 'N/A';
 
+  // Set candidate photo
+  if (candidate.photo) {
+    candidatePhoto.src = candidate.photo;
+  } else {
+    candidatePhoto.src = '../img/icon.png';
+  }
 
   // Hide the candidate list modal (if open)
   const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCandidatesModal'));
@@ -1716,7 +1740,6 @@ function showCandidateProfile(candidate) {
   const profileModal = new bootstrap.Modal(document.getElementById('candidateProfileModal'));
   profileModal.show();
 }
-
 
 
 
