@@ -2202,17 +2202,22 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
       <div class="modal-body">
         <div id="electionStatus" class="alert mb-2"></div>
         
-        <!-- Department Selection -->
-        <div id="departmentSelection" class="mb-3">
-          <label class="form-label">Select Department</label>
-          <select class="form-select" id="departmentSelect">
-            <option value="">Choose a department...</option>
-            <option value="USG">USG (University Student Government)</option>
-            <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
-            <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
-            <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
-          </select>
+        <!-- Department Select -->
+        <div class="mb-3" id="departmentSelectContainer">
+            <label for="departmentSelect" class="form-label">Select Department</label>
+            <select class="form-select" id="departmentSelect" required>
+                <option value="">Choose Department</option>
+                <option value="USG">University Student Government</option>
+                <option value="PAFE">PRIME Association of Future Educators</option>
+                <option value="SITE">Society of Information Technology Enthusiasts</option>
+                <option value="AFPROTECHS">Association of Food Processing Technology Students</option>
+            </select>
         </div>
+
+        <!-- Cast Vote Button -->
+        <button class="btn btn-primary w-100" id="castVoteBtn" onclick="showVotingModal()">
+            Cast Vote
+        </button>
 
         <!-- Candidates Container -->
         <div id="candidatesContainer">
@@ -2472,6 +2477,133 @@ document.getElementById('submitVoteBtn').addEventListener('click', function() {
 document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
   checkElectionStatus();
 });
+
+function castVote() {
+  // Get selected department
+  const department = document.getElementById('departmentSelect').value;
+
+  // Get selected USG candidates (checkboxes or cards with .selected)
+  const usgSelected = Array.from(document.querySelectorAll('.candidate-card.usg.selected'))
+    .map(card => card.dataset.candidateId);
+
+  // Get selected department candidate
+  const deptSelected = Array.from(document.querySelectorAll(`.candidate-card.dept.selected[data-department="${department}"]`))
+    .map(card => card.dataset.candidateId);
+
+  // Validation
+  if (usgSelected.length === 0 || usgSelected.length > 2) {
+    alert('Please select up to 2 USG representatives.');
+    return;
+  }
+  if (deptSelected.length !== 1) {
+    alert('Please select 1 candidate for your department.');
+    return;
+  }
+
+  // Prepare data
+  const voteData = {
+    department: department,
+    usg_votes: usgSelected,
+    dept_vote: deptSelected[0]
+  };
+
+  // Submit via AJAX/fetch
+  fetch('cast_vote.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(voteData)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('Your vote has been cast successfully!');
+      // Optionally redirect or update UI
+    } else {
+      alert(data.message || 'Error casting vote.');
+    }
+  })
+  .catch(() => alert('Error connecting to server.'));
+}
+
+// Add this function to check voting status
+function checkVotingStatus() {
+    fetch('get_voting_status.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const departmentSelect = document.getElementById('departmentSelect');
+                const castVoteBtn = document.getElementById('castVoteBtn');
+                const departmentSelectContainer = document.getElementById('departmentSelectContainer');
+                
+                if (data.hasVoted) {
+                    // If student has already voted, hide the department select
+                    if (departmentSelectContainer) {
+                        departmentSelectContainer.style.display = 'none';
+                    }
+                    if (castVoteBtn) {
+                        castVoteBtn.disabled = true;
+                        castVoteBtn.textContent = 'Already Voted';
+                    }
+                } else if (data.electionStatus.isActive) {
+                    // Voting is active and student hasn't voted
+                    if (departmentSelectContainer) {
+                        departmentSelectContainer.style.display = 'block';
+                    }
+                    if (castVoteBtn) {
+                        castVoteBtn.disabled = false;
+                        castVoteBtn.textContent = 'Cast Vote';
+                    }
+                } else {
+                    // Voting is not active
+                    if (departmentSelectContainer) {
+                        departmentSelectContainer.style.display = 'none';
+                    }
+                    if (castVoteBtn) {
+                        castVoteBtn.disabled = true;
+                        castVoteBtn.textContent = 'Voting Period Ended';
+                    }
+                }
+            } else {
+                console.error('Error checking voting status:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+// Call this function when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    checkVotingStatus();
+    // Check status every minute
+    setInterval(checkVotingStatus, 60000);
+});
+
+function showVotingModal() {
+    fetch('get_voting_status.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.electionStatus.isActive) {
+                    if (data.hasVoted) {
+                        alert('You have already voted.');
+                        return;
+                    }
+                    // Show the voting modal
+                    const votingModal = new bootstrap.Modal(document.getElementById('votingModal'));
+                    votingModal.show();
+                } else {
+                    alert('Voting period has ended.');
+                }
+            } else {
+                alert(data.message || 'Error checking voting status');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error checking voting status');
+        });
+}
 </script>
 
 <style>

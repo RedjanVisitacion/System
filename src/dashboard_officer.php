@@ -182,7 +182,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       z-index: 1200;
       background: #2563eb;
       height: 60px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .navbar.faded {
       opacity: 0.92;
@@ -288,7 +287,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
         background: #2563eb;
         display: flex;
         align-items: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
 
       .main-content {
@@ -898,8 +896,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     }
     .main-content {
       margin-left: 240px;
-      margin-top: 60px; /* Add margin-top to account for fixed navbar */
       transition: margin-left 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+      margin-top: 3rem;
     }
     .body-sidebar-collapsed .main-content {
       margin-left: 70px;
@@ -1313,9 +1311,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <div class="col-12 col-md-6">
                 <div class="dashboard-card p-4">
                   <div class="icon">
-                    <i class="bi bi-check-circle"></i>
+                    <i class="bi bi-person-check"></i>
                   </div>
                   <h3 class="fw-bold text-center">Votes Cast</h3>
+                  <div id="resetVotesContainer1" class="mb-2" style="display:none;">
+                    <button class="btn btn-danger btn-sm w-100" id="resetVotesBtn1">
+                      <i class="bi bi-arrow-counterclockwise"></i> Reset All Votes
+                    </button>
+                  </div>
                   <p class="fs-4 text-center mb-0" id="totalVotesCast">0</p>
                 </div>
               </div>
@@ -1334,6 +1337,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                     <i class="bi bi-person-check"></i>
                   </div>
                   <h3 class="fw-bold text-center">Voted Students</h3>
+                  <div id="resetVotesContainer2" class="mb-2" style="display:block;">
+                    <button class="btn btn-danger btn-sm w-100" id="resetVotesBtn2">
+                      <i class="bi bi-arrow-counterclockwise"></i> Reset All Votes
+                    </button>
+                  </div>
                   <div id="votedUsersList" class="mt-3" style="max-height: 200px; overflow-y: auto;">
                     <div class="text-center">
                       <div class="spinner-border text-primary" role="status">
@@ -2619,23 +2627,83 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
     setInterval(updateTotalVotesCast, 30000);
   });
 
-  // Add this after the totalVotersCard click handler
+  // Function to handle reset votes
+  function handleResetVotes() {
+    if (confirm('Are you sure you want to reset all votes? This action cannot be undone.')) {
+      // Use the correct path to reset_votes.php
+      fetch('reset_votes.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'same-origin' // Add this to include cookies
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.success) {
+          alert('All votes have been reset!');
+          // Refresh dashboard stats
+          if (typeof updateTotalVotesCast === 'function') {
+            updateTotalVotesCast();
+          }
+          if (typeof updateTotalCandidates === 'function') {
+            updateTotalCandidates();
+          }
+          if (typeof loadVotedUsers === 'function') {
+            loadVotedUsers();
+          }
+        } else {
+          alert(data.message || 'Failed to reset votes.');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error connecting to server. Please try again.');
+      });
+    }
+  }
+
+  // Add event listeners to both reset buttons
+  document.addEventListener('DOMContentLoaded', function() {
+    const resetBtn1 = document.getElementById('resetVotesBtn1');
+    const resetBtn2 = document.getElementById('resetVotesBtn2');
+    
+    if (resetBtn1) {
+      resetBtn1.addEventListener('click', handleResetVotes);
+    }
+    if (resetBtn2) {
+      resetBtn2.addEventListener('click', handleResetVotes);
+    }
+  });
+
+  // Update the display logic for reset containers
   document.querySelector('.dashboard-card:nth-child(3)').addEventListener('click', () => {
     const votedUsersList = document.getElementById('votedUsersList');
+    const resetVotesContainer1 = document.getElementById('resetVotesContainer1');
+    const resetVotesContainer2 = document.getElementById('resetVotesContainer2');
+    
     if (votedUsersList) {
-      // Scroll to the voted users list
       votedUsersList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      
-      // Add a highlight effect
       votedUsersList.style.transition = 'all 0.3s ease';
       votedUsersList.style.backgroundColor = '#f8fafc';
       votedUsersList.style.boxShadow = '0 0 0 2px #2563eb';
-      
-      // Remove highlight after 2 seconds
       setTimeout(() => {
         votedUsersList.style.backgroundColor = '';
         votedUsersList.style.boxShadow = '';
       }, 2000);
+    }
+    
+    if (resetVotesContainer1) {
+      resetVotesContainer1.style.display = 'block';
+    }
+    if (resetVotesContainer2) {
+      resetVotesContainer2.style.display = 'block';
     }
   });
   </script>
