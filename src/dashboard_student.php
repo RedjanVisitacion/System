@@ -1745,30 +1745,43 @@ function checkElectionStatus() {
 }
 
 function loadCandidates() {
-  fetch('fetch_candidates.php')
+  fetch('../src/fetch_candidates.php')
     .then(response => response.json())
     .then(data => {
       if (data.success && Array.isArray(data.candidates)) {
         const container = document.getElementById('candidatesContainer');
+        container.innerHTML = '';
+        
+        // Group candidates by position
         const positions = [...new Set(data.candidates.map(c => c.position))];
         
         positions.forEach(position => {
           const positionCandidates = data.candidates.filter(c => c.position === position);
+          const isRepresentative = position.toLowerCase().includes('representative');
+          const maxVotes = isRepresentative ? 2 : 1;
           
           const section = document.createElement('div');
           section.className = 'position-section';
           section.innerHTML = `
-            <h3 class="position-title">${position}</h3>
+            <h3 class="position-title">
+              ${position}
+              ${isRepresentative ? '<span class="badge bg-info ms-2">Vote for 2 candidates</span>' : ''}
+            </h3>
             <div class="candidates-list">
               ${positionCandidates.map(candidate => `
                 <div class="candidate-card d-flex align-items-center" 
-                     onclick="selectCandidate(this, '${position}', ${candidate.candidate_id})">
+                     onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})">
                   <img src="${candidate.photo || '../img/default-avatar.png'}" 
                        alt="${candidate.name}" 
                        class="candidate-photo">
                   <div class="candidate-info">
                     <div class="candidate-name">${candidate.name}</div>
                     <div class="candidate-department">${candidate.department}</div>
+                    ${candidate.platform ? `
+                      <div class="candidate-platform">
+                        <strong>Platform:</strong> ${candidate.platform}
+                      </div>
+                    ` : ''}
                   </div>
                 </div>
               `).join('')}
@@ -1780,39 +1793,79 @@ function loadCandidates() {
     })
     .catch(error => {
       console.error('Error loading candidates:', error);
+      document.getElementById('candidatesContainer').innerHTML = 
+        '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
     });
 }
 
-// Handle candidate selection
+// Function to select a candidate
 const selectedCandidates = new Map();
 
-function selectCandidate(element, position, candidateId) {
+function selectCandidate(element, position, candidateId, maxVotes) {
   const positionSection = element.closest('.position-section');
   const allCards = positionSection.querySelectorAll('.candidate-card');
+  const currentSelections = selectedCandidates.get(position) || [];
   
-  // Remove selected class from all cards in this position
-  allCards.forEach(card => card.classList.remove('selected'));
+  // If already selected, deselect
+  if (element.classList.contains('selected')) {
+    element.classList.remove('selected');
+    selectedCandidates.set(position, currentSelections.filter(id => id !== candidateId));
+  } else {
+    // Check if we can select more candidates for this position
+    if (currentSelections.length < maxVotes) {
+      element.classList.add('selected');
+      selectedCandidates.set(position, [...currentSelections, candidateId]);
+    } else {
+      // Show alert that max votes reached
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+      alertDiv.innerHTML = `
+        <i class="bi bi-exclamation-circle me-2"></i>
+        You can only select ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for this position.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#voteForm'));
+      
+      // Remove alert after 3 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+      return;
+    }
+  }
   
-  // Add selected class to clicked card
-  element.classList.add('selected');
-  
-  // Store the selection
-  selectedCandidates.set(position, candidateId);
-  
-  // Enable submit button if all positions have selections
+  // Enable submit button if all positions have required number of selections
   const submitBtn = document.querySelector('#voteForm button[type="submit"]');
   const allPositions = document.querySelectorAll('.position-section');
-  submitBtn.disabled = selectedCandidates.size !== allPositions.length;
+  let canSubmit = true;
+  
+  allPositions.forEach(section => {
+    const position = section.querySelector('.position-title').textContent.split('Vote')[0].trim();
+    const isRepresentative = position.toLowerCase().includes('representative');
+    const requiredVotes = isRepresentative ? 2 : 1;
+    const selections = selectedCandidates.get(position) || [];
+    
+    if (selections.length !== requiredVotes) {
+      canSubmit = false;
+    }
+  });
+  
+  submitBtn.disabled = !canSubmit;
 }
 
 // Handle form submission
 document.getElementById('voteForm').addEventListener('submit', function(e) {
   e.preventDefault();
   
-  const votes = Array.from(selectedCandidates.entries()).map(([position, candidateId]) => ({
-    position,
-    candidate_id: candidateId
-  }));
+  const votes = [];
+  selectedCandidates.forEach((candidateIds, position) => {
+    candidateIds.forEach(candidateId => {
+      votes.push({
+        position,
+        candidate_id: candidateId
+      });
+    });
+  });
 
   castVote(votes).then(success => {
     if (success) {
@@ -1835,6 +1888,13 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
 // Function to handle Cast Vote link click
 function handleCastVoteClick(event) {
   event.preventDefault();
+
+  // Close sidebar on mobile (same as View Candidates)
+  if (window.innerWidth <= 991.98) {
+    document.getElementById('sidebar').classList.remove('active');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+    document.getElementById('mobileMenuBtn').classList.remove('active');
+  }
   
   // First check if user has already voted
   fetch('../src/get_voting_status.php')
@@ -1939,21 +1999,30 @@ function handleCastVoteClick(event) {
 </div>
 
 <style>
+.badge {
+  font-size: 0.7rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 5px;
+}
+
 .candidate-card {
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 1rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  margin-bottom: 0.2rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   background: #fff;
   position: relative;
   overflow: hidden;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
 }
 
 .candidate-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   border-color: #2563eb;
 }
 
@@ -1970,54 +2039,58 @@ function handleCastVoteClick(event) {
   width: 0;
   height: 0;
   border-style: solid;
-  border-width: 0 40px 40px 0;
+  border-width: 0 18px 18px 0;
   border-color: transparent #2563eb transparent transparent;
 }
 
 .candidate-card.selected::after {
   content: '✓';
   position: absolute;
-  top: 5px;
-  right: 10px;
+  top: 2px;
+  right: 5px;
   color: white;
-  font-size: 16px;
+  font-size: 11px;
   font-weight: bold;
 }
 
 .candidate-photo {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 1.5rem;
-  border: 3px solid #e5e7eb;
-  transition: all 0.3s ease;
+  margin-right: 0.6rem;
+  border: 2.5px solid #e5e7eb;
+  transition: all 0.2s ease;
 }
 
 .candidate-card.selected .candidate-photo {
   border-color: #2563eb;
-  transform: scale(1.05);
+  transform: scale(1.03);
 }
 
 .position-section {
-  margin-bottom: 2.5rem;
+  margin-bottom: 0.3rem;
   background: #f8fafc;
-  padding: 1.5rem;
-  border-radius: 16px;
+  padding: 0.2rem 0.1rem 0.1rem 0.1rem;
+  border-radius: 8px;
 }
 
 .position-title {
-  font-size: 1.3rem;
+  font-size: 0.95rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.2rem;
   color: #1f2937;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.1rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
 }
 
 .candidates-list {
   display: grid;
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.2rem 0.7rem;
 }
 
 .candidate-info {
@@ -2027,42 +2100,47 @@ function handleCastVoteClick(event) {
 .candidate-name {
   font-weight: 600;
   color: #1f2937;
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
+  font-size: 0.92rem;
+  margin-bottom: 0.1rem;
 }
 
 .candidate-department {
   color: #6b7280;
-  font-size: 0.95rem;
+  font-size: 0.75rem;
 }
 
 .candidate-platform {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 0.2rem;
+  padding-top: 0.2rem;
   border-top: 1px solid #e5e7eb;
   color: #4b5563;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
 }
 
-/* Submit button styles */
 #voteForm button[type="submit"] {
-  padding: 0.8rem 2.5rem;
-  font-size: 1.1rem;
+  padding: 0.3rem 1rem;
+  font-size: 0.92rem;
   font-weight: 600;
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   border: none;
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
 #voteForm button[type="submit"]:not(:disabled):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.13);
 }
 
 #voteForm button[type="submit"]:disabled {
   background: #e5e7eb;
   cursor: not-allowed;
+}
+
+/* Make the modal body scrollable if content is too tall */
+#castVoteModal .modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 </style>
 
