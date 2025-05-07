@@ -1,81 +1,139 @@
 <?php
-require_once 'check_session.php';
 require_once 'connection.php';
+session_start();
 
-header('Content-Type: application/json');
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    echo json_encode(['success' => false, 'message' => 'User not logged in']);
     exit;
 }
 
+// Get user ID from session
 $user_id = $_SESSION['user_id'];
-$candidate_id = $_POST['candidate_id'] ?? null;
 
-if (!$candidate_id) {
-    echo json_encode(['success' => false, 'message' => 'Candidate ID is required']);
+// Get JSON data from request body
+$json = file_get_contents('php://input');
+$data = json_decode($json, true);
+
+if (!isset($data['votes']) || !is_array($data['votes'])) {
+    echo json_encode(['success' => false, 'message' => 'Invalid vote data']);
     exit;
 }
 
-// Get student's program
-$stmt = $con->prepare("SELECT program_name FROM user_profile WHERE user_id = ?");
-$stmt->bind_param("s", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$user_data = $result->fetch_assoc();
+try {
+    // Start transaction
+    $con->begin_transaction();
 
-if (!$user_data) {
-    echo json_encode(['success' => false, 'message' => 'User profile not found']);
-    exit;
+    // Check if user has already voted
+    $checkVoteStmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ?");
+    $checkVoteStmt->bind_param("s", $user_id);
+    $checkVoteStmt->execute();
+    $voteResult = $checkVoteStmt->get_result();
+    $voteCount = $voteResult->fetch_assoc()['vote_count'];
+
+    if ($voteCount > 0) {
+        throw new Exception('You have already voted');
+    }
+
+    // Get user's program to check department eligibility
+    $userStmt = $con->prepare("
+        SELECT up.program_name, u.department 
+        FROM user_profile up 
+        JOIN user u ON up.user_id = u.user_id 
+        WHERE up.user_id = ?
+    ");
+    $userStmt->bind_param("s", $user_id);
+    $userStmt->execute();
+    $userResult = $userStmt->get_result();
+    $userData = $userResult->fetch_assoc();
+
+    // Map program to allowed departments
+    $allowedDepartments = ['USG']; // All students can vote for USG
+    if (strpos($userData['program_name'], 'BTLED') !== false) {
+        $allowedDepartments[] = 'PAFE';
+    } elseif (strpos($userData['program_name'], 'BSIT') !== false) {
+        $allowedDepartments[] = 'SITE';
+    } elseif (strpos($userData['program_name'], 'BFP') !== false) {
+        $allowedDepartments[] = 'AFPROTECHS';
+    }
+
+    // Prepare vote insertion statement
+    $voteStmt = $con->prepare("
+        INSERT INTO vote (user_id, candidate_id, vote_status) 
+        VALUES (?, ?, 'Voted')
+    ");
+
+    // Process each vote
+    foreach ($data['votes'] as $candidateId) {
+        // Verify candidate exists and belongs to allowed department
+        $candidateStmt = $con->prepare("
+            SELECT department, position 
+            FROM candidate 
+            WHERE candidate_id = ?
+        ");
+        $candidateStmt->bind_param("i", $candidateId);
+        $candidateStmt->execute();
+        $candidateResult = $candidateStmt->get_result();
+        $candidateData = $candidateResult->fetch_assoc();
+
+        if (!$candidateData) {
+            throw new Exception('Invalid candidate selected');
+        }
+
+        // Check if candidate's department is allowed
+        if (!in_array($candidateData['department'], $allowedDepartments)) {
+            throw new Exception('You are not eligible to vote for this department');
+        }
+
+        // Insert vote
+        $voteStmt->bind_param("si", $user_id, $candidateId);
+        if (!$voteStmt->execute()) {
+            throw new Exception('Error recording vote');
+        }
+
+        // Update result table
+        $resultStmt = $con->prepare("
+            INSERT INTO result (department, position, candidate_id, votes) 
+            VALUES (?, ?, ?, 1)
+            ON DUPLICATE KEY UPDATE votes = votes + 1
+        ");
+        $resultStmt->bind_param("ssi", 
+            $candidateData['department'], 
+            $candidateData['position'], 
+            $candidateId
+        );
+        if (!$resultStmt->execute()) {
+            throw new Exception('Error updating results');
+        }
+    }
+
+    // Update user's voting status
+    $updateUserStmt = $con->prepare("
+        UPDATE user 
+        SET department = 'Voted' 
+        WHERE user_id = ?
+    ");
+    $updateUserStmt->bind_param("s", $user_id);
+    if (!$updateUserStmt->execute()) {
+        throw new Exception('Error updating user status');
+    }
+
+    // Commit transaction
+    $con->commit();
+    echo json_encode(['success' => true, 'message' => 'Votes recorded successfully']);
+
+} catch (Exception $e) {
+    // Rollback transaction on error
+    $con->rollback();
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
 
-$program = $user_data['program_name'];
-$allowed_departments = ['USG']; // All students can vote for USG
-
-// Map program to department
-if (strpos($program, 'Bachelor of Technology and Livelihood Education') !== false) {
-    $allowed_departments[] = 'PAFE';
-} elseif (strpos($program, 'Bachelor of Science in Information Technology') !== false) {
-    $allowed_departments[] = 'SITE';
-} elseif (strpos($program, 'Bachelor in Food Processing and Technology') !== false) {
-    $allowed_departments[] = 'AFPROTECHS';
-}
-
-// Check if candidate is from an allowed department
-$stmt = $con->prepare("SELECT d.department_name 
-                      FROM candidate c 
-                      JOIN department d ON c.department_id = d.department_id 
-                      WHERE c.candidate_id = ?");
-$stmt->bind_param("i", $candidate_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$candidate_data = $result->fetch_assoc();
-
-if (!$candidate_data || !in_array($candidate_data['department_name'], $allowed_departments)) {
-    echo json_encode(['success' => false, 'message' => 'You are not eligible to vote for this candidate']);
-    exit;
-}
-
-// Check if user has already voted
-$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ?");
-$stmt->bind_param("s", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-$vote_data = $result->fetch_assoc();
-
-if ($vote_data['vote_count'] > 0) {
-    echo json_encode(['success' => false, 'message' => 'You have already voted']);
-    exit;
-}
-
-// Record the vote
-$stmt = $con->prepare("INSERT INTO vote (user_id, candidate_id, vote_status) VALUES (?, ?, 'Voted')");
-$stmt->bind_param("si", $user_id, $candidate_id);
-
-if ($stmt->execute()) {
-    echo json_encode(['success' => true, 'message' => 'Vote recorded successfully']);
-} else {
-    echo json_encode(['success' => false, 'message' => 'Failed to record vote']);
-}
-
-$con->close(); 
+// Close statements and connection
+if (isset($checkVoteStmt)) $checkVoteStmt->close();
+if (isset($userStmt)) $userStmt->close();
+if (isset($voteStmt)) $voteStmt->close();
+if (isset($candidateStmt)) $candidateStmt->close();
+if (isset($resultStmt)) $resultStmt->close();
+if (isset($updateUserStmt)) $updateUserStmt->close();
+$con->close();
+?> 

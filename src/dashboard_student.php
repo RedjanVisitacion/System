@@ -1370,6 +1370,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       25% { transform: translateX(-5px); }
       75% { transform: translateX(5px); }
     }
+
+    @keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.5s ease;
+}
+
   </style>
 </head>
 <body>
@@ -1961,6 +1974,7 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
 
 
 
+
     // Initialize all updates
     document.addEventListener('DOMContentLoaded', function() {
       updateVotingStatus();
@@ -2075,267 +2089,69 @@ function castVote(votes) {
   });
 }
 
-// Add these new functions for the voting modal
+// Function to check election status
 function checkElectionStatus() {
-  fetch('../src/get_voting_status.php')
+  fetch('../src/get_election_dates.php')
     .then(response => response.json())
     .then(data => {
+      const statusEl = document.getElementById('electionStatus');
+      
+      if (!data.success) {
+        statusEl.className = 'alert alert-danger';
+        statusEl.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Error checking election status.';
+        return;
+      }
+
       const now = new Date();
       const startDate = new Date(data.start_date);
       const endDate = new Date(data.end_date);
-      const statusEl = document.getElementById('electionStatus');
-      const voteForm = document.getElementById('voteForm');
+
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        statusEl.className = 'alert alert-warning';
+        statusEl.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Election dates not properly set.';
+        return;
+      }
 
       if (now < startDate) {
         statusEl.className = 'alert alert-warning';
-        statusEl.innerHTML = '<i class="bi bi-clock me-2"></i>Voting has not started yet.';
-        voteForm.classList.add('d-none');
+        statusEl.innerHTML = `<i class="bi bi-clock me-2"></i>Voting has not started yet. Starts on ${formatDateTime(data.start_date)}`;
       } else if (now > endDate) {
         statusEl.className = 'alert alert-danger';
-        statusEl.innerHTML = '<i class="bi bi-x-circle me-2"></i>Voting period has ended.';
-        voteForm.classList.add('d-none');
+        statusEl.innerHTML = `<i class="bi bi-x-circle me-2"></i>Voting period has ended on ${formatDateTime(data.end_date)}`;
       } else {
         statusEl.className = 'alert alert-success';
         statusEl.innerHTML = '<i class="bi bi-check-circle me-2"></i>Voting is currently active.';
-        voteForm.classList.remove('d-none');
-        loadCandidates();
+        // Load candidates if voting is active
+        const department = document.getElementById('departmentSelect').value;
+        if (department) {
+          loadCandidatesByDepartment(department);
+        }
       }
     })
     .catch(error => {
       console.error('Error checking election status:', error);
-      document.getElementById('electionStatus').innerHTML = 
-        '<i class="bi bi-exclamation-circle me-2"></i>Error checking election status.';
+      const statusEl = document.getElementById('electionStatus');
+      statusEl.className = 'alert alert-danger';
+      statusEl.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Error checking election status. Please try again.';
     });
 }
 
-function loadCandidates() {
-  fetch('../src/fetch_candidates.php')
-    .then(response => response.json())
-    .then(data => {
-      if (data.success && Array.isArray(data.candidates)) {
-        const container = document.getElementById('candidatesContainer');
-        container.innerHTML = '';
-        
-        // Define position order for each department
-        const positionOrder = {
-          'USG': [
-            'President',
-            'Vice President',
-            'General Secretary',
-            'Associate Secretary',
-            'Treasurer',
-            'Auditor',
-            'Public Information Officer',
-            'BTLED Representatives',
-            'BSIT Representatives',
-            'BFPT Representatives'
-          ],
-          'AFPROTECHS': [
-            'President',
-            'Vice President',
-            'General Secretary',
-            'Associate Secretary',
-            'Treasurer',
-            'Auditor',
-            'Public Information Officer'
-          ],
-          'SITE': [
-            'President',
-            'Vice President',
-            'General Secretary',
-            'Associate Secretary',
-            'Treasurer',
-            'Auditor',
-            'Public Information Officer'
-          ],
-          'PAFE': [
-            'President',
-            'Vice President',
-            'General Secretary',
-            'Associate Secretary',
-            'Treasurer',
-            'Auditor',
-            'Public Information Officer'
-          ]
-        };
+// Function to format date and time
+function formatDateTime(dateString) {
+  const date = new Date(dateString);
+  if (isNaN(date)) return 'Invalid date';
 
-        // Define default profile images for each department
-        const defaultProfiles = {
-          'USG': '../img/USG.jpg',
-          'AFPROTECHS': '../img/AFPROTECHS.jpg',
-          'SITE': '../img/SITE.jpg',
-          'PAFE': '../img/PAFE.jpg'
-        };
-        
-        // Group candidates by department
-        const departments = {
-          'USG': [],
-          'AFPROTECHS': [],
-          'SITE': [],
-          'PAFE': []
-        };
-        
-        // Sort candidates into departments
-        data.candidates.forEach(candidate => {
-          if (candidate.department in departments) {
-            departments[candidate.department].push(candidate);
-          }
-        });
-        
-        // Create sections for each department
-        Object.entries(departments).forEach(([department, candidates]) => {
-          if (candidates.length > 0) {
-            const departmentSection = document.createElement('div');
-            departmentSection.className = 'department-section';
-            departmentSection.innerHTML = `
-              <div class="department-header">
-                <h4 class="department-title">${department}</h4>
-                <div class="department-subtitle">
-                  ${department === 'USG' ? 'One vote per position, two votes for representatives' : 'One vote per position'}
-                </div>
-              </div>
-            `;
-            
-            // Create position sections in specified order
-            positionOrder[department].forEach(position => {
-              const positionCandidates = candidates.filter(c => c.position === position);
-              if (positionCandidates.length > 0) {
-                const isRepresentative = position.toLowerCase().includes('representative');
-                const maxVotes = isRepresentative ? 2 : 1;
-                
-                const section = document.createElement('div');
-                section.className = 'position-section';
-                section.innerHTML = `
-                  <div class="position-header">
-                    <h3 class="position-title">
-                      ${position}
-                      ${isRepresentative ? '<span class="badge bg-info ms-2">Vote for 2 candidates</span>' : ''}
-                    </h3>
-                    <div class="position-subtitle">
-                      ${isRepresentative ? 'Select up to 2 candidates' : 'Select 1 candidate'}
-                    </div>
-                  </div>
-                  <div class="candidates-list">
-                    ${positionCandidates.map(candidate => `
-                      <div class="candidate-card" 
-                           onclick="selectCandidate(this, '${department}-${position}', ${candidate.candidate_id}, ${maxVotes})">
-                        <div class="candidate-photo-container">
-                          <img src="${candidate.photo || defaultProfiles[department]}" 
-                               alt="${candidate.name}" 
-                               class="candidate-photo">
-                        </div>
-                        <div class="candidate-info">
-                          <div class="candidate-name">${candidate.name}</div>
-                          <div class="candidate-department">${candidate.department}</div>
-                          ${candidate.platform ? `
-                            <div class="candidate-platform">
-                              <strong>Platform:</strong> ${candidate.platform}
-                            </div>
-                          ` : ''}
-                        </div>
-                      </div>
-                    `).join('')}
-                  </div>
-                `;
-                departmentSection.appendChild(section);
-              }
-            });
-            
-            container.appendChild(departmentSection);
-          }
-        });
-      }
-    })
-    .catch(error => {
-      console.error('Error loading candidates:', error);
-      document.getElementById('candidatesContainer').innerHTML = 
-        '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
-    });
-}
-
-// Function to select a candidate
-const selectedCandidates = new Map();
-
-function selectCandidate(element, positionKey, candidateId, maxVotes) {
-  const [department, position] = positionKey.split('-');
-  const currentSelections = selectedCandidates.get(positionKey) || [];
-  
-  if (element.classList.contains('selected')) {
-    // Deselect candidate with animation
-    element.style.transition = 'all 0.3s ease';
-    element.classList.remove('selected');
-    selectedCandidates.set(positionKey, currentSelections.filter(id => id !== candidateId));
-  } else {
-    // Check if can select more candidates
-    if (currentSelections.length < maxVotes) {
-      // Add selection with animation
-      element.style.transition = 'all 0.3s ease';
-      element.classList.add('selected');
-      selectedCandidates.set(positionKey, [...currentSelections, candidateId]);
-      
-      // Add subtle animation
-      element.style.transform = 'scale(1.02)';
-      setTimeout(() => {
-        element.style.transform = 'scale(1)';
-      }, 200);
-    } else {
-      // Show max votes reached warning with animation
-      const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-warning alert-dismissible fade show';
-      alertDiv.style.animation = 'slideIn 0.3s ease';
-      alertDiv.innerHTML = `
-        <i class="bi bi-exclamation-circle me-2"></i>
-        You can only select ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for ${position} in ${department}.
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      `;
-      document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#voteForm'));
-      
-      // Add shake animation to the card
-      element.style.animation = 'shake 0.5s ease';
-      setTimeout(() => {
-        element.style.animation = '';
-      }, 500);
-      
-      setTimeout(() => alertDiv.remove(), 3000);
-      return;
-    }
-  }
-  
-  updateSubmitButton();
-}
-
-// Handle form submission
-document.getElementById('voteForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  
-  const votes = [];
-  selectedCandidates.forEach((candidateIds, positionKey) => {
-    const [department, position] = positionKey.split('-');
-    candidateIds.forEach(candidateId => {
-      votes.push({
-        department,
-        position,
-        candidate_id: candidateId
-      });
-    });
+  return date.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
   });
+}
 
-  castVote(votes).then(success => {
-    if (success) {
-      const modal = bootstrap.Modal.getInstance(document.getElementById('castVoteModal'));
-      modal.hide();
-      selectedCandidates.clear();
-      document.getElementById('candidatesContainer').innerHTML = '';
-    }
-  });
-});
-
-// Check election status when modal is shown
-document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
-  checkElectionStatus();
-});
-
-// Function to handle Cast Vote link click
+// Handle Cast Vote click
 function handleCastVoteClick(event) {
   event.preventDefault();
   
@@ -2346,26 +2162,18 @@ function handleCastVoteClick(event) {
     document.getElementById('mobileMenuBtn').classList.remove('active');
   }
   
-  // Check voting status before allowing vote
-  fetch('../src/get_voting_status.php')
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        if (data.hasVoted) {
-          // Show "already voted" warning
-          showAlert('warning', 'You have already cast your vote.');
-        } else if (!data.electionStatus.isActive) {
-          // Show "election not active" info
-          showAlert('info', `Voting is not currently active. Election period: ${dates}`);
-        } else {
-          // Open voting modal if eligible
-          const castVoteModal = new bootstrap.Modal(document.getElementById('castVoteModal'));
-          castVoteModal.show();
-          loadCandidates();
-        }
-      }
-    })
+  // Show the voting modal
+  const castVoteModal = new bootstrap.Modal(document.getElementById('castVoteModal'));
+  castVoteModal.show();
+  
+  // Check election status when modal is shown
+  checkElectionStatus();
 }
+
+// Add event listener for modal shown
+document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
+  checkElectionStatus();
+});
 
   </script>
 
@@ -2379,19 +2187,324 @@ function handleCastVoteClick(event) {
       </div>
       <div class="modal-body">
         <div id="electionStatus" class="alert mb-2"></div>
-        <form id="voteForm">
-          <div id="candidatesContainer">
-            <!-- Candidates loaded here -->
-          </div>
-          <div class="d-flex justify-content-between align-items-center mt-2">
-            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="submit" class="btn btn-sm btn-primary" disabled>Submit Vote</button>
-          </div>
-        </form>
+        
+        <!-- Department Selection -->
+        <div id="departmentSelection" class="mb-3">
+          <label class="form-label">Select Department</label>
+          <select class="form-select" id="departmentSelect">
+            <option value="">Choose a department...</option>
+            <option value="USG">USG (University Student Government)</option>
+            <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
+            <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
+            <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
+          </select>
+        </div>
+
+        <!-- Candidates Container -->
+        <div id="candidatesContainer">
+          <!-- Candidates will be loaded here -->
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mt-2">
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-primary" id="submitVoteBtn" disabled>Submit Vote</button>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
+<script>
+// Function to load candidates based on selected department
+function loadCandidatesByDepartment(department) {
+  const container = document.getElementById('candidatesContainer');
+  container.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
+
+  // Map department codes to full names
+  const departmentNames = {
+    'USG': 'University Student Government',
+    'PAFE': 'PRIME Association of Future Educators',
+    'SITE': 'Society of Information Technology Enthusiasts',
+    'AFPROTECHS': 'Association of Food Processing Technology Students'
+  };
+
+  // Define position order for each department
+  const departmentPositions = {
+    'USG': [
+      'President',
+      'Vice President',
+      'General Secretary',
+      'Associate Secretary',
+      'Treasurer',
+      'Auditor',
+      'Public Information Officer',
+      'BTLED Representatives',
+      'BSIT Representatives',
+      'BFPT Representatives'
+    ],
+    'PAFE': [
+      'President',
+      'Vice President',
+      'General Secretary',
+      'Associate Secretary',
+      'Treasurer',
+      'Auditor',
+      'Public Information Officer'
+    ],
+    'SITE': [
+      'President',
+      'Vice President',
+      'General Secretary',
+      'Associate Secretary',
+      'Treasurer',
+      'Auditor',
+      'Public Information Officer'
+    ],
+    'AFPROTECHS': [
+      'President',
+      'Vice President',
+      'General Secretary',
+      'Associate Secretary',
+      'Treasurer',
+      'Auditor',
+      'Public Information Officer'
+    ]
+  };
+
+  // Map positions to their vote counts
+  const positionVotes = {
+    'President': 1,
+    'Vice President': 1,
+    'General Secretary': 1,
+    'Associate Secretary': 1,
+    'Treasurer': 1,
+    'Auditor': 1,
+    'Public Information Officer': 1,
+    'BTLED Representatives': 2,
+    'BSIT Representatives': 2,
+    'BFPT Representatives': 2
+  };
+
+  fetch('../src/fetch_candidates.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.candidates)) {
+        // Filter candidates by selected department
+        const departmentCandidates = data.candidates.filter(c => c.department === department);
+        
+        if (departmentCandidates.length === 0) {
+          container.innerHTML = '<div class="alert alert-info">No candidates found for this department.</div>';
+          return;
+        }
+
+        // Group candidates by position
+        const positions = {};
+        departmentCandidates.forEach(candidate => {
+          if (!positions[candidate.position]) {
+            positions[candidate.position] = [];
+          }
+          positions[candidate.position].push(candidate);
+        });
+
+        // Create HTML for each position in the specified order
+        let html = `
+          <div class="department-header mb-4">
+            <h5 class="department-title">${departmentNames[department]}</h5>
+            <p class="department-subtitle text-muted mb-0">
+              ${department === 'USG' ? 'One vote per position, two votes for representatives' : 'One vote per position'}
+            </p>
+          </div>
+        `;
+
+        // Get the position order for the selected department
+        const positionOrder = departmentPositions[department] || [];
+
+        // Sort positions according to the department's specified order
+        positionOrder.forEach(position => {
+          if (positions[position]) {
+            const maxVotes = positionVotes[position] || 1;
+            html += `
+              <div class="position-section mb-4">
+                <div class="position-header">
+                  <h6 class="position-title mb-2">
+                    ${position}
+                    <span class="badge bg-primary ms-2">${maxVotes} vote${maxVotes > 1 ? 's' : ''}</span>
+                  </h6>
+                </div>
+                <div class="candidates-list">
+                  ${positions[position].map(candidate => `
+                    <div class="candidate-card" 
+                         onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})"
+                         data-position="${position}"
+                         data-max-votes="${maxVotes}">
+                      <img src="${candidate.photo || '../img/icon.png'}" 
+                           alt="${candidate.name}" 
+                           class="candidate-photo">
+                      <div class="candidate-info">
+                        <div class="candidate-name">${candidate.name}</div>
+                        <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        container.innerHTML = html;
+      } else {
+        container.innerHTML = '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      container.innerHTML = '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
+    });
+}
+
+// Add event listener for department selection change
+document.getElementById('departmentSelect').addEventListener('change', function(e) {
+  const department = e.target.value;
+  if (department) {
+    loadCandidatesByDepartment(department);
+  } else {
+    document.getElementById('candidatesContainer').innerHTML = '';
+  }
+});
+
+// Function to select a candidate
+function selectCandidate(element, position, candidateId, maxVotes) {
+  const positionSection = element.closest('.position-section');
+  const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
+  
+  // If already selected, deselect
+  if (element.classList.contains('selected')) {
+    element.classList.remove('selected');
+  } else {
+    // Check if max votes reached for this position
+    if (selectedCandidates.length >= maxVotes) {
+      // Show error message
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-warning alert-dismissible fade show mt-2';
+      alertDiv.innerHTML = `
+        <i class="bi bi-exclamation-circle me-2"></i>
+        You can only select ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for ${position}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      positionSection.appendChild(alertDiv);
+      
+      // Remove alert after 3 seconds
+      setTimeout(() => alertDiv.remove(), 3000);
+      return;
+    }
+    
+    // Select the candidate
+    element.classList.add('selected');
+  }
+  
+  // Update submit button state
+  updateSubmitButtonState();
+}
+
+// Function to update submit button state
+function updateSubmitButtonState() {
+  const submitBtn = document.getElementById('submitVoteBtn');
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  submitBtn.disabled = selectedCandidates.length === 0;
+}
+
+// Handle vote submission
+document.getElementById('submitVoteBtn').addEventListener('click', function() {
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const votes = Array.from(selectedCandidates).map(card => {
+    const candidateId = card.getAttribute('onclick').match(/\d+/)[0];
+    return candidateId;
+  });
+
+  // Submit votes
+  fetch('../src/submit_vote.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ votes: votes })
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Vote recorded successfully!');
+        location.reload();
+      } else {
+        alert(data.message || 'Error recording vote. Please try again.');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error recording vote. Please try again.');
+    });
+});
+
+// Check election status when modal is shown
+document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
+  checkElectionStatus();
+});
+</script>
+
+<style>
+.candidate-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.candidate-card:hover {
+  background-color: #f8f9fa;
+}
+
+.candidate-card.selected {
+  border-color: #0d6efd;
+  background-color: #e7f1ff;
+}
+
+.candidate-photo {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 15px;
+}
+
+.candidate-info {
+  flex: 1;
+}
+
+.candidate-name {
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.candidate-platform {
+  font-size: 0.9em;
+  color: #6c757d;
+}
+
+.position-section {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.position-title {
+  color: #0d6efd;
+  margin-bottom: 15px;
+}
+</style>
 </body>
 </html>
