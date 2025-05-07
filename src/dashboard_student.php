@@ -1768,23 +1768,25 @@ function loadCandidates() {
               ${isRepresentative ? '<span class="badge bg-info ms-2">Vote for 2 candidates</span>' : ''}
             </h3>
             <div class="candidates-list">
-              ${positionCandidates.map(candidate => `
-                <div class="candidate-card d-flex align-items-center" 
-                     onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})">
-                  <img src="${candidate.photo || '../img/default-avatar.png'}" 
-                       alt="${candidate.name}" 
-                       class="candidate-photo">
-                  <div class="candidate-info">
-                    <div class="candidate-name">${candidate.name}</div>
-                    <div class="candidate-department">${candidate.department}</div>
-                    ${candidate.platform ? `
-                      <div class="candidate-platform">
-                        <strong>Platform:</strong> ${candidate.platform}
-                      </div>
-                    ` : ''}
+              ${positionCandidates.length === 0 ? `<div class='text-center text-muted' style='padding:0.5rem;'>No candidates available for this position.</div>` :
+                positionCandidates.map(candidate => `
+                  <div class="candidate-card d-flex align-items-center" 
+                       onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})">
+                    <img src="${candidate.photo || '../img/default-avatar.png'}" 
+                         alt="${candidate.name}" 
+                         class="candidate-photo">
+                    <div class="candidate-info">
+                      <div class="candidate-name">${candidate.name}</div>
+                      <div class="candidate-department">${candidate.department}</div>
+                      ${candidate.platform ? `
+                        <div class="candidate-platform">
+                          <strong>Platform:</strong> ${candidate.platform}
+                        </div>
+                      ` : ''}
+                    </div>
                   </div>
-                </div>
-              `).join('')}
+                `).join('')
+              }
             </div>
           `;
           container.appendChild(section);
