@@ -1625,6 +1625,70 @@ const usgRepresentatives = [
   "BFPT Representative"
 ];
 
+// Define positions for each department
+const positions = {
+  'USG': [
+    'President',
+    'Vice President',
+    'General Secretary',
+    'Associate Secretary',
+    'Treasurer',
+    'Auditor',
+    'Public Information Officer',
+    'BTLED Representatives',
+    'BSIT Representatives',
+    'BFPT Representatives'
+  ],
+  'AFPROTECHS': [
+    'President',
+    'Vice President',
+    'General Secretary',
+    'Associate Secretary',
+    'Treasurer',
+    'Auditor',
+    'Public Information Officer'
+  ],
+  'SITE': [
+    'President',
+    'Vice President',
+    'General Secretary',
+    'Associate Secretary',
+    'Treasurer',
+    'Auditor',
+    'Public Information Officer'
+  ],
+  'PAFE': [
+    'President',
+    'Vice President',
+    'General Secretary',
+    'Associate Secretary',
+    'Treasurer',
+    'Auditor',
+    'Public Information Officer'
+  ]
+};
+
+// Function to update position options based on selected department
+document.getElementById('department').addEventListener('change', function() {
+  const dept = this.value;
+  const positionSelect = document.getElementById('candidatePosition');
+  positionSelect.innerHTML = '<option value="">Select Position</option>';
+  
+  if (dept && positions[dept]) {
+    positions[dept].forEach(pos => {
+      const option = document.createElement('option');
+      option.value = pos;
+      option.textContent = pos;
+      positionSelect.appendChild(option);
+    });
+  }
+});
+
+// Function to check if a position is a representative position
+function isRepresentativePosition(position) {
+  return position.includes('Representatives');
+}
+
 // Populate positions based on selected department
 departmentSelect.addEventListener("change", () => {
   const dept = departmentSelect.value;
@@ -2302,22 +2366,12 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
           const positionSelect = document.getElementById('candidatePosition');
           positionSelect.innerHTML = '<option value="">Select Position</option>';
           
-          // Add base positions
-          basePositions.forEach(pos => {
-            const option = document.createElement('option');
-            option.value = pos;
-            option.textContent = pos;
-            if (pos === candidate.position) option.selected = true;
-            positionSelect.appendChild(option);
-          });
-          
-          // Add representative positions for USG
-          if (candidate.department === 'USG') {
-            usgRepresentatives.forEach(rep => {
+          if (candidate.department && positions[candidate.department]) {
+            positions[candidate.department].forEach(pos => {
               const option = document.createElement('option');
-              option.value = rep;
-              option.textContent = rep;
-              if (rep === candidate.position) option.selected = true;
+              option.value = pos;
+              option.textContent = pos;
+              if (pos === candidate.position) option.selected = true;
               positionSelect.appendChild(option);
             });
           }

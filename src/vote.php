@@ -244,6 +244,16 @@ $has_voted = $vote_count > 0;
                 });
         }
 
+        // Function to check if a position is a representative position
+        function isRepresentativePosition(position) {
+            return position.includes('Representatives');
+        }
+
+        // Function to get max votes for a position
+        function getMaxVotesForPosition(position) {
+            return isRepresentativePosition(position) ? 2 : 1;
+        }
+
         // Load candidates
         function loadCandidates() {
             fetch('fetch_candidates.php')
@@ -251,68 +261,131 @@ $has_voted = $vote_count > 0;
                 .then(data => {
                     if (data.success && Array.isArray(data.candidates)) {
                         const container = document.getElementById('candidatesContainer');
-                        const positions = [...new Set(data.candidates.map(c => c.position))];
+                        container.innerHTML = ''; // Clear existing content
                         
-                        positions.forEach(position => {
-                            const positionCandidates = data.candidates.filter(c => c.position === position);
+                        // Group candidates by department and position
+                        const departments = [...new Set(data.candidates.map(c => c.department))];
+                        
+                        departments.forEach(department => {
+                            const departmentSection = document.createElement('div');
+                            departmentSection.className = 'department-section mb-4';
+                            departmentSection.innerHTML = `<h2 class="department-title mb-3">${department}</h2>`;
                             
-                            const section = document.createElement('div');
-                            section.className = 'position-section';
-                            section.innerHTML = `
-                                <h3 class="position-title">${position}</h3>
-                                <div class="candidates-list">
-                                    ${positionCandidates.map(candidate => `
-                                        <div class="candidate-card d-flex align-items-center" 
-                                             onclick="selectCandidate(this, '${position}', ${candidate.candidate_id})">
-                                            <img src="${candidate.photo || '../img/default-avatar.png'}" 
-                                                 alt="${candidate.name}" 
-                                                 class="candidate-photo">
-                                            <div class="candidate-info">
-                                                <div class="candidate-name">${candidate.name}</div>
-                                                <div class="candidate-department">${candidate.department}</div>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            `;
-                            container.appendChild(section);
+                            const positions = [...new Set(data.candidates
+                                .filter(c => c.department === department)
+                                .map(c => c.position))];
+                            
+                            positions.forEach(position => {
+                                const positionCandidates = data.candidates.filter(c => 
+                                    c.department === department && c.position === position
+                                );
+                                
+                                const maxVotes = getMaxVotesForPosition(position);
+                                const section = document.createElement('div');
+                                section.className = 'position-section mb-4';
+                                section.innerHTML = `
+                                    <h3 class="position-title">
+                                        ${position}
+                                        ${maxVotes > 1 ? `<span class="badge bg-info ms-2">Vote for ${maxVotes} candidate${maxVotes > 1 ? 's' : ''}</span>` : ''}
+                                    </h3>
+                                    <div class="candidates-list">
+                                        ${positionCandidates.length === 0 ? 
+                                            `<div class='text-center text-muted' style='padding:0.5rem;'>No candidates available for this position.</div>` :
+                                            positionCandidates.map(candidate => `
+                                                <div class="candidate-card d-flex align-items-center" 
+                                                     onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})">
+                                                    <img src="${candidate.photo || '../img/default-avatar.png'}" 
+                                                         alt="${candidate.name}" 
+                                                         class="candidate-photo">
+                                                    <div class="candidate-info">
+                                                        <div class="candidate-name">${candidate.name}</div>
+                                                        <div class="candidate-department">${candidate.department}</div>
+                                                        ${candidate.platform ? `
+                                                            <div class="candidate-platform">
+                                                                <strong>Platform:</strong> ${candidate.platform}
+                                                            </div>
+                                                        ` : ''}
+                                                    </div>
+                                                </div>
+                                            `).join('')
+                                        }
+                                    </div>
+                                `;
+                                departmentSection.appendChild(section);
+                            });
+                            
+                            container.appendChild(departmentSection);
                         });
                     }
                 })
                 .catch(error => {
                     console.error('Error loading candidates:', error);
+                    document.getElementById('candidatesContainer').innerHTML = 
+                        '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
                 });
         }
 
-        // Handle candidate selection
+        // Function to select a candidate
         const selectedCandidates = new Map();
 
-        function selectCandidate(element, position, candidateId) {
+        function selectCandidate(element, position, candidateId, maxVotes) {
             const positionSection = element.closest('.position-section');
             const allCards = positionSection.querySelectorAll('.candidate-card');
+            const currentSelections = selectedCandidates.get(position) || [];
             
-            // Remove selected class from all cards in this position
-            allCards.forEach(card => card.classList.remove('selected'));
+            // If already selected, deselect
+            if (element.classList.contains('selected')) {
+                element.classList.remove('selected');
+                selectedCandidates.set(position, currentSelections.filter(id => id !== candidateId));
+            } else {
+                // Check if we can select more candidates for this position
+                if (currentSelections.length < maxVotes) {
+                    element.classList.add('selected');
+                    selectedCandidates.set(position, [...currentSelections, candidateId]);
+                } else {
+                    // Show alert that max votes reached
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        <i class="bi bi-exclamation-circle me-2"></i>
+                        You can only select ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for this position.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    `;
+                    document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#voteForm'));
+                    
+                    // Remove alert after 3 seconds
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 3000);
+                    return;
+                }
+            }
             
-            // Add selected class to clicked card
-            element.classList.add('selected');
-            
-            // Store the selection
-            selectedCandidates.set(position, candidateId);
-            
-            // Enable submit button if all positions have selections
-            const submitBtn = document.querySelector('.submit-vote-btn');
+            // Enable submit button if all positions have required number of selections
+            const submitBtn = document.querySelector('#voteForm button[type="submit"]');
             const allPositions = document.querySelectorAll('.position-section');
-            submitBtn.disabled = selectedCandidates.size !== allPositions.length;
+            let canSubmit = true;
+            
+            allPositions.forEach(section => {
+                const position = section.querySelector('.position-title').textContent.trim();
+                const maxVotes = getMaxVotesForPosition(position);
+                const selections = selectedCandidates.get(position) || [];
+                
+                if (selections.length !== maxVotes) {
+                    canSubmit = false;
+                }
+            });
+            
+            submitBtn.disabled = !canSubmit;
         }
 
         // Handle form submission
         document.getElementById('voteForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const votes = Array.from(selectedCandidates.entries()).map(([position, candidateId]) => ({
+            const votes = Array.from(selectedCandidates.entries()).map(([position, candidateIds]) => ({
                 position,
-                candidate_id: candidateId
+                candidate_ids: candidateIds
             }));
 
             fetch('vote_status.php', {
