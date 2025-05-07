@@ -4,7 +4,7 @@ require_once 'connection.php';
 
 header('Content-Type: application/json');
 
-$query = "SELECT candidate_id, name, position, department, platform, age , photo FROM candidate ORDER BY name ASC";
+$query = "SELECT candidate_id, name, position, department, platform, age, photo FROM candidate ORDER BY name ASC";
 $result = $con->query($query);
 
 if ($result) {
@@ -12,7 +12,7 @@ if ($result) {
     while ($row = $result->fetch_assoc()) {
         $candidates[] = $row;
     }
-
+    
     echo json_encode([
         'success' => true,
         'candidates' => $candidates
@@ -23,4 +23,6 @@ if ($result) {
         'message' => 'Failed to fetch candidates.'
     ]);
 }
+
+$con->close();
 ?>

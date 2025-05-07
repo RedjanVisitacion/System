@@ -1875,6 +1875,7 @@ function handleCastVoteClick(event) {
           // If not voted and election is active, open the voting modal
           const castVoteModal = new bootstrap.Modal(document.getElementById('castVoteModal'));
           castVoteModal.show();
+          loadCandidates(); // Load candidates when modal opens
         }
       } else {
         // Show error message
@@ -1882,7 +1883,7 @@ function handleCastVoteClick(event) {
         alertDiv.className = 'alert alert-danger alert-dismissible fade show';
         alertDiv.innerHTML = `
           <i class="bi bi-exclamation-circle me-2"></i>
-          ${data.message || 'Error checking voting status. Please try again.'}
+          ${data.message}
           <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         `;
         document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
@@ -1913,5 +1914,157 @@ function handleCastVoteClick(event) {
 }
 
   </script>
+
+<!-- Cast Vote Modal -->
+<div class="modal fade" id="castVoteModal" tabindex="-1" aria-labelledby="castVoteModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="castVoteModalLabel">Cast Your Vote</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="electionStatus" class="alert mb-3"></div>
+        <form id="voteForm">
+          <div id="candidatesContainer">
+            <!-- Candidates will be loaded here -->
+          </div>
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary" disabled>Submit Vote</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.candidate-card {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.candidate-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #2563eb;
+}
+
+.candidate-card.selected {
+  border-color: #2563eb;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
+}
+
+.candidate-card.selected::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40px 40px 0;
+  border-color: transparent #2563eb transparent transparent;
+}
+
+.candidate-card.selected::after {
+  content: '✓';
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.candidate-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1.5rem;
+  border: 3px solid #e5e7eb;
+  transition: all 0.3s ease;
+}
+
+.candidate-card.selected .candidate-photo {
+  border-color: #2563eb;
+  transform: scale(1.05);
+}
+
+.position-section {
+  margin-bottom: 2.5rem;
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 16px;
+}
+
+.position-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #1f2937;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.candidates-list {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.candidate-info {
+  flex: 1;
+}
+
+.candidate-name {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.candidate-department {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.candidate-platform {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+/* Submit button styles */
+#voteForm button[type="submit"] {
+  padding: 0.8rem 2.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+#voteForm button[type="submit"]:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+#voteForm button[type="submit"]:disabled {
+  background: #e5e7eb;
+  cursor: not-allowed;
+}
+</style>
+
 </body>
 </html>

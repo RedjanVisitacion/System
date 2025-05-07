@@ -18,7 +18,10 @@ $user_id = $_SESSION['user_id'];
 
 try {
     // First check if user exists and get their role
-    $stmt = $con->prepare("SELECT role FROM user WHERE user_id = ?");
+    $stmt = $con->prepare("SELECT u.role, up.full_name 
+                          FROM user u 
+                          LEFT JOIN user_profile up ON u.user_id = up.user_id 
+                          WHERE u.user_id = ?");
     if (!$stmt) {
         throw new Exception("Database prepare error: " . $con->error);
     }
@@ -39,7 +42,10 @@ try {
 
     // Check if user is a student
     if ($user['role'] !== 'student') {
-        echo json_encode(['success' => false, 'message' => 'Only students can access this feature']);
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Only students can vote. Your account type is: ' . $user['role']
+        ]);
         exit;
     }
 
@@ -87,6 +93,10 @@ try {
     $response = [
         'success' => true,
         'hasVoted' => $vote_count > 0,
+        'userInfo' => [
+            'name' => $user['full_name'],
+            'role' => $user['role']
+        ],
         'electionStatus' => [
             'isActive' => $now >= $startDate && $now <= $endDate,
             'startDate' => $dates['start_date'],
