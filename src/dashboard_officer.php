@@ -182,6 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       z-index: 1200;
       background: #2563eb;
       height: 60px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .navbar.faded {
       opacity: 0.92;
@@ -287,6 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
         background: #2563eb;
         display: flex;
         align-items: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
       }
 
       .main-content {
@@ -896,8 +898,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     }
     .main-content {
       margin-left: 240px;
+      margin-top: 60px; /* Add margin-top to account for fixed navbar */
       transition: margin-left 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
-      margin-top: 3rem;
     }
     .body-sidebar-collapsed .main-content {
       margin-left: 70px;
