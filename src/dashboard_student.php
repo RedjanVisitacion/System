@@ -1849,6 +1849,20 @@ function showCandidateProfile(candidate) {
         .then(data => {
           if (data.success) {
             document.getElementById('totalVotesCast').textContent = data.total_votes;
+            
+            // Create or update the voted users list
+            const votedUsersList = document.getElementById('votedUsersList');
+            if (votedUsersList) {
+              votedUsersList.innerHTML = data.voted_users.map(user => `
+                <div class="voted-user-item">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-check-fill text-success"></i>
+                    <span>${user.full_name}</span>
+                  </div>
+                  <small class="text-muted">${user.program_name}</small>
+                </div>
+              `).join('');
+            }
           }
         })
         .catch(error => {
@@ -2321,35 +2335,34 @@ function loadCandidatesByDepartment(department) {
 
         // Sort positions according to the department's specified order
         positionOrder.forEach(position => {
-          if (positions[position]) {
-            const maxVotes = positionVotes[position] || 1;
-            html += `
-              <div class="position-section mb-4">
-                <div class="position-header">
-                  <h6 class="position-title mb-2">
-                    ${position}
-                    <span class="badge bg-primary ms-2">${maxVotes} vote${maxVotes > 1 ? 's' : ''}</span>
-                  </h6>
-                </div>
-                <div class="candidates-list">
-                  ${positions[position].map(candidate => `
-                    <div class="candidate-card" 
-                         onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})"
-                         data-position="${position}"
-                         data-max-votes="${maxVotes}">
-                      <img src="${candidate.photo || '../img/icon.png'}" 
-                           alt="${candidate.name}" 
-                           class="candidate-photo">
-                      <div class="candidate-info">
-                        <div class="candidate-name">${candidate.name}</div>
-                        <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
-                      </div>
-                    </div>
-                  `).join('')}
-                </div>
+          // Always show the position section, even if no candidates
+          const maxVotes = positionVotes[position] || 1;
+          html += `
+            <div class="position-section mb-4">
+              <div class="position-header">
+                <h6 class="position-title mb-2">
+                  ${position}
+                  <span class="badge bg-primary ms-2">${maxVotes} vote${maxVotes > 1 ? 's' : ''}</span>
+                </h6>
               </div>
-            `;
-          }
+              <div class="candidates-list">
+                ${positions[position] ? positions[position].map(candidate => `
+                  <div class="candidate-card" 
+                       onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})"
+                       data-position="${position}"
+                       data-max-votes="${maxVotes}">
+                    <img src="${candidate.photo || '../img/icon.png'}" 
+                         alt="${candidate.name}" 
+                         class="candidate-photo">
+                    <div class="candidate-info">
+                      <div class="candidate-name">${candidate.name}</div>
+                      <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
+                    </div>
+                  </div>
+                `).join('') : '<div class="alert alert-info">No candidates available for this position.</div>'}
+              </div>
+            </div>
+          `;
         });
 
         container.innerHTML = html;
@@ -2362,6 +2375,16 @@ function loadCandidatesByDepartment(department) {
       container.innerHTML = '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
     });
 }
+
+// Add hidden input for user's program
+document.addEventListener('DOMContentLoaded', function() {
+  // Add hidden input for user's program
+  const userProgramInput = document.createElement('input');
+  userProgramInput.type = 'hidden';
+  userProgramInput.id = 'userProgram';
+  userProgramInput.value = '<?php echo htmlspecialchars($user_profile['program_name'] ?? ''); ?>';
+  document.body.appendChild(userProgramInput);
+});
 
 // Add event listener for department selection change
 document.getElementById('departmentSelect').addEventListener('change', function(e) {

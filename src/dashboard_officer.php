@@ -1127,6 +1127,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     }
 
   </style>
+  <style>
+    .voted-user-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      transition: background-color 0.2s;
+    }
+    
+    .voted-user-item:last-child {
+      border-bottom: none;
+    }
+    
+    .voted-user-item:hover {
+      background-color: #f8fafc;
+    }
+    
+    .voted-user-item small {
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 2px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  </style>
 </head>
 <body>
   <!-- Top Bar -->
@@ -1275,7 +1314,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                     <i class="bi bi-check-circle"></i>
                   </div>
                   <h3 class="fw-bold text-center">Votes Cast</h3>
-                  <p class="fs-4 text-center mb-0" id="votesCast">0</p>
+                  <p class="fs-4 text-center mb-0" id="totalVotesCast">0</p>
                 </div>
               </div>
               <div class="col-12 col-md-6">
@@ -1285,6 +1324,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                   </div>
                   <h3 class="fw-bold text-center">Time Remaining</h3>
                   <p class="fs-4 text-center mb-0" id="timeRemaining">Loading...</p>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="dashboard-card p-4">
+                  <div class="icon">
+                    <i class="bi bi-person-check"></i>
+                  </div>
+                  <h3 class="fw-bold text-center">Voted Students</h3>
+                  <div id="votedUsersList" class="mt-3" style="max-height: 200px; overflow-y: auto;">
+                    <div class="text-center">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -2478,6 +2532,84 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
     document.getElementById('submitBtn').textContent = 'Add Candidate';
     document.getElementById('profile_pic').required = true;
     document.getElementById('addCandidateMsg').textContent = '';
+  });
+
+  // Add this CSS to style the voted users list
+  const style = document.createElement('style');
+  style.textContent = `
+    .voted-user-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      transition: background-color 0.2s;
+    }
+    
+    .voted-user-item:last-child {
+      border-bottom: none;
+    }
+    
+    .voted-user-item:hover {
+      background-color: #f8fafc;
+    }
+    
+    .voted-user-item small {
+      font-size: 0.75rem;
+      display: block;
+      margin-top: 2px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 3px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 3px;
+    }
+    
+    #votedUsersList::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Update the updateTotalVotesCast function
+  function updateTotalVotesCast() {
+    fetch('../src/get_total_votes_cast.php')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('totalVotesCast').textContent = data.total_votes;
+          
+          // Create or update the voted users list
+          const votedUsersList = document.getElementById('votedUsersList');
+          if (votedUsersList) {
+            votedUsersList.innerHTML = data.voted_users.map(user => `
+              <div class="voted-user-item">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-person-check-fill text-success"></i>
+                  <span>${user.full_name}</span>
+                </div>
+                <small class="text-muted">${user.program_name}</small>
+              </div>
+            `).join('');
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching total votes cast:', error);
+      });
+  }
+
+  // Make sure to call updateTotalVotesCast in your initialization
+  document.addEventListener('DOMContentLoaded', function() {
+    updateTotalVotesCast();
+    // Update every 30 seconds
+    setInterval(updateTotalVotesCast, 30000);
   });
   </script>
   
