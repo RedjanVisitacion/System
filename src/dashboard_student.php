@@ -1117,7 +1117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="vote.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" onclick="handleCastVoteClick(event)">
               <i class="bi bi-check-circle"></i>
               <span class="sidebar-text">Cast Vote</span>
             </a>
@@ -1639,6 +1639,279 @@ document.getElementById('totalCandidatesCard').addEventListener('click', () => {
   loadViewCandidateTable();
 });
 
-L  </script>
+// Function to handle casting votes
+function castVote(votes) {
+  return fetch('vote_status.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ votes: votes })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Show success message
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-success alert-dismissible fade show';
+      alertDiv.innerHTML = `
+        <i class="bi bi-check-circle me-2"></i>
+        ${data.message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+      
+      // Update voting status
+      updateVotingStatus();
+      updateTotalVotesCast();
+      
+      // Remove alert after 5 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
+      
+      return true;
+    } else {
+      // Show error message
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+      alertDiv.innerHTML = `
+        <i class="bi bi-exclamation-circle me-2"></i>
+        ${data.message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+      
+      // Remove alert after 5 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
+      
+      return false;
+    }
+  })
+  .catch(error => {
+    console.error('Error casting vote:', error);
+    // Show error message
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+    alertDiv.innerHTML = `
+      <i class="bi bi-exclamation-circle me-2"></i>
+      Error casting vote. Please try again.
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+    
+    // Remove alert after 5 seconds
+    setTimeout(() => {
+      alertDiv.remove();
+    }, 5000);
+    
+    return false;
+  });
+}
+
+// Add these new functions for the voting modal
+function checkElectionStatus() {
+  fetch('../src/get_voting_status.php')
+    .then(response => response.json())
+    .then(data => {
+      const now = new Date();
+      const startDate = new Date(data.start_date);
+      const endDate = new Date(data.end_date);
+      const statusEl = document.getElementById('electionStatus');
+      const voteForm = document.getElementById('voteForm');
+
+      if (now < startDate) {
+        statusEl.className = 'alert alert-warning';
+        statusEl.innerHTML = '<i class="bi bi-clock me-2"></i>Voting has not started yet.';
+        voteForm.classList.add('d-none');
+      } else if (now > endDate) {
+        statusEl.className = 'alert alert-danger';
+        statusEl.innerHTML = '<i class="bi bi-x-circle me-2"></i>Voting period has ended.';
+        voteForm.classList.add('d-none');
+      } else {
+        statusEl.className = 'alert alert-success';
+        statusEl.innerHTML = '<i class="bi bi-check-circle me-2"></i>Voting is currently active.';
+        voteForm.classList.remove('d-none');
+        loadCandidates();
+      }
+    })
+    .catch(error => {
+      console.error('Error checking election status:', error);
+      document.getElementById('electionStatus').innerHTML = 
+        '<i class="bi bi-exclamation-circle me-2"></i>Error checking election status.';
+    });
+}
+
+function loadCandidates() {
+  fetch('fetch_candidates.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.candidates)) {
+        const container = document.getElementById('candidatesContainer');
+        const positions = [...new Set(data.candidates.map(c => c.position))];
+        
+        positions.forEach(position => {
+          const positionCandidates = data.candidates.filter(c => c.position === position);
+          
+          const section = document.createElement('div');
+          section.className = 'position-section';
+          section.innerHTML = `
+            <h3 class="position-title">${position}</h3>
+            <div class="candidates-list">
+              ${positionCandidates.map(candidate => `
+                <div class="candidate-card d-flex align-items-center" 
+                     onclick="selectCandidate(this, '${position}', ${candidate.candidate_id})">
+                  <img src="${candidate.photo || '../img/default-avatar.png'}" 
+                       alt="${candidate.name}" 
+                       class="candidate-photo">
+                  <div class="candidate-info">
+                    <div class="candidate-name">${candidate.name}</div>
+                    <div class="candidate-department">${candidate.department}</div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+          container.appendChild(section);
+        });
+      }
+    })
+    .catch(error => {
+      console.error('Error loading candidates:', error);
+    });
+}
+
+// Handle candidate selection
+const selectedCandidates = new Map();
+
+function selectCandidate(element, position, candidateId) {
+  const positionSection = element.closest('.position-section');
+  const allCards = positionSection.querySelectorAll('.candidate-card');
+  
+  // Remove selected class from all cards in this position
+  allCards.forEach(card => card.classList.remove('selected'));
+  
+  // Add selected class to clicked card
+  element.classList.add('selected');
+  
+  // Store the selection
+  selectedCandidates.set(position, candidateId);
+  
+  // Enable submit button if all positions have selections
+  const submitBtn = document.querySelector('#voteForm button[type="submit"]');
+  const allPositions = document.querySelectorAll('.position-section');
+  submitBtn.disabled = selectedCandidates.size !== allPositions.length;
+}
+
+// Handle form submission
+document.getElementById('voteForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const votes = Array.from(selectedCandidates.entries()).map(([position, candidateId]) => ({
+    position,
+    candidate_id: candidateId
+  }));
+
+  castVote(votes).then(success => {
+    if (success) {
+      // Close the modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('castVoteModal'));
+      modal.hide();
+      
+      // Clear selections
+      selectedCandidates.clear();
+      document.getElementById('candidatesContainer').innerHTML = '';
+    }
+  });
+});
+
+// Check election status when modal is shown
+document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
+  checkElectionStatus();
+});
+
+// Function to handle Cast Vote link click
+function handleCastVoteClick(event) {
+  event.preventDefault();
+  
+  // First check if user has already voted
+  fetch('../src/get_voting_status.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        if (data.hasVoted) {
+          // Show alert that user has already voted
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+          alertDiv.innerHTML = `
+            <i class="bi bi-exclamation-circle me-2"></i>
+            You have already cast your vote.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+          document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+          
+          // Remove alert after 5 seconds
+          setTimeout(() => {
+            alertDiv.remove();
+          }, 5000);
+        } else if (!data.electionStatus.isActive) {
+          // Show alert that election is not active
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'alert alert-info alert-dismissible fade show';
+          alertDiv.innerHTML = `
+            <i class="bi bi-info-circle me-2"></i>
+            Voting is not currently active. Election period: ${new Date(data.electionStatus.startDate).toLocaleDateString()} - ${new Date(data.electionStatus.endDate).toLocaleDateString()}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          `;
+          document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+          
+          // Remove alert after 5 seconds
+          setTimeout(() => {
+            alertDiv.remove();
+          }, 5000);
+        } else {
+          // If not voted and election is active, open the voting modal
+          const castVoteModal = new bootstrap.Modal(document.getElementById('castVoteModal'));
+          castVoteModal.show();
+        }
+      } else {
+        // Show error message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+          <i class="bi bi-exclamation-circle me-2"></i>
+          ${data.message || 'Error checking voting status. Please try again.'}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+        
+        // Remove alert after 5 seconds
+        setTimeout(() => {
+          alertDiv.remove();
+        }, 5000);
+      }
+    })
+    .catch(error => {
+      console.error('Error checking voting status:', error);
+      // Show error message
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+      alertDiv.innerHTML = `
+        <i class="bi bi-exclamation-circle me-2"></i>
+        Network error. Please check your connection and try again.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+      
+      // Remove alert after 5 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
+    });
+}
+
+  </script>
 </body>
 </html>
