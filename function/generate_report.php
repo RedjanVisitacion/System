@@ -3,14 +3,39 @@ require_once '../src/connection.php';
 require_once '../src/check_session.php';
 
 // Function to generate election report
-function generateElectionReport($format = 'json') {
+function generateElectionReport($format = 'json', $startDate = null, $endDate = null) {
     global $con;
     
     try {
+        // Base query for election dates
+        $dateQuery = "SELECT * FROM election_dates";
+        $params = [];
+        $types = "";
+        
+        // Add date range conditions if provided
+        if ($startDate && $endDate) {
+            $dateQuery .= " WHERE start_date >= ? AND end_date <= ?";
+            $params[] = $startDate;
+            $params[] = $endDate;
+            $types .= "ss";
+        }
+        
+        $dateQuery .= " ORDER BY id DESC";
+        
         // Get election dates
-        $stmt = $con->prepare("SELECT * FROM election_dates ORDER BY id DESC LIMIT 1");
+        $stmt = $con->prepare($dateQuery);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
         $stmt->execute();
-        $electionDates = $stmt->get_result()->fetch_assoc();
+        $electionDates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        
+        if (empty($electionDates)) {
+            return [
+                'success' => false,
+                'message' => 'No election data found for the selected date range'
+            ];
+        }
         
         // Get all candidates with their results
         $stmt = $con->prepare("
@@ -21,7 +46,8 @@ function generateElectionReport($format = 'json') {
                 c.position,
                 c.age,
                 c.platform,
-                COALESCE(r.votes, 0) as votes
+                COALESCE(r.votes, 0) as votes,
+                r.published_at
             FROM candidate c
             LEFT JOIN result r ON c.candidate_id = r.candidate_id
             ORDER BY c.department, c.position, r.votes DESC
@@ -41,18 +67,26 @@ function generateElectionReport($format = 'json') {
         $stmt->execute();
         $departmentStats = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         
-        // Get total votes cast
-        $stmt = $con->prepare("SELECT COUNT(DISTINCT user_id) as total_votes FROM vote");
+        // Get total votes cast with date range
+        $voteQuery = "SELECT COUNT(DISTINCT user_id) as total_votes FROM vote";
+        if ($startDate && $endDate) {
+            $voteQuery .= " WHERE vote_timestamp BETWEEN ? AND ?";
+        }
+        
+        $stmt = $con->prepare($voteQuery);
+        if ($startDate && $endDate) {
+            $stmt->bind_param("ss", $startDate, $endDate);
+        }
         $stmt->execute();
         $totalVotes = $stmt->get_result()->fetch_assoc()['total_votes'];
         
         // Compile report data
         $reportData = [
-            'election_period' => [
-                'start_date' => $electionDates['start_date'],
-                'end_date' => $electionDates['end_date'],
-                'results_date' => $electionDates['results_date']
+            'report_period' => [
+                'start_date' => $startDate,
+                'end_date' => $endDate
             ],
+            'election_periods' => $electionDates,
             'department_statistics' => $departmentStats,
             'candidate_results' => $candidates,
             'total_votes_cast' => $totalVotes,
@@ -65,9 +99,11 @@ function generateElectionReport($format = 'json') {
             mkdir($reportsDir, 0777, true);
         }
         
-        // Generate filename with timestamp
+        // Generate filename with timestamp and date range
         $timestamp = date('Y-m-d_H-i-s');
-        $filename = "election_report_{$timestamp}.{$format}";
+        $dateRange = $startDate && $endDate ? 
+            '_' . date('Y-m-d', strtotime($startDate)) . '_to_' . date('Y-m-d', strtotime($endDate)) : '';
+        $filename = "election_report{$dateRange}_{$timestamp}.{$format}";
         $filepath = "{$reportsDir}/{$filename}";
         
         // Write report to file
@@ -97,11 +133,21 @@ function generateTextReport($data) {
     $report = "ELECTION REPORT\n";
     $report .= "==============\n\n";
     
-    // Election Period
-    $report .= "Election Period:\n";
-    $report .= "Start Date: " . date('F j, Y g:i A', strtotime($data['election_period']['start_date'])) . "\n";
-    $report .= "End Date: " . date('F j, Y g:i A', strtotime($data['election_period']['end_date'])) . "\n";
-    $report .= "Results Date: " . date('F j, Y g:i A', strtotime($data['election_period']['results_date'])) . "\n\n";
+    // Report Period
+    if ($data['report_period']['start_date'] && $data['report_period']['end_date']) {
+        $report .= "Report Period:\n";
+        $report .= "From: " . date('F j, Y', strtotime($data['report_period']['start_date'])) . "\n";
+        $report .= "To: " . date('F j, Y', strtotime($data['report_period']['end_date'])) . "\n\n";
+    }
+    
+    // Election Periods
+    $report .= "Election Periods:\n";
+    $report .= "================\n";
+    foreach ($data['election_periods'] as $period) {
+        $report .= "Start Date: " . date('F j, Y g:i A', strtotime($period['start_date'])) . "\n";
+        $report .= "End Date: " . date('F j, Y g:i A', strtotime($period['end_date'])) . "\n";
+        $report .= "Results Date: " . date('F j, Y g:i A', strtotime($period['results_date'])) . "\n\n";
+    }
     
     // Department Statistics
     $report .= "Department Statistics:\n";
@@ -145,6 +191,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     
     $format = $_POST['format'] ?? 'json';
+    $startDate = $_POST['start_date'] ?? null;
+    $endDate = $_POST['end_date'] ?? null;
+    
     if (!in_array($format, ['json', 'txt'])) {
         echo json_encode([
             'success' => false,
@@ -153,7 +202,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
     
-    $result = generateElectionReport($format);
+    // Validate dates if provided
+    if ($startDate && $endDate) {
+        if (!strtotime($startDate) || !strtotime($endDate)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Invalid date format'
+            ]);
+            exit;
+        }
+        
+        if (strtotime($startDate) > strtotime($endDate)) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Start date cannot be after end date'
+            ]);
+            exit;
+        }
+    }
+    
+    $result = generateElectionReport($format, $startDate, $endDate);
     echo json_encode($result);
     exit;
 }
