@@ -11,13 +11,12 @@ $result = $stmt->get_result();
 $user_profile = $result->fetch_assoc();
 $stmt->close();
 
-$profile_picture = !empty($user_profile['profile_picture']) && file_exists('../uploads/profile_pictures/' . $user_profile['profile_picture'])
+// Set profile picture path
+$profile_picture = !empty($user_profile['profile_picture']) 
     ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture'])
-    : null;
+    : '../img/icon.png';
 
-
-
-    // Fetch and display candidate details (with photo)
+// Fetch and display candidate details (with photo)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   $candidate_id = $_GET['candidate_id'];
 
@@ -30,10 +29,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   $stmt->close();
 
   if ($candidate) {
-      // If photo exists, use the photo path, else fallback to a default image
-      $photoPath = !empty($candidate['photo']) && file_exists($candidate['photo'])
+      // If photo exists, use the photo path, else fallback to default image
+      $photoPath = !empty($candidate['photo']) 
           ? $candidate['photo']
-          : 'path/to/default/photo.png';  // Default photo
+          : '../img/icon.png';
 
       // Send the candidate data with the photo path
       echo json_encode([

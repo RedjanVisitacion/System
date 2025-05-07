@@ -1519,13 +1519,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <div class="modal-content p-3">
       <div class="modal-header d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center gap-2">
-          <!-- Display candidate photo here -->
-          <?php if (!empty($candidate_photo)): ?>
-              <img src="<?php echo $candidate_photo; ?>" id="candidatePhoto" class="rounded-circle" alt="Candidate Photo" style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff;">
-          <?php else: ?>
-              <i class="bi bi-person-circle" style="font-size: 40px;"></i>
-          <?php endif; ?>
-
+          <img id="candidatePhoto" class="rounded-circle" alt="Candidate Photo"
+               style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #fff;">
           <h5 class="modal-title mb-0" id="candidateProfileModalLabel">Candidate Name</h5>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1766,9 +1761,13 @@ function showVoterProfile(index) {
   document.getElementById('voterGender').textContent = voter.gender || 'N/A';
 
   const photoElement = document.getElementById('voterPhoto');
-  photoElement.src = voter.profile_picture && voter.profile_picture !== ''
-    ? voter.profile_picture
-    : '../img/icon.png';
+  // Set voter photo
+  if (voter.profile_picture) {
+    // The photo path from database already includes '../uploads/profile_pictures/'
+    photoElement.src = voter.profile_picture;
+  } else {
+    photoElement.src = '../img/icon.png';
+  }
 
   const votersModalInstance = bootstrap.Modal.getInstance(votersModalElement);
   if (votersModalInstance) {
@@ -1989,6 +1988,7 @@ function showCandidateProfile(candidate) {
   const profileDept = document.getElementById('profileDept');
   const profilePosition = document.getElementById('profilePosition');
   const profilePlatform = document.getElementById('profilePlatform');
+  const candidatePhoto = document.getElementById('candidatePhoto');
 
   profileModalTitle.textContent = candidate.name || 'Candidate Profile';
   profileAge.textContent = candidate.age ? `${candidate.age} years old` : 'N/A';
@@ -1996,6 +1996,13 @@ function showCandidateProfile(candidate) {
   profilePosition.textContent = candidate.position || 'N/A';
   profilePlatform.textContent = candidate.platform || 'N/A';
 
+  // Set candidate photo
+  if (candidate.photo) {
+    // The photo path from database already includes '../uploads/profile_pictures/'
+    candidatePhoto.src = candidate.photo;
+  } else {
+    candidatePhoto.src = '../img/icon.png';
+  }
 
   // Hide the candidate list modal (if open)
   const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCandidatesModal'));

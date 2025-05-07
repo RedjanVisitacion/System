@@ -12,7 +12,8 @@ $query = "
         up.full_name,
         up.section_name,
         up.program_name,
-        up.gender
+        up.gender,
+        up.profile_picture
     FROM user_profile up
     WHERE up.user_id IN (
         SELECT user_id FROM user WHERE role = 'student'
@@ -31,7 +32,8 @@ if ($result) {
             'full_name' => $row['full_name'],
             'section_name' => $row['section_name'] ?? 'N/A',
             'program_name' => $row['program_name'] ?? 'N/A',
-            'gender' => $row['gender'] ?? 'N/A'
+            'gender' => $row['gender'] ?? 'N/A',
+            'profile_picture' => $row['profile_picture'] ?? null
         ];
     }
 
