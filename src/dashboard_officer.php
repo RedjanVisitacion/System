@@ -1350,6 +1350,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       </div>
       <div class="modal-body">
         <form id="addCandidateForm" enctype="multipart/form-data">
+          <input type="hidden" id="candidate_id" name="candidate_id">
           <div class="row g-3">
             <div class="col-12 col-md-6">
               <label for="full_name" class="form-label">Full Name</label>
@@ -1378,16 +1379,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             </div>
             <div class="col-12">
               <label for="profile_pic" class="form-label">Profile Picture</label>
-              <input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/*" required>
+              <input type="file" class="form-control" id="profile_pic" name="profile_pic" accept="image/*">
+              <div id="currentPhoto" class="mt-2 d-none">
+                <label class="form-label">Current Photo:</label>
+                <img id="currentPhotoPreview" src="" alt="Current Photo" style="max-width: 150px; max-height: 150px;">
+              </div>
             </div>
 
             <div class="col-12">
               <label for="info" class="form-label">Candidate Information</label>
               <textarea class="form-control" id="info" name="info" rows="3" placeholder="Brief background or platform..." required></textarea>
             </div>
-            
           </div>
-          <button type="submit" class="btn btn-primary w-100 mt-3">Add Candidate</button>
+          <button type="submit" class="btn btn-primary w-100 mt-3" id="submitBtn">Add Candidate</button>
         </form>
 
         <div id="addCandidateMsg" class="mt-2"></div>
@@ -1496,6 +1500,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <tr>
                 <th>Candidate ID</th>
                 <th>Name</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
@@ -1931,7 +1936,7 @@ const viewSearchInput = document.getElementById('searchViewCandidate');
 
 // Fetch and render candidates
 function loadViewCandidateTable(searchQuery = '') {
-  viewTableBody.innerHTML = '<tr><td colspan="2">Loading...</td></tr>';
+  viewTableBody.innerHTML = '<tr><td colspan="3">Loading...</td></tr>';
   viewMsg.textContent = '';
   viewMsg.className = '';
 
@@ -1949,24 +1954,27 @@ function loadViewCandidateTable(searchQuery = '') {
           row.style.cursor = 'pointer';
           row.innerHTML = `
             <td>${candidate.candidate_id}</td>
-            <td>${candidate.name}</td>
+            <td onclick="showCandidateProfile(${JSON.stringify(candidate).replace(/"/g, '&quot;')})">${candidate.name}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); editCandidate(${candidate.candidate_id})">
+                <i class="bi bi-pencil"></i> Edit
+              </button>
+            </td>
           `;
-          row.onclick = () => showCandidateProfile(candidate);
           viewTableBody.appendChild(row);
           hasMatch = true;
         });
 
         if (!hasMatch) {
-          viewTableBody.innerHTML = '<tr><td colspan="2">No matching candidates found.</td></tr>';
+          viewTableBody.innerHTML = '<tr><td colspan="3">No matching candidates found.</td></tr>';
         }
-
       } else {
-        viewTableBody.innerHTML = '<tr><td colspan="2">No candidates found.</td></tr>';
+        viewTableBody.innerHTML = '<tr><td colspan="3">No candidates found.</td></tr>';
       }
     })
     .catch(error => {
       console.error('Error fetching candidates:', error);
-      viewTableBody.innerHTML = '<tr><td colspan="2">Error loading candidates.</td></tr>';
+      viewTableBody.innerHTML = '<tr><td colspan="3">Error loading candidates.</td></tr>';
     });
 }
 
@@ -2262,6 +2270,160 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
     const viewCandidatesModal = new bootstrap.Modal(document.getElementById('viewCandidatesModal'));
     viewCandidatesModal.show();
     loadViewCandidateTable();
+  });
+
+  // Function to edit candidate
+  function editCandidate(candidateId) {
+    // Close the view candidates modal first
+    const viewModal = bootstrap.Modal.getInstance(document.getElementById('viewCandidatesModal'));
+    if (viewModal) {
+      viewModal.hide();
+    }
+
+    // Fetch candidate details
+    fetch(`get_candidate.php?candidate_id=${candidateId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const candidate = data.candidate;
+          
+          // Update modal title and button
+          document.getElementById('addCandidateModalLabel').textContent = 'Edit Candidate';
+          document.getElementById('submitBtn').textContent = 'Update Candidate';
+          
+          // Populate form fields
+          document.getElementById('candidate_id').value = candidate.candidate_id;
+          document.getElementById('full_name').value = candidate.name;
+          document.getElementById('age').value = candidate.age;
+          document.getElementById('department').value = candidate.department;
+          document.getElementById('info').value = candidate.platform;
+          
+          // Handle position selection
+          const positionSelect = document.getElementById('candidatePosition');
+          positionSelect.innerHTML = '<option value="">Select Position</option>';
+          
+          // Add base positions
+          basePositions.forEach(pos => {
+            const option = document.createElement('option');
+            option.value = pos;
+            option.textContent = pos;
+            if (pos === candidate.position) option.selected = true;
+            positionSelect.appendChild(option);
+          });
+          
+          // Add representative positions for USG
+          if (candidate.department === 'USG') {
+            usgRepresentatives.forEach(rep => {
+              const option = document.createElement('option');
+              option.value = rep;
+              option.textContent = rep;
+              if (rep === candidate.position) option.selected = true;
+              positionSelect.appendChild(option);
+            });
+          }
+          
+          // Show current photo if exists
+          const currentPhotoDiv = document.getElementById('currentPhoto');
+          const currentPhotoPreview = document.getElementById('currentPhotoPreview');
+          if (candidate.photo) {
+            currentPhotoPreview.src = candidate.photo;
+            currentPhotoDiv.classList.remove('d-none');
+          } else {
+            currentPhotoDiv.classList.add('d-none');
+          }
+          
+          // Make profile picture optional for edit
+          document.getElementById('profile_pic').required = false;
+          
+          // Show the edit modal
+          const addCandidateModal = new bootstrap.Modal(document.getElementById('addCandidateModal'));
+          addCandidateModal.show();
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching candidate details:', error);
+        alert('Error loading candidate details');
+      });
+  }
+
+  // Update form submission to handle both add and edit
+  document.getElementById('addCandidateForm').onsubmit = function(e) {
+    e.preventDefault();
+    
+    const form = this;
+    const msg = document.getElementById('addCandidateMsg');
+    const candidateId = document.getElementById('candidate_id').value;
+    const isEdit = candidateId !== '';
+    
+    msg.textContent = '';
+    msg.className = '';
+    
+    const formData = new FormData(form);
+    formData.append('action', isEdit ? 'edit' : 'add');
+    
+    fetch('manage_candidate.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Show success message
+        const successAlert = document.createElement('div');
+        successAlert.className = 'alert alert-success alert-dismissible fade show position-fixed top-50 start-50 translate-middle';
+        successAlert.style.zIndex = '1500';
+        successAlert.role = 'alert';
+        successAlert.innerHTML = `
+          ${data.message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.body.appendChild(successAlert);
+        
+        // Auto-dismiss the alert after 3 seconds
+        setTimeout(() => {
+          successAlert.classList.remove('show');
+          setTimeout(() => successAlert.remove(), 150);
+        }, 3000);
+        
+        msg.textContent = data.message;
+        msg.className = 'text-success mt-2';
+        
+        // Reset form and close modal after success
+        form.reset();
+        document.getElementById('candidate_id').value = '';
+        document.getElementById('currentPhoto').classList.add('d-none');
+        document.getElementById('addCandidateModalLabel').textContent = 'Add Candidate';
+        document.getElementById('submitBtn').textContent = 'Add Candidate';
+        document.getElementById('profile_pic').required = true;
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addCandidateModal'));
+        modal.hide();
+        
+        // Refresh candidate list
+        loadViewCandidateTable();
+      } else {
+        msg.textContent = data.message;
+        msg.className = 'text-danger mt-2';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      msg.textContent = 'Error processing request';
+      msg.className = 'text-danger mt-2';
+    });
+  };
+
+  // Reset form when modal is closed
+  document.getElementById('addCandidateModal').addEventListener('hidden.bs.modal', function() {
+    const form = document.getElementById('addCandidateForm');
+    form.reset();
+    document.getElementById('candidate_id').value = '';
+    document.getElementById('currentPhoto').classList.add('d-none');
+    document.getElementById('addCandidateModalLabel').textContent = 'Add Candidate';
+    document.getElementById('submitBtn').textContent = 'Add Candidate';
+    document.getElementById('profile_pic').required = true;
+    document.getElementById('addCandidateMsg').textContent = '';
   });
   </script>
   
