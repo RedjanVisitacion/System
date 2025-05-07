@@ -2202,31 +2202,39 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
       <div class="modal-body">
         <div id="electionStatus" class="alert mb-2"></div>
         
-        <!-- Department Select -->
-        <div class="mb-3" id="departmentSelectContainer">
-            <label for="departmentSelect" class="form-label">Select Department</label>
-            <select class="form-select" id="departmentSelect" required>
-                <option value="">Choose Department</option>
-                <option value="USG">University Student Government</option>
-                <option value="PAFE">PRIME Association of Future Educators</option>
-                <option value="SITE">Society of Information Technology Enthusiasts</option>
-                <option value="AFPROTECHS">Association of Food Processing Technology Students</option>
-            </select>
+        <!-- Voting Status Message Container -->
+        <div id="votingStatusMessage" style="display: none;">
+          <div class="text-center py-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+            <h4 class="mt-3">Thank You for Voting!</h4>
+            <p class="text-muted">Your vote has been successfully recorded.</p>
+            <button type="button" class="btn btn-secondary mt-3" data-bs-dismiss="modal">Close</button>
+          </div>
         </div>
 
-        <!-- Cast Vote Button -->
-        <button class="btn btn-primary w-100" id="castVoteBtn" onclick="showVotingModal()">
-            Cast Vote
-        </button>
+        <!-- Voting Form Container -->
+        <div id="votingFormContainer">
+          <!-- Department Select -->
+          <div class="mb-3" id="departmentSelectContainer">
+              <label for="departmentSelect" class="form-label">Select Department</label>
+              <select class="form-select" id="departmentSelect" required>
+                  <option value="">Choose Department</option>
+                  <option value="USG">University Student Government</option>
+                  <option value="PAFE">PRIME Association of Future Educators</option>
+                  <option value="SITE">Society of Information Technology Enthusiasts</option>
+                  <option value="AFPROTECHS">Association of Food Processing Technology Students</option>
+              </select>
+          </div>
 
-        <!-- Candidates Container -->
-        <div id="candidatesContainer">
-          <!-- Candidates will be loaded here -->
-        </div>
+          <!-- Candidates Container -->
+          <div id="candidatesContainer">
+            <!-- Candidates will be loaded here -->
+          </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-2">
-          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-sm btn-primary" id="submitVoteBtn" disabled>Submit Vote</button>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-primary" id="submitVoteBtn" disabled>Submit Vote</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2461,8 +2469,15 @@ document.getElementById('submitVoteBtn').addEventListener('click', function() {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        alert('Vote recorded successfully!');
-        location.reload();
+        // Show the thank you message
+        document.getElementById('votingStatusMessage').style.display = 'block';
+        document.getElementById('votingFormContainer').style.display = 'none';
+        document.getElementById('electionStatus').style.display = 'none';
+        
+        // Refresh the page after a short delay
+        setTimeout(() => {
+            location.reload();
+        }, 2000);
       } else {
         alert(data.message || 'Error recording vote. Please try again.');
       }
@@ -2531,36 +2546,46 @@ function checkVotingStatus() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const departmentSelect = document.getElementById('departmentSelect');
-                const castVoteBtn = document.getElementById('castVoteBtn');
-                const departmentSelectContainer = document.getElementById('departmentSelectContainer');
+                const votingStatusMessage = document.getElementById('votingStatusMessage');
+                const votingFormContainer = document.getElementById('votingFormContainer');
+                const electionStatus = document.getElementById('electionStatus');
                 
                 if (data.hasVoted) {
-                    // If student has already voted, hide the department select
-                    if (departmentSelectContainer) {
-                        departmentSelectContainer.style.display = 'none';
+                    // Show thank you message and hide voting form
+                    if (votingStatusMessage) {
+                        votingStatusMessage.style.display = 'block';
                     }
-                    if (castVoteBtn) {
-                        castVoteBtn.disabled = true;
-                        castVoteBtn.textContent = 'Already Voted';
+                    if (votingFormContainer) {
+                        votingFormContainer.style.display = 'none';
+                    }
+                    if (electionStatus) {
+                        electionStatus.style.display = 'none';
                     }
                 } else if (data.electionStatus.isActive) {
-                    // Voting is active and student hasn't voted
-                    if (departmentSelectContainer) {
-                        departmentSelectContainer.style.display = 'block';
+                    // Show voting form and hide thank you message
+                    if (votingStatusMessage) {
+                        votingStatusMessage.style.display = 'none';
                     }
-                    if (castVoteBtn) {
-                        castVoteBtn.disabled = false;
-                        castVoteBtn.textContent = 'Cast Vote';
+                    if (votingFormContainer) {
+                        votingFormContainer.style.display = 'block';
+                    }
+                    if (electionStatus) {
+                        electionStatus.style.display = 'block';
+                        electionStatus.className = 'alert alert-info mb-2';
+                        electionStatus.innerHTML = '<i class="bi bi-info-circle me-2"></i>Please select your department to view candidates.';
                     }
                 } else {
-                    // Voting is not active
-                    if (departmentSelectContainer) {
-                        departmentSelectContainer.style.display = 'none';
+                    // Voting period ended
+                    if (votingStatusMessage) {
+                        votingStatusMessage.style.display = 'none';
                     }
-                    if (castVoteBtn) {
-                        castVoteBtn.disabled = true;
-                        castVoteBtn.textContent = 'Voting Period Ended';
+                    if (votingFormContainer) {
+                        votingFormContainer.style.display = 'none';
+                    }
+                    if (electionStatus) {
+                        electionStatus.style.display = 'block';
+                        electionStatus.className = 'alert alert-warning mb-2';
+                        electionStatus.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Voting period has ended.';
                     }
                 }
             } else {
