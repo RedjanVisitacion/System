@@ -1030,34 +1030,250 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 
     .department-section {
       background: #fff;
-      border-radius: 12px;
-      padding: 1.5rem;
+      border-radius: 16px;
+      padding: 2rem;
       margin-bottom: 2rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .department-header {
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #e5e7eb;
     }
 
     .department-title {
       color: #1f2937;
-      font-size: 1.25rem;
-      font-weight: 600;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid #e5e7eb;
-      margin-bottom: 1.5rem;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .department-subtitle {
+      color: #6b7280;
+      font-size: 0.9rem;
     }
 
     .position-section {
-      margin-bottom: 1.5rem;
       background: #f8fafc;
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+    }
+
+    .position-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .position-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .position-subtitle {
+      color: #6b7280;
+      font-size: 0.85rem;
     }
 
     .candidates-list {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1rem;
     }
 
+    .candidate-card {
+      background: #fff;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .candidate-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-color: #2563eb;
+    }
+
+    .candidate-card.selected {
+      border-color: #2563eb;
+      background: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
+    }
+
+    .candidate-photo-container {
+      flex-shrink: 0;
+    }
+
+    .candidate-photo {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #e5e7eb;
+      transition: all 0.2s ease;
+    }
+
+    .candidate-card.selected .candidate-photo {
+      border-color: #2563eb;
+      transform: scale(1.05);
+    }
+
+    .candidate-info {
+      flex: 1;
+    }
+
+    .candidate-name {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 0.95rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .candidate-department {
+      color: #6b7280;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .candidate-platform {
+      font-size: 0.75rem;
+      color: #4b5563;
+      padding-top: 0.25rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+
+    #voteForm button[type="submit"] {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border: none;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+    }
+
+    #voteForm button[type="submit"]:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    }
+
+    #voteForm button[type="submit"]:disabled {
+      background: #e5e7eb;
+      cursor: not-allowed;
+    }
+
+    .candidate-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .candidate-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid #e5e7eb;
+    }
+
+    .candidate-name {
+      font-weight: 600;
+      color: #1f2937;
+      font-size: 0.85rem;
+      margin-bottom: 0.1rem;
+    }
+
+    .candidate-department {
+      color: #6b7280;
+      font-size: 0.75rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .candidate-platform {
+      font-size: 0.7rem;
+      color: #4b5563;
+      padding-top: 0.15rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .department-section {
+      background: #fff;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .department-header {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .department-title {
+      font-size: 1.1rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .department-subtitle {
+      font-size: 0.75rem;
+    }
+
+    .position-section {
+      background: #f8fafc;
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-bottom: 0.75rem;
+    }
+
+    .position-header {
+      margin-bottom: 0.75rem;
+    }
+
+    .position-title {
+      font-size: 0.9rem;
+      margin-bottom: 0.15rem;
+    }
+
+    .position-subtitle {
+      font-size: 0.7rem;
+    }
+
+    .candidates-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+    }
   </style>
 </head>
 <body>
@@ -1781,7 +1997,50 @@ function loadCandidates() {
         const container = document.getElementById('candidatesContainer');
         container.innerHTML = '';
         
-        // Group candidates by department first
+        // Define position order for each department
+        const positionOrder = {
+          'USG': [
+            'President',
+            'Vice President',
+            'General Secretary',
+            'Associate Secretary',
+            'Treasurer',
+            'Auditor',
+            'Public Information Officer',
+            'BTLED Representatives',
+            'BSIT Representatives',
+            'BFPT Representatives'
+          ],
+          'AFPROTECHS': [
+            'President',
+            'Vice President',
+            'General Secretary',
+            'Associate Secretary',
+            'Treasurer',
+            'Auditor',
+            'Public Information Officer'
+          ],
+          'SITE': [
+            'President',
+            'Vice President',
+            'General Secretary',
+            'Associate Secretary',
+            'Treasurer',
+            'Auditor',
+            'Public Information Officer'
+          ],
+          'PAFE': [
+            'President',
+            'Vice President',
+            'General Secretary',
+            'Associate Secretary',
+            'Treasurer',
+            'Auditor',
+            'Public Information Officer'
+          ]
+        };
+        
+        // Group candidates by department
         const departments = {
           'USG': [],
           'AFPROTECHS': [],
@@ -1800,47 +2059,59 @@ function loadCandidates() {
         Object.entries(departments).forEach(([department, candidates]) => {
           if (candidates.length > 0) {
             const departmentSection = document.createElement('div');
-            departmentSection.className = 'department-section mb-4';
+            departmentSection.className = 'department-section';
             departmentSection.innerHTML = `
-              <h4 class="department-title mb-3">${department}</h4>
+              <div class="department-header">
+                <h4 class="department-title">${department}</h4>
+                <div class="department-subtitle">
+                  ${department === 'USG' ? 'One vote per position, two votes for representatives' : 'One vote per position'}
+                </div>
+              </div>
             `;
             
-            // Group candidates by position within department
-            const positions = [...new Set(candidates.map(c => c.position))];
-            
-            positions.forEach(position => {
+            // Create position sections in specified order
+            positionOrder[department].forEach(position => {
               const positionCandidates = candidates.filter(c => c.position === position);
-              const isRepresentative = position.toLowerCase().includes('representative');
-              const maxVotes = isRepresentative ? 2 : 1;
-              
-              const section = document.createElement('div');
-              section.className = 'position-section';
-              section.innerHTML = `
-                <h3 class="position-title">
-                  ${position}
-                  ${isRepresentative ? '<span class="badge bg-info ms-2">Vote for 2 candidates</span>' : ''}
-                </h3>
-                <div class="candidates-list">
-                  ${positionCandidates.map(candidate => `
-                    <div class="candidate-card d-flex align-items-center" 
-                         onclick="selectCandidate(this, '${department}-${position}', ${candidate.candidate_id}, ${maxVotes})">
-                      <img src="${candidate.photo || '../img/default-avatar.png'}" 
-                           alt="${candidate.name}" 
-                           class="candidate-photo">
-                      <div class="candidate-info">
-                        <div class="candidate-name">${candidate.name}</div>
-                        <div class="candidate-department">${candidate.department}</div>
-                        ${candidate.platform ? `
-                          <div class="candidate-platform">
-                            <strong>Platform:</strong> ${candidate.platform}
-                          </div>
-                        ` : ''}
-                      </div>
+              if (positionCandidates.length > 0) {
+                const isRepresentative = position.toLowerCase().includes('representative');
+                const maxVotes = isRepresentative ? 2 : 1;
+                
+                const section = document.createElement('div');
+                section.className = 'position-section';
+                section.innerHTML = `
+                  <div class="position-header">
+                    <h3 class="position-title">
+                      ${position}
+                      ${isRepresentative ? '<span class="badge bg-info ms-2">Vote for 2 candidates</span>' : ''}
+                    </h3>
+                    <div class="position-subtitle">
+                      ${isRepresentative ? 'Select up to 2 candidates' : 'Select 1 candidate'}
                     </div>
-                  `).join('')}
-                </div>
-              `;
-              departmentSection.appendChild(section);
+                  </div>
+                  <div class="candidates-list">
+                    ${positionCandidates.map(candidate => `
+                      <div class="candidate-card" 
+                           onclick="selectCandidate(this, '${department}-${position}', ${candidate.candidate_id}, ${maxVotes})">
+                        <div class="candidate-photo-container">
+                          <img src="${candidate.photo || '../img/default-avatar.png'}" 
+                               alt="${candidate.name}" 
+                               class="candidate-photo">
+                        </div>
+                        <div class="candidate-info">
+                          <div class="candidate-name">${candidate.name}</div>
+                          <div class="candidate-department">${candidate.department}</div>
+                          ${candidate.platform ? `
+                            <div class="candidate-platform">
+                              <strong>Platform:</strong> ${candidate.platform}
+                            </div>
+                          ` : ''}
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                `;
+                departmentSection.appendChild(section);
+              }
             });
             
             container.appendChild(departmentSection);
@@ -1957,164 +2228,27 @@ function handleCastVoteClick(event) {
 
 <!-- Cast Vote Modal -->
 <div class="modal fade" id="castVoteModal">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5>Cast Your Vote</h5>
+      <div class="modal-header py-2">
+        <h5 class="mb-0" style="font-size: 1rem;">Cast Your Vote</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div id="electionStatus" class="alert mb-3"></div>
+        <div id="electionStatus" class="alert mb-2"></div>
         <form id="voteForm">
           <div id="candidatesContainer">
             <!-- Candidates loaded here -->
           </div>
-          <button type="submit" class="btn btn-primary" disabled>Submit Vote</button>
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-sm btn-primary" disabled>Submit Vote</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 </div>
-
-<style>
-.badge {
-  font-size: 0.7rem;
-  padding: 0.15rem 0.35rem;
-  border-radius: 5px;
-}
-
-.candidate-card {
-  border: 1.5px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 0.4rem 0.7rem;
-  margin-bottom: 0.2rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  background: #fff;
-  position: relative;
-  overflow: hidden;
-  min-height: 48px;
-  display: flex;
-  align-items: center;
-}
-
-.candidate-card:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  border-color: #2563eb;
-}
-
-.candidate-card.selected {
-  border-color: #2563eb;
-  background: linear-gradient(135deg, #f0f7ff 0%, #e6f0ff 100%);
-}
-
-.candidate-card.selected::before {
-  content: '';
-  position: absolute;
-  border-width: 0 18px 18px 0;
-  border-color: transparent #2563eb transparent transparent;
-}
-
-.candidate-card.selected::after {
-  content: '✓';
-  position: absolute;
-  top: 2px;
-  right: 5px;
-  color: white;
-  font-size: 11px;
-  font-weight: bold;
-}
-
-.candidate-photo {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 0.6rem;
-  border: 2.5px solid #e5e7eb;
-  transition: all 0.2s ease;
-}
-
-.candidate-card.selected .candidate-photo {
-  border-color: #2563eb;
-  transform: scale(1.03);
-}
-
-.position-section {
-  margin-bottom: 0.3rem;
-  background: #f8fafc;
-  padding: 0.2rem 0.1rem 0.1rem 0.1rem;
-  border-radius: 8px;
-}
-
-.position-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.2rem;
-  color: #1f2937;
-  padding-bottom: 0.1rem;
-  border-bottom: 1px solid #e5e7eb;
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.candidates-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.2rem 0.7rem;
-}
-
-.candidate-info {
-  flex: 1;
-}
-
-.candidate-name {
-  font-weight: 600;
-  color: #1f2937;
-  font-size: 0.92rem;
-  margin-bottom: 0.1rem;
-}
-
-.candidate-department {
-  color: #6b7280;
-  font-size: 0.75rem;
-}
-
-.candidate-platform {
-  margin-top: 0.2rem;
-  padding-top: 0.2rem;
-  border-top: 1px solid #e5e7eb;
-  color: #4b5563;
-  font-size: 0.75rem;
-}
-
-#voteForm button[type="submit"] {
-  padding: 0.3rem 1rem;
-  font-size: 0.92rem;
-  font-weight: 600;
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  border: none;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-#voteForm button[type="submit"]:not(:disabled):hover {
-  transform: translateY(-1px);
-  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.13);
-}
-
-#voteForm button[type="submit"]:disabled {
-  background: #e5e7eb;
-  cursor: not-allowed;
-}
-
-/* Make the modal body scrollable if content is too tall */
-#castVoteModal .modal-body {
-  max-height: 80vh;
-  overflow-y: auto;
-}
-</style>
 
 </body>
 </html>
