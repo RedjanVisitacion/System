@@ -2588,15 +2588,20 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
           // Create or update the voted users list
           const votedUsersList = document.getElementById('votedUsersList');
           if (votedUsersList) {
-            votedUsersList.innerHTML = data.voted_users.map(user => `
-              <div class="voted-user-item">
-                <div class="d-flex align-items-center gap-2">
-                  <i class="bi bi-person-check-fill text-success"></i>
-                  <span>${user.full_name}</span>
-                </div>
-                <small class="text-muted">${user.program_name}</small>
+            votedUsersList.innerHTML = `
+              <div class="text-center mb-2">
+                <small class="text-muted">Total Voted Students: ${data.voted_users.length}</small>
               </div>
-            `).join('');
+              ${data.voted_users.map(user => `
+                <div class="voted-user-item">
+                  <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-person-check-fill text-success"></i>
+                    <span>${user.full_name}</span>
+                  </div>
+                  <small class="text-muted">${user.program_name}</small>
+                </div>
+              `).join('')}
+            `;
           }
         }
       })
@@ -2610,6 +2615,26 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
     updateTotalVotesCast();
     // Update every 30 seconds
     setInterval(updateTotalVotesCast, 30000);
+  });
+
+  // Add this after the totalVotersCard click handler
+  document.querySelector('.dashboard-card:nth-child(3)').addEventListener('click', () => {
+    const votedUsersList = document.getElementById('votedUsersList');
+    if (votedUsersList) {
+      // Scroll to the voted users list
+      votedUsersList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      
+      // Add a highlight effect
+      votedUsersList.style.transition = 'all 0.3s ease';
+      votedUsersList.style.backgroundColor = '#f8fafc';
+      votedUsersList.style.boxShadow = '0 0 0 2px #2563eb';
+      
+      // Remove highlight after 2 seconds
+      setTimeout(() => {
+        votedUsersList.style.backgroundColor = '';
+        votedUsersList.style.boxShadow = '';
+      }, 2000);
+    }
   });
   </script>
   
