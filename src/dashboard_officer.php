@@ -1329,7 +1329,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                     <i class="bi bi-clock"></i>
                   </div>
                   <h3 class="fw-bold text-center">Time Remaining</h3>
-                  <p class="fs-4 text-center mb-0" id="timeRemaining">Loading...</p>
+                  <div class="card-body">
+                    <p class="fs-4 text-center mb-0" id="timeRemaining">Loading...</p>
+                    <audio id="tickSound" preload="auto">
+                        <source src="assets/sounds/tick.mp3" type="audio/mpeg">
+                        <source src="assets/sounds/tick.wav" type="audio/wav">
+                    </audio>
+                  </div>
                 </div>
               </div>
               <div class="col-12">
@@ -2259,37 +2265,74 @@ function fetchElectionDatesAndStartCountdown() {
 }
 
 function startDynamicCountdown(startTime, endTime) {
-  clearInterval(countdownInterval);
-  const timeEl = document.getElementById('timeRemaining');
+    clearInterval(countdownInterval);
+    const timeEl = document.getElementById('timeRemaining');
+    const tickSound = document.getElementById('tickSound');
+    const departmentSelect = document.getElementById('department');
+    let lastSeconds = null;
+    let soundEnabled = true;
 
-  function updateCountdown() {
-    const now = new Date();
-    let diff, label;
+    // Try to load the sound
+    tickSound.load();
+    
+    // Handle sound loading errors
+    tickSound.onerror = function() {
+        console.log('Sound file could not be loaded');
+        soundEnabled = false;
+    };
 
-    if (now < startTime) {
-      diff = startTime - now;
-      label = 'Voting starts in ';
-      timeEl.style.color = ''; // default
-    } else if (now >= startTime && now < endTime) {
-      diff = endTime - now;
-      label = 'Voting ends in ';
-      timeEl.style.color = ''; // default
-    } else {
-      timeEl.textContent = 'Voting has ended';
-      timeEl.style.color = 'red';
-      clearInterval(countdownInterval);
-      return;
+    function updateCountdown() {
+        const now = new Date();
+        let diff, label;
+
+        if (now < startTime) {
+            diff = startTime - now;
+            label = 'Voting starts in ';
+            timeEl.style.color = ''; // default
+            // Show department dropdown
+            if (departmentSelect) {
+                departmentSelect.closest('.col-12.col-md-6').style.display = 'block';
+            }
+        } else if (now >= startTime && now < endTime) {
+            diff = endTime - now;
+            label = 'Voting ends in ';
+            timeEl.style.color = ''; // default
+            // Show department dropdown
+            if (departmentSelect) {
+                departmentSelect.closest('.col-12.col-md-6').style.display = 'block';
+            }
+        } else {
+            timeEl.textContent = 'Voting has ended';
+            timeEl.style.color = 'red';
+            // Hide department dropdown
+            if (departmentSelect) {
+                departmentSelect.closest('.col-12.col-md-6').style.display = 'none';
+            }
+            clearInterval(countdownInterval);
+            return;
+        }
+
+        const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+        const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+        const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+
+        // Play tick sound when seconds change and sound is enabled
+        if (seconds !== lastSeconds && soundEnabled) {
+            if (hours === '00' && minutes === '00') {
+                tickSound.currentTime = 0;
+                tickSound.play().catch(error => {
+                    console.log('Error playing sound:', error);
+                    soundEnabled = false;
+                });
+            }
+            lastSeconds = seconds;
+        }
+
+        timeEl.textContent = label + `${hours}:${minutes}:${seconds}`;
     }
 
-    const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
-    const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-    const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
-
-    timeEl.textContent = label + `${hours}:${minutes}:${seconds}`;
-  }
-
-  updateCountdown();
-  countdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown();
+    countdownInterval = setInterval(updateCountdown, 1000);
 }
 
 document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdown);

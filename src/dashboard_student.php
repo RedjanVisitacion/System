@@ -2109,6 +2109,9 @@ function checkElectionStatus() {
     .then(response => response.json())
     .then(data => {
       const statusEl = document.getElementById('electionStatus');
+      const departmentSelection = document.getElementById('departmentSelection');
+      const candidatesContainer = document.getElementById('candidatesContainer');
+      const submitVoteBtn = document.getElementById('submitVoteBtn');
       
       if (!data.success) {
         statusEl.className = 'alert alert-danger';
@@ -2129,13 +2132,23 @@ function checkElectionStatus() {
       if (now < startDate) {
         statusEl.className = 'alert alert-warning';
         statusEl.innerHTML = `<i class="bi bi-clock me-2"></i>Voting has not started yet. Starts on ${formatDateTime(data.start_date)}`;
+        // Hide department selection and candidates
+        departmentSelection.style.display = 'none';
+        candidatesContainer.innerHTML = '';
+        submitVoteBtn.style.display = 'none';
       } else if (now > endDate) {
         statusEl.className = 'alert alert-danger';
         statusEl.innerHTML = `<i class="bi bi-x-circle me-2"></i>Voting period has ended on ${formatDateTime(data.end_date)}`;
+        // Hide department selection and candidates
+        departmentSelection.style.display = 'none';
+        candidatesContainer.innerHTML = '';
+        submitVoteBtn.style.display = 'none';
       } else {
         statusEl.className = 'alert alert-success';
         statusEl.innerHTML = '<i class="bi bi-check-circle me-2"></i>Voting is currently active.';
-        // Load candidates if voting is active
+        // Show department selection
+        departmentSelection.style.display = 'block';
+        // Load candidates if voting is active and department is selected
         const department = document.getElementById('departmentSelect').value;
         if (department) {
           loadCandidatesByDepartment(department);
