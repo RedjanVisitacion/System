@@ -52,6 +52,7 @@ if (!$result) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
@@ -211,6 +212,46 @@ if (!$result) {
         .backB{
             margin-left: 20px;
         }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .winner-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #fbbf24;
+            color: #92400e;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        .position-section {
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+                margin: 15px 0;
+                padding: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -241,12 +282,17 @@ if (!$result) {
         $current_department = '';
         $current_position = '';
         $position_total_votes = 0;
+        $position_data = [];
         
         if (mysqli_num_rows($result) > 0) {
             while ($row = mysqli_fetch_assoc($result)) {
                 // Display department header if it changes
                 if ($current_department != $row['department']) {
                     if ($current_department != '') {
+                        // Output the last position's chart
+                        if (!empty($position_data)) {
+                            outputPositionChart($current_position, $position_data);
+                        }
                         echo '</div>'; // Close previous department div
                     }
                     $current_department = $row['department'];
@@ -257,60 +303,158 @@ if (!$result) {
                 // Display position header if it changes
                 if ($current_position != $row['position']) {
                     if ($current_position != '') {
-                        echo '<div class="total-votes">';
-                        echo '<i class="bi bi-people-fill"></i>';
-                        echo 'Total Votes: ' . number_format($position_total_votes);
-                        echo '</div>';
+                        // Output the previous position's chart
+                        if (!empty($position_data)) {
+                            outputPositionChart($current_position, $position_data);
+                        }
                     }
                     $current_position = $row['position'];
                     $position_total_votes = 0;
+                    $position_data = [];
                     echo '<h4 class="position-header">' . htmlspecialchars($current_position) . '</h4>';
                 }
                 
                 // Add to position total votes
                 $position_total_votes += $row['total_votes'];
                 
-                // Calculate vote percentage
-                $vote_percentage = ($position_total_votes > 0) ? ($row['total_votes'] / $position_total_votes) * 100 : 0;
-                
-                // Display candidate result
-                echo '<div class="card result-card">';
-                echo '<div class="card-body">';
-                echo '<div class="d-flex justify-content-between align-items-start">';
-                echo '<div class="candidate-info">';
-                echo '<img src="../img/icon.png" alt="Candidate Photo" class="candidate-photo">';
-                echo '<div class="candidate-details">';
-                echo '<div class="candidate-name">' . htmlspecialchars($row['name']) . '</div>';
-                echo '<div class="candidate-position">' . htmlspecialchars($row['position']) . '</div>';
-                echo '</div>';
-                echo '</div>';
-                echo '<div class="votes-badge">';
-                echo '<i class="bi bi-check-circle-fill"></i>';
-                echo number_format($row['total_votes']) . ' votes';
-                echo '</div>';
-                echo '</div>';
-                echo '<div class="progress-container">';
-                echo '<div class="progress" style="width: ' . $vote_percentage . '%"></div>';
-                echo '</div>';
-                echo '<div class="published-date mt-2">';
-                echo '<i class="bi bi-clock"></i>';
-                echo 'Published: ' . date('F j, Y g:i A', strtotime($row['published_at']));
-                echo '</div>';
-                echo '</div>';
-                echo '</div>';
+                // Store data for chart
+                $position_data[] = [
+                    'name' => $row['name'],
+                    'votes' => $row['total_votes']
+                ];
             }
             
-            // Display total votes for the last position
-            if ($current_position != '') {
-                echo '<div class="total-votes">';
-                echo '<i class="bi bi-people-fill"></i>';
-                echo 'Total Votes: ' . number_format($position_total_votes);
-                echo '</div>';
+            // Output the last position's chart
+            if (!empty($position_data)) {
+                outputPositionChart($current_position, $position_data);
             }
             
             echo '</div>'; // Close last department div
         } else {
             echo '<div class="alert alert-info">No results available.</div>';
+        }
+
+        function outputPositionChart($position, $data) {
+            $labels = array_map(function($item) { return $item['name']; }, $data);
+            $votes = array_map(function($item) { return $item['votes']; }, $data);
+            $chartId = 'chart_' . md5($position);
+            
+            // Find the leading candidate
+            $maxVotes = max($votes);
+            $leadingIndex = array_search($maxVotes, $votes);
+            $leadingName = $labels[$leadingIndex];
+            
+            echo '<div class="position-section">';
+            echo '<div class="winner-badge"><i class="bi bi-trophy-fill"></i> Leading: ' . htmlspecialchars($leadingName) . '</div>';
+            echo '<div class="chart-container">';
+            echo '<canvas id="' . $chartId . '"></canvas>';
+            echo '</div>';
+            echo '</div>';
+            
+            echo '<script>
+                new Chart(document.getElementById("' . $chartId . '"), {
+                    type: "bar",
+                    data: {
+                        labels: ' . json_encode($labels) . ',
+                        datasets: [{
+                            label: "Votes",
+                            data: ' . json_encode($votes) . ',
+                            backgroundColor: function(context) {
+                                const index = context.dataIndex;
+                                const value = context.dataset.data[index];
+                                const max = Math.max(...context.dataset.data);
+                                return value === max ? 
+                                    "rgba(234, 179, 8, 0.85)" : // Gold color for winner
+                                    "rgba(37, 99, 235, 0.85)";
+                            },
+                            borderColor: function(context) {
+                                const index = context.dataIndex;
+                                const value = context.dataset.data[index];
+                                const max = Math.max(...context.dataset.data);
+                                return value === max ? 
+                                    "rgb(234, 179, 8)" : // Gold border for winner
+                                    "rgb(37, 99, 235)";
+                            },
+                            borderWidth: 2,
+                            borderRadius: 6,
+                            barThickness: 30,
+                            maxBarThickness: 40
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            title: {
+                                display: true,
+                                text: "Vote Distribution",
+                                font: {
+                                    size: 16,
+                                    family: "Poppins",
+                                    weight: "600"
+                                },
+                                padding: {
+                                    top: 5,
+                                    bottom: 15
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: "rgba(0, 0, 0, 0.8)",
+                                padding: 10,
+                                titleFont: {
+                                    size: 13,
+                                    family: "Poppins",
+                                    weight: "600"
+                                },
+                                bodyFont: {
+                                    size: 12,
+                                    family: "Poppins"
+                                },
+                                cornerRadius: 6,
+                                displayColors: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0,
+                                    font: {
+                                        size: 11,
+                                        family: "Poppins"
+                                    },
+                                    padding: 8
+                                },
+                                grid: {
+                                    color: "rgba(0, 0, 0, 0.05)",
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 11,
+                                        family: "Poppins"
+                                    },
+                                    padding: 8,
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                },
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        },
+                        animation: {
+                            duration: 1000,
+                            easing: "easeOutQuart"
+                        }
+                    }
+                });
+            </script>';
         }
         ?>
     </div>
