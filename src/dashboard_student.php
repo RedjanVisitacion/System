@@ -2033,75 +2033,164 @@ document.getElementById('totalCandidatesCard').addEventListener('click', () => {
 
 // Function to handle casting votes
 function castVote(votes) {
-  return fetch('vote_status.php', {
+  // Show loading state
+  const submitBtn = document.getElementById('submitVoteBtn');
+  const originalBtnText = submitBtn.innerHTML;
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+
+  return fetch('../src/submit_vote.php', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
     },
     body: JSON.stringify({ votes: votes })
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    return response.json();
+  })
   .then(data => {
     if (data.success) {
-      // Show success message
+      // Show success message with animation
       const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-success alert-dismissible fade show';
+      alertDiv.className = 'alert alert-success alert-dismissible fade show animate__animated animate__fadeIn';
       alertDiv.innerHTML = `
-        <i class="bi bi-check-circle me-2"></i>
-        ${data.message}
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle-fill me-2" style="font-size: 1.5rem;"></i>
+          <div>
+            <h6 class="mb-1">Vote Recorded Successfully!</h6>
+            <p class="mb-0">${data.message}</p>
+          </div>
+        </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       `;
       document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
       
-      // Update voting status
+      // Update UI
       updateVotingStatus();
       updateTotalVotesCast();
       
+      // Close modal after success
+      const castVoteModal = bootstrap.Modal.getInstance(document.getElementById('castVoteModal'));
+      if (castVoteModal) {
+        castVoteModal.hide();
+      }
+      
       // Remove alert after 5 seconds
       setTimeout(() => {
-        alertDiv.remove();
+        alertDiv.classList.add('animate__fadeOut');
+        setTimeout(() => alertDiv.remove(), 500);
       }, 5000);
       
       return true;
     } else {
-      // Show error message
-      const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-danger alert-dismissible fade show';
-      alertDiv.innerHTML = `
-        <i class="bi bi-exclamation-circle me-2"></i>
-        ${data.message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      `;
-      document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
-      
-      // Remove alert after 5 seconds
-      setTimeout(() => {
-        alertDiv.remove();
-      }, 5000);
-      
-      return false;
+      throw new Error(data.message || 'Error recording vote');
     }
   })
   .catch(error => {
     console.error('Error casting vote:', error);
-    // Show error message
+    // Show error message with animation
     const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+    alertDiv.className = 'alert alert-danger alert-dismissible fade show animate__animated animate__fadeIn';
     alertDiv.innerHTML = `
-      <i class="bi bi-exclamation-circle me-2"></i>
-      Error casting vote. Please try again.
+      <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-circle-fill me-2" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-1">Error Recording Vote</h6>
+          <p class="mb-0">${error.message}</p>
+        </div>
+      </div>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
     
     // Remove alert after 5 seconds
     setTimeout(() => {
-      alertDiv.remove();
+      alertDiv.classList.add('animate__fadeOut');
+      setTimeout(() => alertDiv.remove(), 500);
     }, 5000);
     
     return false;
+  })
+  .finally(() => {
+    // Reset button state
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
   });
 }
+
+// Function to validate votes before submission
+function validateVotes() {
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const department = document.getElementById('departmentSelect').value;
+  const votes = Array.from(selectedCandidates).map(card => {
+    const candidateId = card.getAttribute('onclick').match(/\d+/)[0];
+    const position = card.closest('.position-section').querySelector('.position-title').textContent.trim();
+    return { candidateId, position };
+  });
+
+  // Group votes by position
+  const votesByPosition = votes.reduce((acc, vote) => {
+    if (!acc[vote.position]) {
+      acc[vote.position] = [];
+    }
+    acc[vote.position].push(vote.candidateId);
+    return acc;
+  }, {});
+
+  // Validate each position
+  for (const [position, candidateIds] of Object.entries(votesByPosition)) {
+    const maxVotes = positionVotes[position] || 1;
+    if (candidateIds.length !== maxVotes) {
+      throw new Error(`Please select exactly ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for ${position}`);
+    }
+  }
+
+  // Validate department selection
+  if (!department) {
+    throw new Error('Please select a department');
+  }
+
+  return votes.map(v => v.candidateId);
+}
+
+// Handle vote submission with validation
+document.getElementById('submitVoteBtn').addEventListener('click', function() {
+  try {
+    const votes = validateVotes();
+    castVote(votes);
+  } catch (error) {
+    // Show validation error
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-warning alert-dismissible fade show animate__animated animate__fadeIn';
+    alertDiv.innerHTML = `
+      <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 1.5rem;"></i>
+        <div>
+          <h6 class="mb-1">Validation Error</h6>
+          <p class="mb-0">${error.message}</p>
+        </div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
+    
+    // Remove alert after 3 seconds
+    setTimeout(() => {
+      alertDiv.classList.add('animate__fadeOut');
+      setTimeout(() => alertDiv.remove(), 500);
+    }, 3000);
+  }
+});
+
+// Add animation classes
+document.head.insertAdjacentHTML('beforeend', `
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+`);
 
 // Function to check election status
 function checkElectionStatus() {
@@ -2206,40 +2295,150 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
 
 <!-- Cast Vote Modal -->
 <div class="modal fade" id="castVoteModal">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
-      <div class="modal-header py-2">
-        <h5 class="mb-0" style="font-size: 1rem;">Cast Your Vote</h5>
+      <div class="modal-header py-3 border-bottom">
+        <h5 class="modal-title d-flex align-items-center gap-2">
+          <i class="bi bi-check-circle-fill text-primary"></i>
+          Cast Your Vote
+        </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <div id="electionStatus" class="alert mb-2"></div>
+        <!-- Election Status -->
+        <div id="electionStatus" class="alert mb-4"></div>
         
-        <!-- Department Selection -->
-        <div id="departmentSelection" class="mb-3">
-          <label class="form-label">Select Department</label>
-          <select class="form-select" id="departmentSelect">
-            <option value="">Choose a department...</option>
-            <option value="USG">USG (University Student Government)</option>
-            <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
-            <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
-            <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
-          </select>
+        <!-- Already Voted Message -->
+        <div id="alreadyVotedMessage" class="text-center py-5 d-none">
+          <div class="mb-4">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+          </div>
+          <h4 class="mb-3">Thank You for Voting!</h4>
+          <p class="text-muted mb-4">You have already cast your vote. Your participation is greatly appreciated.</p>
+          <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-2"></i>Close
+          </button>
         </div>
 
-        <!-- Candidates Container -->
-        <div id="candidatesContainer">
-          <!-- Candidates will be loaded here -->
-        </div>
+        <!-- Voting Interface -->
+        <div id="votingInterface">
+          <!-- Department Selection -->
+          <div id="departmentSelection" class="mb-4">
+            <label class="form-label fw-bold">Select Department</label>
+            <select class="form-select form-select-lg" id="departmentSelect">
+              <option value="">Choose a department...</option>
+              <option value="USG">USG (University Student Government)</option>
+              <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
+              <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
+              <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
+            </select>
+          </div>
 
-        <div class="d-flex justify-content-between align-items-center mt-2">
-          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-sm btn-primary" id="submitVoteBtn" disabled>Submit Vote</button>
+          <!-- Progress Indicator -->
+          <div class="progress-indicator mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="step active" data-step="1">
+                <span class="step-number">1</span>
+                <span class="step-text">Select Department</span>
+              </span>
+              <span class="step-line"></span>
+              <span class="step" data-step="2">
+                <span class="step-number">2</span>
+                <span class="step-text">Choose Candidates</span>
+              </span>
+              <span class="step-line"></span>
+              <span class="step" data-step="3">
+                <span class="step-number">3</span>
+                <span class="step-text">Review & Submit</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- Candidates Container -->
+          <div id="candidatesContainer" class="candidates-wrapper">
+            <!-- Candidates will be loaded here -->
+          </div>
+
+          <!-- Vote Summary -->
+          <div id="voteSummary" class="vote-summary d-none mt-4">
+            <h6 class="mb-3">Your Selected Candidates</h6>
+            <div id="selectedCandidatesList" class="selected-candidates-list">
+              <!-- Selected candidates will be shown here -->
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              <i class="bi bi-x-circle me-2"></i>Cancel
+            </button>
+            <div class="d-flex gap-2">
+              <button type="button" class="btn btn-outline-primary" id="prevStepBtn" style="display: none;">
+                <i class="bi bi-arrow-left me-2"></i>Previous
+              </button>
+              <button type="button" class="btn btn-primary" id="nextStepBtn" style="display: none;">
+                Next<i class="bi bi-arrow-right ms-2"></i>
+              </button>
+              <button type="submit" class="btn btn-success" id="submitVoteBtn" disabled>
+                <i class="bi bi-check-circle me-2"></i>Submit Vote
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<style>
+/* Already Voted Message Styles */
+#alreadyVotedMessage {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  margin: 1rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+#alreadyVotedMessage .bi-check-circle-fill {
+  color: #059669;
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Enhanced Form Select Styles */
+.form-select-lg {
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-select-lg:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-select-lg:hover {
+  border-color: #2563eb;
+}
+</style>
 
 <script>
 // Function to check voting status and update UI
@@ -2248,28 +2447,19 @@ function checkVotingStatus() {
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        const departmentSelection = document.getElementById('departmentSelection');
-        const candidatesContainer = document.getElementById('candidatesContainer');
-        const submitVoteBtn = document.getElementById('submitVoteBtn');
+        const votingInterface = document.getElementById('votingInterface');
+        const alreadyVotedMessage = document.getElementById('alreadyVotedMessage');
         
         if (data.hasVoted) {
-          // Hide department selection and show message
-          departmentSelection.style.display = 'none';
-          candidatesContainer.innerHTML = `
-            <div class="alert alert-success d-flex align-items-center">
-              <i class="bi bi-check-circle-fill me-2" style="font-size: 1.5rem;"></i>
-              <div>
-                <h6 class="mb-1">Thank you for voting!</h6>
-                <p class="mb-0">You have already cast your vote. Your participation is greatly appreciated.</p>
-              </div>
-            </div>
-          `;
-          submitVoteBtn.style.display = 'none';
+          // Hide voting interface
+          votingInterface.classList.add('d-none');
+          // Show already voted message
+          alreadyVotedMessage.classList.remove('d-none');
         } else {
-          // Show department selection
-          departmentSelection.style.display = 'block';
-          candidatesContainer.innerHTML = '';
-          submitVoteBtn.style.display = 'block';
+          // Show voting interface
+          votingInterface.classList.remove('d-none');
+          // Hide already voted message
+          alreadyVotedMessage.classList.add('d-none');
         }
       }
     })
@@ -2283,297 +2473,6 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
   checkVotingStatus();
   checkElectionStatus();
 });
-
-// Function to load candidates based on selected department
-function loadCandidatesByDepartment(department) {
-  const container = document.getElementById('candidatesContainer');
-  container.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div></div>';
-
-  // Map department codes to full names
-  const departmentNames = {
-    'USG': 'University Student Government',
-    'PAFE': 'PRIME Association of Future Educators',
-    'SITE': 'Society of Information Technology Enthusiasts',
-    'AFPROTECHS': 'Association of Food Processing Technology Students'
-  };
-
-  // Define position order for each department
-  const departmentPositions = {
-    'USG': [
-      'President',
-      'Vice President',
-      'General Secretary',
-      'Associate Secretary',
-      'Treasurer',
-      'Auditor',
-      'Public Information Officer',
-      'BTLED Representatives',
-      'BSIT Representatives',
-      'BFPT Representatives'
-    ],
-    'PAFE': [
-      'President',
-      'Vice President',
-      'General Secretary',
-      'Associate Secretary',
-      'Treasurer',
-      'Auditor',
-      'Public Information Officer'
-    ],
-    'SITE': [
-      'President',
-      'Vice President',
-      'General Secretary',
-      'Associate Secretary',
-      'Treasurer',
-      'Auditor',
-      'Public Information Officer'
-    ],
-    'AFPROTECHS': [
-      'President',
-      'Vice President',
-      'General Secretary',
-      'Associate Secretary',
-      'Treasurer',
-      'Auditor',
-      'Public Information Officer'
-    ]
-  };
-
-  // Map positions to their vote counts
-  const positionVotes = {
-    'President': 1,
-    'Vice President': 1,
-    'General Secretary': 1,
-    'Associate Secretary': 1,
-    'Treasurer': 1,
-    'Auditor': 1,
-    'Public Information Officer': 1,
-    'BTLED Representatives': 2,
-    'BSIT Representatives': 2,
-    'BFPT Representatives': 2
-  };
-
-  fetch('../src/fetch_candidates.php')
-    .then(response => response.json())
-    .then(data => {
-      if (data.success && Array.isArray(data.candidates)) {
-        // Filter candidates by selected department
-        const departmentCandidates = data.candidates.filter(c => c.department === department);
-        
-        if (departmentCandidates.length === 0) {
-          container.innerHTML = '<div class="alert alert-info">No candidates found for this department.</div>';
-          return;
-        }
-
-        // Group candidates by position
-        const positions = {};
-        departmentCandidates.forEach(candidate => {
-          if (!positions[candidate.position]) {
-            positions[candidate.position] = [];
-          }
-          positions[candidate.position].push(candidate);
-        });
-
-        // Create HTML for each position in the specified order
-        let html = `
-          <div class="department-header mb-4">
-            <h5 class="department-title">${departmentNames[department]}</h5>
-            <p class="department-subtitle text-muted mb-0">
-              ${department === 'USG' ? 'One vote per position, two votes for representatives' : 'One vote per position'}
-            </p>
-          </div>
-        `;
-
-        // Get the position order for the selected department
-        const positionOrder = departmentPositions[department] || [];
-
-        // Sort positions according to the department's specified order
-        positionOrder.forEach(position => {
-          // Always show the position section, even if no candidates
-          const maxVotes = positionVotes[position] || 1;
-          html += `
-            <div class="position-section mb-4">
-              <div class="position-header">
-                <h6 class="position-title mb-2">
-                  ${position}
-                  <span class="badge bg-primary ms-2">${maxVotes} vote${maxVotes > 1 ? 's' : ''}</span>
-                </h6>
-              </div>
-              <div class="candidates-list">
-                ${positions[position] ? positions[position].map(candidate => `
-                  <div class="candidate-card" 
-                       onclick="selectCandidate(this, '${position}', ${candidate.candidate_id}, ${maxVotes})"
-                       data-position="${position}"
-                       data-max-votes="${maxVotes}">
-                    <img src="${candidate.photo || '../img/icon.png'}" 
-                         alt="${candidate.name}" 
-                         class="candidate-photo">
-                    <div class="candidate-info">
-                      <div class="candidate-name">${candidate.name}</div>
-                      <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
-                    </div>
-                  </div>
-                `).join('') : '<div class="alert alert-info">No candidates available for this position.</div>'}
-              </div>
-            </div>
-          `;
-        });
-
-        container.innerHTML = html;
-      } else {
-        container.innerHTML = '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      container.innerHTML = '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
-    });
-}
-
-// Add hidden input for user's program
-document.addEventListener('DOMContentLoaded', function() {
-  // Add hidden input for user's program
-  const userProgramInput = document.createElement('input');
-  userProgramInput.type = 'hidden';
-  userProgramInput.id = 'userProgram';
-  userProgramInput.value = '<?php echo htmlspecialchars($user_profile['program_name'] ?? ''); ?>';
-  document.body.appendChild(userProgramInput);
-});
-
-// Add event listener for department selection change
-document.getElementById('departmentSelect').addEventListener('change', function(e) {
-  const department = e.target.value;
-  if (department) {
-    loadCandidatesByDepartment(department);
-  } else {
-    document.getElementById('candidatesContainer').innerHTML = '';
-  }
-});
-
-// Function to select a candidate
-function selectCandidate(element, position, candidateId, maxVotes) {
-  const positionSection = element.closest('.position-section');
-  const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
-  
-  // If already selected, deselect
-  if (element.classList.contains('selected')) {
-    element.classList.remove('selected');
-  } else {
-    // Check if max votes reached for this position
-    if (selectedCandidates.length >= maxVotes) {
-      // Show error message
-      const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-warning alert-dismissible fade show mt-2';
-      alertDiv.innerHTML = `
-        <i class="bi bi-exclamation-circle me-2"></i>
-        You can only select ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for ${position}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      `;
-      positionSection.appendChild(alertDiv);
-      
-      // Remove alert after 3 seconds
-      setTimeout(() => alertDiv.remove(), 3000);
-      return;
-    }
-    
-    // Select the candidate
-    element.classList.add('selected');
-  }
-  
-  // Update submit button state
-  updateSubmitButtonState();
-}
-
-// Function to update submit button state
-function updateSubmitButtonState() {
-  const submitBtn = document.getElementById('submitVoteBtn');
-  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
-  submitBtn.disabled = selectedCandidates.length === 0;
-}
-
-// Handle vote submission
-document.getElementById('submitVoteBtn').addEventListener('click', function() {
-  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
-  const votes = Array.from(selectedCandidates).map(card => {
-    const candidateId = card.getAttribute('onclick').match(/\d+/)[0];
-    return candidateId;
-  });
-
-  // Submit votes
-  fetch('../src/submit_vote.php', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ votes: votes })
-  })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        alert('Vote recorded successfully!');
-        location.reload();
-      } else {
-        alert(data.message || 'Error recording vote. Please try again.');
-      }
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error recording vote. Please try again.');
-    });
-});
-
-// Check election status when modal is shown
-document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
-  checkElectionStatus();
-});
-
-function castVote() {
-  // Get selected department
-  const department = document.getElementById('departmentSelect').value;
-
-  // Get selected USG candidates (checkboxes or cards with .selected)
-  const usgSelected = Array.from(document.querySelectorAll('.candidate-card.usg.selected'))
-    .map(card => card.dataset.candidateId);
-
-  // Get selected department candidate
-  const deptSelected = Array.from(document.querySelectorAll(`.candidate-card.dept.selected[data-department="${department}"]`))
-    .map(card => card.dataset.candidateId);
-
-  // Validation
-  if (usgSelected.length === 0 || usgSelected.length > 2) {
-    alert('Please select up to 2 USG representatives.');
-    return;
-  }
-  if (deptSelected.length !== 1) {
-    alert('Please select 1 candidate for your department.');
-    return;
-  }
-
-  // Prepare data
-  const voteData = {
-    department: department,
-    usg_votes: usgSelected,
-    dept_vote: deptSelected[0]
-  };
-
-  // Submit via AJAX/fetch
-  fetch('cast_vote.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(voteData)
-  })
-  .then(res => res.json())
-  .then(data => {
-    if (data.success) {
-      alert('Your vote has been cast successfully!');
-      // Optionally redirect or update UI
-    } else {
-      alert(data.message || 'Error casting vote.');
-    }
-  })
-  .catch(() => alert('Error connecting to server.'));
-}
 </script>
 
 <style>
