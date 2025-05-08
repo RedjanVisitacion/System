@@ -2683,17 +2683,26 @@ function handleVoteSubmission() {
 // Function to submit vote
 function submitVote() {
   const submitBtn = document.getElementById('submitVoteBtn');
-  const originalBtnText = submitBtn.innerHTML;
-  
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const department = document.getElementById('departmentSelect').value;
+
+  // Validate department selection
+  if (!department) {
+    alert('Please select a department first.');
+    return;
+  }
+
+  // Validate candidate selection
+  if (selectedCandidates.length === 0) {
+    alert('Please select at least one candidate.');
+    return;
+  }
+
   // Show loading state
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
-  // Get selected candidates and department
-  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
-  const department = document.getElementById('departmentSelect').value;
-  
-  // Prepare vote data
+  // Get selected candidates
   const votes = Array.from(selectedCandidates).map(card => card.getAttribute('data-candidate-id'));
   const voteData = {
     department: department,
@@ -2709,31 +2718,29 @@ function submitVote() {
     },
     body: JSON.stringify(voteData)
   })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-      showAlert('success', data.message);
-      
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('Vote submitted successfully!');
       // Update UI
       updateVotingStatus();
       updateTotalVotesCast();
-
-      // Close modal after success
+      // Close modal
       const castVoteModal = bootstrap.Modal.getInstance(document.getElementById('castVoteModal'));
       if (castVoteModal) {
         castVoteModal.hide();
       }
-      } else {
-      throw new Error(data.message || 'Error recording vote');
-      }
-    })
-    .catch(error => {
-    showAlert('danger', error.message);
+    } else {
+      alert('Error: ' + (data.message || 'Failed to submit vote'));
+    }
+  })
+  .catch(error => {
+    alert('Error: ' + error.message);
   })
   .finally(() => {
     // Reset button state
     submitBtn.disabled = false;
-    submitBtn.innerHTML = originalBtnText;
+    submitBtn.innerHTML = '<i class="bi bi-check-circle me-2"></i>Submit Vote';
   });
 }
 
@@ -2809,6 +2816,109 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
   checkVotingStatus();
   checkElectionStatus();
 });
+
+function confirmVote() {
+  const submitBtn = document.getElementById('submitVoteBtn');
+  const originalBtnText = submitBtn.innerHTML;
+  
+  // Show loading state
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+
+  // Get selected candidates and department
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const department = document.getElementById('departmentSelect').value;
+  
+  // Prepare vote data
+  const votes = Array.from(selectedCandidates).map(card => card.getAttribute('data-candidate-id'));
+  const voteData = {
+    department: department,
+    votes: votes
+  };
+
+  // Submit vote
+  fetch('../src/submit_vote.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: JSON.stringify(voteData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Show success message
+      const successDiv = document.createElement('div');
+      successDiv.className = 'alert alert-success alert-dismissible fade show';
+      successDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="bi bi-check-circle-fill me-2"></i>
+          <div>
+            <strong>Success!</strong> Your vote has been successfully recorded.
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.querySelector('.modal-body').insertBefore(successDiv, document.querySelector('#candidatesContainer'));
+      
+      // Update UI
+      updateVotingStatus();
+      updateTotalVotesCast();
+
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        const castVoteModal = bootstrap.Modal.getInstance(document.getElementById('castVoteModal'));
+        if (castVoteModal) {
+          castVoteModal.hide();
+        }
+      }, 2000);
+    } else {
+      throw new Error(data.message || 'Error recording vote');
+    }
+  })
+  .catch(error => {
+    // Show error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+    errorDiv.innerHTML = `
+      <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-circle-fill me-2"></i>
+        <div>
+          <strong>Error!</strong> ${error.message}
+        </div>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    document.querySelector('.modal-body').insertBefore(errorDiv, document.querySelector('#candidatesContainer'));
+  })
+  .finally(() => {
+    // Reset button state
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  });
+}
+
+// Function to show alerts
+function showAlert(type, message) {
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+  alertDiv.innerHTML = `
+    <div class="d-flex align-items-center">
+      <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'exclamation-circle'}-fill me-2"></i>
+      <div>
+        <strong>${type === 'success' ? 'Success!' : type === 'warning' ? 'Warning!' : 'Error!'}</strong> ${message}
+      </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  `;
+  document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
+  
+  // Remove alert after 5 seconds
+  setTimeout(() => {
+    alertDiv.remove();
+  }, 5000);
+}
 </script>
 
 <style>
