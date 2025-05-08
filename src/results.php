@@ -124,34 +124,18 @@ if (!$result) {
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg position-relative">
         <div class="container-fluid px-4">
-            <div class="d-flex align-items-center">
-                <img src="../img/icon.png" alt="Electoral Commission Logo" class="me-3" style="width:44px; height:44px; background:#fff; border-radius:50%;">
-                <span class="navbar-brand mb-0 h1 text-white">Election Results</span>
-            </div>
-            <div class="d-flex align-items-center">
+            
            
             <a href="<?php echo $_SESSION['role'] === 'officer' ? 'dashboard_officer.php' : 'dashboard_student.php'; ?>" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
                 <i class="bi bi-arrow-left fs-6"></i>
                 <span class="fw-semibold" style="font-size:1rem;">Back</span>
-            </a>    
+                
+            </a>   
+            
 
 
 
-                <div class="dropdown">
-                    <a href="#" class="btn btn-outline-light rounded-pill d-flex align-items-center" role="button" data-bs-toggle="dropdown">
-                        <?php if ($profile_picture): ?>
-                            <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
-                        <?php else: ?>
-                            <i class="bi bi-person-circle me-2"></i>
-                        <?php endif; ?>
-                        <?php echo htmlspecialchars($user_profile['full_name'] ?? ''); ?>
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="profile.php"><i class="bi bi-person me-2"></i>Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item text-danger" href="logout.php"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
-                    </ul>
-                </div>
+               
             </div>
         </div>
     </nav>
