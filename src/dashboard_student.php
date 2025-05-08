@@ -2039,41 +2039,45 @@ function castVote(votes) {
   submitBtn.disabled = true;
   submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
 
-  return fetch('../src/submit_vote.php', {
+  // Get the selected department
+  const department = document.getElementById('departmentSelect').value;
+
+  // Prepare the vote data
+  const voteData = {
+    department: department,
+    votes: votes
+  };
+
+  // Make the AJAX request
+  fetch('../src/submit_vote.php', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest'
     },
-    body: JSON.stringify({ votes: votes })
+    body: JSON.stringify(voteData)
   })
-  .then(response => {
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    return response.json();
-  })
+  .then(response => response.json())
   .then(data => {
     if (data.success) {
-      // Show success message with animation
+      // Show success message
       const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-success alert-dismissible fade show animate__animated animate__fadeIn';
+      alertDiv.className = 'alert alert-success alert-dismissible fade show';
       alertDiv.innerHTML = `
         <div class="d-flex align-items-center">
-          <i class="bi bi-check-circle-fill me-2" style="font-size: 1.5rem;"></i>
+          <i class="bi bi-check-circle-fill me-2"></i>
           <div>
-            <h6 class="mb-1">Vote Recorded Successfully!</h6>
-            <p class="mb-0">${data.message}</p>
+            <strong>Success!</strong> ${data.message}
           </div>
         </div>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
       `;
-      document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
+      document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
       
       // Update UI
       updateVotingStatus();
       updateTotalVotesCast();
-      
+
       // Close modal after success
       const castVoteModal = bootstrap.Modal.getInstance(document.getElementById('castVoteModal'));
       if (castVoteModal) {
@@ -2082,39 +2086,31 @@ function castVote(votes) {
       
       // Remove alert after 5 seconds
       setTimeout(() => {
-        alertDiv.classList.add('animate__fadeOut');
-        setTimeout(() => alertDiv.remove(), 500);
+        alertDiv.remove();
       }, 5000);
-      
-      return true;
     } else {
       throw new Error(data.message || 'Error recording vote');
     }
   })
   .catch(error => {
-    console.error('Error casting vote:', error);
-    // Show error message with animation
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-danger alert-dismissible fade show animate__animated animate__fadeIn';
-    alertDiv.innerHTML = `
+      // Show error message
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+      alertDiv.innerHTML = `
       <div class="d-flex align-items-center">
-        <i class="bi bi-exclamation-circle-fill me-2" style="font-size: 1.5rem;"></i>
+        <i class="bi bi-exclamation-circle-fill me-2"></i>
         <div>
-          <h6 class="mb-1">Error Recording Vote</h6>
-          <p class="mb-0">${error.message}</p>
+          <strong>Error!</strong> ${error.message}
         </div>
       </div>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
-    document.querySelector('.main-content').insertBefore(alertDiv, document.querySelector('.row.g-4'));
-    
-    // Remove alert after 5 seconds
-    setTimeout(() => {
-      alertDiv.classList.add('animate__fadeOut');
-      setTimeout(() => alertDiv.remove(), 500);
-    }, 5000);
-    
-    return false;
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+    document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
+      
+      // Remove alert after 5 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
   })
   .finally(() => {
     // Reset button state
@@ -2127,35 +2123,21 @@ function castVote(votes) {
 function validateVotes() {
   const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
   const department = document.getElementById('departmentSelect').value;
-  const votes = Array.from(selectedCandidates).map(card => {
-    const candidateId = card.getAttribute('onclick').match(/\d+/)[0];
-    const position = card.closest('.position-section').querySelector('.position-title').textContent.trim();
-    return { candidateId, position };
-  });
-
-  // Group votes by position
-  const votesByPosition = votes.reduce((acc, vote) => {
-    if (!acc[vote.position]) {
-      acc[vote.position] = [];
-    }
-    acc[vote.position].push(vote.candidateId);
-    return acc;
-  }, {});
-
-  // Validate each position
-  for (const [position, candidateIds] of Object.entries(votesByPosition)) {
-    const maxVotes = positionVotes[position] || 1;
-    if (candidateIds.length !== maxVotes) {
-      throw new Error(`Please select exactly ${maxVotes} candidate${maxVotes > 1 ? 's' : ''} for ${position}`);
-    }
-  }
-
-  // Validate department selection
+  
   if (!department) {
     throw new Error('Please select a department');
   }
 
-  return votes.map(v => v.candidateId);
+  if (selectedCandidates.length === 0) {
+    throw new Error('Please select at least one candidate');
+  }
+
+  // Get all selected candidate IDs
+  const votes = Array.from(selectedCandidates).map(card => {
+    return card.getAttribute('data-candidate-id');
+  });
+
+  return votes;
 }
 
 // Handle vote submission with validation
@@ -2166,13 +2148,12 @@ document.getElementById('submitVoteBtn').addEventListener('click', function() {
   } catch (error) {
     // Show validation error
     const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-warning alert-dismissible fade show animate__animated animate__fadeIn';
+    alertDiv.className = 'alert alert-warning alert-dismissible fade show';
     alertDiv.innerHTML = `
       <div class="d-flex align-items-center">
-        <i class="bi bi-exclamation-triangle-fill me-2" style="font-size: 1.5rem;"></i>
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
         <div>
-          <h6 class="mb-1">Validation Error</h6>
-          <p class="mb-0">${error.message}</p>
+          <strong>Validation Error!</strong> ${error.message}
         </div>
       </div>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -2181,8 +2162,7 @@ document.getElementById('submitVoteBtn').addEventListener('click', function() {
     
     // Remove alert after 3 seconds
     setTimeout(() => {
-      alertDiv.classList.add('animate__fadeOut');
-      setTimeout(() => alertDiv.remove(), 500);
+      alertDiv.remove();
     }, 3000);
   }
 });
@@ -2205,6 +2185,7 @@ function checkElectionStatus() {
       if (!data.success) {
         statusEl.className = 'alert alert-danger';
         statusEl.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Error checking election status.';
+        submitVoteBtn.disabled = true;
         return;
       }
 
@@ -2215,28 +2196,27 @@ function checkElectionStatus() {
       if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
         statusEl.className = 'alert alert-warning';
         statusEl.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Election dates not properly set.';
+        submitVoteBtn.disabled = true;
         return;
       }
 
       if (now < startDate) {
         statusEl.className = 'alert alert-warning';
         statusEl.innerHTML = `<i class="bi bi-clock me-2"></i>Voting has not started yet. Starts on ${formatDateTime(data.start_date)}`;
-        // Hide department selection and candidates
         departmentSelection.style.display = 'none';
         candidatesContainer.innerHTML = '';
-        submitVoteBtn.style.display = 'none';
+        submitVoteBtn.disabled = true;
       } else if (now > endDate) {
         statusEl.className = 'alert alert-danger';
         statusEl.innerHTML = `<i class="bi bi-x-circle me-2"></i>Voting period has ended on ${formatDateTime(data.end_date)}`;
-        // Hide department selection and candidates
         departmentSelection.style.display = 'none';
         candidatesContainer.innerHTML = '';
-        submitVoteBtn.style.display = 'none';
+        submitVoteBtn.disabled = true;
       } else {
         statusEl.className = 'alert alert-success';
         statusEl.innerHTML = '<i class="bi bi-check-circle me-2"></i>Voting is currently active.';
-        // Show department selection
         departmentSelection.style.display = 'block';
+        updateSubmitButtonState(); // Update button state based on selections
         // Load candidates if voting is active and department is selected
         const department = document.getElementById('departmentSelect').value;
         if (department) {
@@ -2249,6 +2229,7 @@ function checkElectionStatus() {
       const statusEl = document.getElementById('electionStatus');
       statusEl.className = 'alert alert-danger';
       statusEl.innerHTML = '<i class="bi bi-exclamation-circle me-2"></i>Error checking election status. Please try again.';
+      document.getElementById('submitVoteBtn').disabled = true;
     });
 }
 
@@ -2322,67 +2303,31 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
 
         <!-- Voting Interface -->
         <div id="votingInterface">
-          <!-- Department Selection -->
+        <!-- Department Selection -->
           <div id="departmentSelection" class="mb-4">
             <label class="form-label fw-bold">Select Department</label>
             <select class="form-select form-select-lg" id="departmentSelect">
-              <option value="">Choose a department...</option>
-              <option value="USG">USG (University Student Government)</option>
-              <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
-              <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
-              <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
-            </select>
-          </div>
+            <option value="">Choose a department...</option>
+            <option value="USG">USG (University Student Government)</option>
+            <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
+            <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
+            <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
+          </select>
+        </div>
 
-          <!-- Progress Indicator -->
-          <div class="progress-indicator mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="step active" data-step="1">
-                <span class="step-number">1</span>
-                <span class="step-text">Select Department</span>
-              </span>
-              <span class="step-line"></span>
-              <span class="step" data-step="2">
-                <span class="step-number">2</span>
-                <span class="step-text">Choose Candidates</span>
-              </span>
-              <span class="step-line"></span>
-              <span class="step" data-step="3">
-                <span class="step-number">3</span>
-                <span class="step-text">Review & Submit</span>
-              </span>
-            </div>
-          </div>
-
-          <!-- Candidates Container -->
+        <!-- Candidates Container -->
           <div id="candidatesContainer" class="candidates-wrapper">
-            <!-- Candidates will be loaded here -->
-          </div>
-
-          <!-- Vote Summary -->
-          <div id="voteSummary" class="vote-summary d-none mt-4">
-            <h6 class="mb-3">Your Selected Candidates</h6>
-            <div id="selectedCandidatesList" class="selected-candidates-list">
-              <!-- Selected candidates will be shown here -->
-            </div>
-          </div>
+          <!-- Candidates will be loaded here -->
+        </div>
 
           <!-- Action Buttons -->
           <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
               <i class="bi bi-x-circle me-2"></i>Cancel
             </button>
-            <div class="d-flex gap-2">
-              <button type="button" class="btn btn-outline-primary" id="prevStepBtn" style="display: none;">
-                <i class="bi bi-arrow-left me-2"></i>Previous
-              </button>
-              <button type="button" class="btn btn-primary" id="nextStepBtn" style="display: none;">
-                Next<i class="bi bi-arrow-right ms-2"></i>
-              </button>
-              <button type="submit" class="btn btn-success" id="submitVoteBtn" disabled>
-                <i class="bi bi-check-circle me-2"></i>Submit Vote
-              </button>
-            </div>
+            <button type="button" class="btn btn-success" id="submitVoteBtn" onclick="submitVote()">
+              <i class="bi bi-check-circle me-2"></i>Submit Vote
+            </button>
           </div>
         </div>
       </div>
@@ -2438,34 +2383,425 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
 .form-select-lg:hover {
   border-color: #2563eb;
 }
+
+/* Progress Indicator Styles */
+.progress-indicator {
+  padding: 1rem;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.step-number {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.step.active .step-number {
+  background: #2563eb;
+  color: #fff;
+}
+
+.step-text {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.step.active .step-text {
+  color: #2563eb;
+}
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 0 1rem;
+  margin-top: 16px;
+}
+
+/* Candidate Card Styles */
+.candidate-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.candidate-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-color: #2563eb;
+}
+
+.candidate-card.selected {
+  border-color: #2563eb;
+  background: #f0f7ff;
+}
+
+.candidate-photo {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.candidate-card.selected .candidate-photo {
+  border-color: #2563eb;
+}
+
+.candidate-info {
+  flex: 1;
+}
+
+.candidate-name {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+}
+
+.candidate-platform {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0;
+}
+
+/* Vote Summary Styles */
+.vote-summary {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 2rem;
+}
+
+.selected-candidates-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.selected-candidate-item {
+  background: #fff;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
 </style>
 
 <script>
-// Function to check voting status and update UI
+// Function to check voting status
 function checkVotingStatus() {
   fetch('../src/get_voting_status.php')
     .then(response => response.json())
     .then(data => {
-      if (data.success) {
-        const votingInterface = document.getElementById('votingInterface');
-        const alreadyVotedMessage = document.getElementById('alreadyVotedMessage');
-        
-        if (data.hasVoted) {
-          // Hide voting interface
-          votingInterface.classList.add('d-none');
-          // Show already voted message
-          alreadyVotedMessage.classList.remove('d-none');
+      const votingInterface = document.getElementById('votingInterface');
+      const alreadyVotedMessage = document.getElementById('alreadyVotedMessage');
+      
+      if (data.success && data.hasVoted) {
+        votingInterface.classList.add('d-none');
+        alreadyVotedMessage.classList.remove('d-none');
         } else {
-          // Show voting interface
-          votingInterface.classList.remove('d-none');
-          // Hide already voted message
-          alreadyVotedMessage.classList.add('d-none');
-        }
+        votingInterface.classList.remove('d-none');
+        alreadyVotedMessage.classList.add('d-none');
       }
     })
     .catch(error => {
       console.error('Error checking voting status:', error);
     });
+}
+
+// Function to load candidates by department
+function loadCandidatesByDepartment(department) {
+  const container = document.getElementById('candidatesContainer');
+  container.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div></div>';
+
+  fetch('../src/fetch_candidates.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && Array.isArray(data.candidates)) {
+        const departmentCandidates = data.candidates.filter(c => c.department === department);
+        
+        if (departmentCandidates.length === 0) {
+          container.innerHTML = '<div class="alert alert-info">No candidates found for this department.</div>';
+          return;
+        }
+
+        // Group candidates by position
+        const positions = {};
+        departmentCandidates.forEach(candidate => {
+          if (!positions[candidate.position]) {
+            positions[candidate.position] = [];
+          }
+          positions[candidate.position].push(candidate);
+        });
+
+        let html = '';
+        for (const [position, candidates] of Object.entries(positions)) {
+          html += `
+            <div class="position-section mb-4">
+              <div class="position-header">
+                <h6 class="position-title mb-2">
+                  ${position}
+                  <span class="badge bg-primary ms-2">1 vote</span>
+                </h6>
+              </div>
+              <div class="candidates-list">
+                ${candidates.map(candidate => `
+                  <div class="candidate-card" 
+                       onclick="selectCandidate(this, '${position}', ${candidate.candidate_id})"
+                       data-position="${position}"
+                       data-candidate-id="${candidate.candidate_id}">
+                    <img src="${candidate.photo || '../img/icon.png'}" 
+                         alt="${candidate.name}" 
+                         class="candidate-photo">
+                    <div class="candidate-info">
+                      <div class="candidate-name">${candidate.name}</div>
+                      <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        container.innerHTML = html;
+        updateSubmitButtonState();
+      } else {
+        container.innerHTML = '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      container.innerHTML = '<div class="alert alert-danger">Error loading candidates. Please try again.</div>';
+    });
+}
+
+// Function to select a candidate
+function selectCandidate(element, position, candidateId) {
+  const positionSection = element.closest('.position-section');
+  const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
+  
+  // If already selected, deselect
+  if (element.classList.contains('selected')) {
+    element.classList.remove('selected');
+  } else {
+    // Deselect any previously selected candidate for this position
+    selectedCandidates.forEach(card => card.classList.remove('selected'));
+    // Select the new candidate
+    element.classList.add('selected');
+  }
+  
+  updateSubmitButtonState();
+}
+
+// Function to update submit button state
+function updateSubmitButtonState() {
+  const submitBtn = document.getElementById('submitVoteBtn');
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const department = document.getElementById('departmentSelect').value;
+  const electionStatus = document.getElementById('electionStatus');
+  
+  // Check if voting is active
+  const isVotingActive = electionStatus.classList.contains('alert-success');
+  
+  // Enable submit button only if:
+  // 1. Voting is active
+  // 2. Department is selected
+  // 3. At least one candidate is selected
+  submitBtn.disabled = !isVotingActive || !department || selectedCandidates.length === 0;
+}
+
+// Function to handle vote submission
+function handleVoteSubmission() {
+  const submitBtn = document.getElementById('submitVoteBtn');
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const department = document.getElementById('departmentSelect').value;
+
+  // Validate department selection
+  if (!department) {
+    showAlert('warning', 'Please select a department first.');
+    return;
+  }
+
+  // Validate candidate selection
+  if (selectedCandidates.length === 0) {
+    showAlert('warning', 'Please select at least one candidate.');
+    return;
+  }
+
+  // Show confirmation dialog
+  const confirmDiv = document.createElement('div');
+  confirmDiv.className = 'alert alert-info alert-dismissible fade show';
+  confirmDiv.innerHTML = `
+    <div class="d-flex align-items-center">
+      <i class="bi bi-info-circle-fill me-2"></i>
+      <div>
+        <strong>Confirm Your Vote</strong>
+        <p class="mb-0 mt-1">Are you sure you want to submit your vote? This action cannot be undone.</p>
+        <div class="mt-2">
+          <button type="button" class="btn btn-primary btn-sm me-2" onclick="submitVote()">
+            <i class="bi bi-check-circle me-1"></i>Yes, Submit Vote
+          </button>
+          <button type="button" class="btn btn-outline-secondary btn-sm" onclick="this.closest('.alert').remove()">
+            <i class="bi bi-x-circle me-1"></i>Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.querySelector('.modal-body').insertBefore(confirmDiv, document.querySelector('#candidatesContainer'));
+}
+
+// Function to submit vote
+function submitVote() {
+  const submitBtn = document.getElementById('submitVoteBtn');
+  const originalBtnText = submitBtn.innerHTML;
+  
+  // Show loading state
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Submitting...';
+
+  // Get selected candidates and department
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const department = document.getElementById('departmentSelect').value;
+  
+  // Prepare vote data
+  const votes = Array.from(selectedCandidates).map(card => card.getAttribute('data-candidate-id'));
+  const voteData = {
+    department: department,
+    votes: votes
+  };
+
+  // Submit vote
+  fetch('../src/submit_vote.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: JSON.stringify(voteData)
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+      showAlert('success', data.message);
+      
+      // Update UI
+      updateVotingStatus();
+      updateTotalVotesCast();
+
+      // Close modal after success
+      const castVoteModal = bootstrap.Modal.getInstance(document.getElementById('castVoteModal'));
+      if (castVoteModal) {
+        castVoteModal.hide();
+      }
+      } else {
+      throw new Error(data.message || 'Error recording vote');
+      }
+    })
+    .catch(error => {
+    showAlert('danger', error.message);
+  })
+  .finally(() => {
+    // Reset button state
+    submitBtn.disabled = false;
+    submitBtn.innerHTML = originalBtnText;
+  });
+}
+
+// Function to show alerts
+function showAlert(type, message) {
+  const alertDiv = document.createElement('div');
+  alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+  alertDiv.innerHTML = `
+    <div class="d-flex align-items-center">
+      <i class="bi bi-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'exclamation-circle'}-fill me-2"></i>
+      <div>
+        <strong>${type === 'success' ? 'Success!' : type === 'warning' ? 'Warning!' : 'Error!'}</strong> ${message}
+      </div>
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  `;
+  document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
+  
+  // Remove alert after 5 seconds
+  setTimeout(() => {
+    alertDiv.remove();
+  }, 5000);
+}
+
+// Function to update submit button state
+function updateSubmitButtonState() {
+  const submitBtn = document.getElementById('submitVoteBtn');
+  const selectedCandidates = document.querySelectorAll('.candidate-card.selected');
+  const department = document.getElementById('departmentSelect').value;
+  const electionStatus = document.getElementById('electionStatus');
+  
+  // Check if voting is active
+  const isVotingActive = electionStatus.classList.contains('alert-success');
+  
+  // Enable submit button only if:
+  // 1. Voting is active
+  // 2. Department is selected
+  // 3. At least one candidate is selected
+  submitBtn.disabled = !isVotingActive || !department || selectedCandidates.length === 0;
+}
+
+// Add event listener for department selection
+document.getElementById('departmentSelect').addEventListener('change', function(e) {
+  const department = e.target.value;
+  if (department) {
+    loadCandidatesByDepartment(department);
+  } else {
+    document.getElementById('candidatesContainer').innerHTML = '';
+    updateSubmitButtonState();
+  }
+});
+
+// Function to select a candidate
+function selectCandidate(element, position, candidateId) {
+  const positionSection = element.closest('.position-section');
+  const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
+  
+  // If already selected, deselect
+  if (element.classList.contains('selected')) {
+    element.classList.remove('selected');
+    } else {
+    // Deselect any previously selected candidate for this position
+    selectedCandidates.forEach(card => card.classList.remove('selected'));
+    // Select the new candidate
+    element.classList.add('selected');
+  }
+  
+  updateSubmitButtonState();
 }
 
 // Check voting status when modal is shown
@@ -2477,31 +2813,40 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
 
 <style>
 .candidate-card {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
-  margin-bottom: 10px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .candidate-card:hover {
-  background-color: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border-color: #2563eb;
 }
 
 .candidate-card.selected {
-  border-color: #0d6efd;
-  background-color: #e7f1ff;
+  border-color: #2563eb;
+  background: #f0f7ff;
 }
 
 .candidate-photo {
-  width: 50px;
-  height: 50px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   object-fit: cover;
-  margin-right: 15px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.candidate-card.selected .candidate-photo {
+  border-color: #2563eb;
 }
 
 .candidate-info {
@@ -2510,24 +2855,60 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
 
 .candidate-name {
   font-weight: 600;
-  margin-bottom: 5px;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
 }
 
 .candidate-platform {
-  font-size: 0.9em;
-  color: #6c757d;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0;
 }
 
 .position-section {
-  background-color: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.position-header {
+  margin-bottom: 1.5rem;
 }
 
 .position-title {
-  color: #0d6efd;
-  margin-bottom: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 6px;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.form-select-lg {
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  border: 2px solid #e5e7eb;
+  transition: all 0.2s ease;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.form-select-lg:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.form-select-lg:hover {
+  border-color: #2563eb;
 }
 </style>
 </body>
