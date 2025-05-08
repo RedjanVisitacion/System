@@ -2472,6 +2472,53 @@ document.getElementById('submitVoteBtn').addEventListener('click', function() {
 document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
   checkElectionStatus();
 });
+
+function castVote() {
+  // Get selected department
+  const department = document.getElementById('departmentSelect').value;
+
+  // Get selected USG candidates (checkboxes or cards with .selected)
+  const usgSelected = Array.from(document.querySelectorAll('.candidate-card.usg.selected'))
+    .map(card => card.dataset.candidateId);
+
+  // Get selected department candidate
+  const deptSelected = Array.from(document.querySelectorAll(`.candidate-card.dept.selected[data-department="${department}"]`))
+    .map(card => card.dataset.candidateId);
+
+  // Validation
+  if (usgSelected.length === 0 || usgSelected.length > 2) {
+    alert('Please select up to 2 USG representatives.');
+    return;
+  }
+  if (deptSelected.length !== 1) {
+    alert('Please select 1 candidate for your department.');
+    return;
+  }
+
+  // Prepare data
+  const voteData = {
+    department: department,
+    usg_votes: usgSelected,
+    dept_vote: deptSelected[0]
+  };
+
+  // Submit via AJAX/fetch
+  fetch('cast_vote.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(voteData)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      alert('Your vote has been cast successfully!');
+      // Optionally redirect or update UI
+    } else {
+      alert(data.message || 'Error casting vote.');
+    }
+  })
+  .catch(() => alert('Error connecting to server.'));
+}
 </script>
 
 <style>
