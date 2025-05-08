@@ -1387,7 +1387,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 </head>
 <body>
   <!-- Top Bar -->
-  <nav class="navbar navbar-expand-lg position-relative" style="background: #2563eb; height: 60px;">
+  <nav class="navbar navbar-expand-lg position-sticky" style="background: #2563eb; height: 60px;">
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
