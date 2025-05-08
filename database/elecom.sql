@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 07, 2025 at 05:40 PM
+-- Generation Time: May 08, 2025 at 07:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -54,7 +54,7 @@ INSERT INTO `candidate` (`candidate_id`, `name`, `department`, `position`, `age`
 (70, 'Clark Ramirez', 'USG', 'Auditor', 21, 'Integrity above all.', NULL),
 (71, 'Kaye Lopez', 'USG', 'Public Information Officer', 20, 'Information that matters.', NULL),
 (72, 'Mira Tan', 'USG', 'BTLED Representative', 20, 'BTLED united for excellence.', NULL),
-(73, 'Allan Jay', 'USG', 'BTLED Representative', 21, 'Innovation and creativity for BTLED.', NULL),
+(73, 'Allan Jay', 'USG', 'Auditor', 21, 'Innovation and creativity for BTLED.', 'uploads/681c426806e00.png'),
 (74, 'Therese Lim', 'USG', 'BSIT Representative', 22, 'Tech-savvy leadership.', NULL),
 (75, 'Jonel Dizon', 'USG', 'BSIT Representative', 23, 'Coding for a better tomorrow.', NULL),
 (76, 'Anna Reyes', 'USG', 'BFPT Representative', 21, 'Together we grow.', NULL),
@@ -155,7 +155,7 @@ CREATE TABLE `election_dates` (
 --
 
 INSERT INTO `election_dates` (`id`, `start_date`, `end_date`, `results_date`, `created_at`, `updated_at`) VALUES
-(1, '2025-05-04 22:05:00', '2025-05-08 14:51:00', '2025-05-06 22:06:00', '2025-05-06 07:31:06', '2025-05-07 10:18:19');
+(1, '2025-05-04 07:05:00', '2025-05-09 23:58:00', '2025-05-06 07:06:00', '2025-05-06 07:31:06', '2025-05-08 04:55:47');
 
 -- --------------------------------------------------------
 
@@ -191,7 +191,29 @@ INSERT INTO `result` (`result_id`, `department`, `position`, `candidate_id`, `vo
 (12, 'USG', 'Associate Secretary', 102, 1, '2025-05-07 15:22:33'),
 (13, 'USG', 'Treasurer', 103, 1, '2025-05-07 15:22:33'),
 (14, 'USG', 'Auditor', 104, 1, '2025-05-07 15:22:33'),
-(15, 'USG', 'Public Information Officer', 105, 1, '2025-05-07 15:22:33');
+(15, 'USG', 'Public Information Officer', 105, 1, '2025-05-07 15:22:33'),
+(16, 'USG', 'President', 99, 1, '2025-05-08 03:24:23'),
+(17, 'USG', 'President', 99, 1, '2025-05-08 04:21:18'),
+(18, 'USG', 'Vice President', 100, 1, '2025-05-08 04:21:18'),
+(19, 'USG', 'General Secretary', 101, 1, '2025-05-08 04:21:18'),
+(20, 'USG', 'Associate Secretary', 102, 1, '2025-05-08 04:21:18'),
+(21, 'USG', 'Treasurer', 103, 1, '2025-05-08 04:21:18'),
+(22, 'USG', 'Auditor', 104, 1, '2025-05-08 04:21:18'),
+(23, 'USG', 'Public Information Officer', 105, 1, '2025-05-08 04:21:18'),
+(24, 'USG', 'President', 99, 1, '2025-05-08 04:57:30'),
+(25, 'USG', 'Vice President', 100, 1, '2025-05-08 04:57:30'),
+(26, 'USG', 'General Secretary', 101, 1, '2025-05-08 04:57:30'),
+(27, 'USG', 'Associate Secretary', 102, 1, '2025-05-08 04:57:30'),
+(28, 'USG', 'Treasurer', 103, 1, '2025-05-08 04:57:30'),
+(29, 'USG', 'Auditor', 104, 1, '2025-05-08 04:57:30'),
+(30, 'USG', 'Public Information Officer', 105, 1, '2025-05-08 04:57:30'),
+(31, 'USG', 'President', 99, 1, '2025-05-08 05:44:26'),
+(32, 'USG', 'Vice President', 100, 1, '2025-05-08 05:44:26'),
+(33, 'USG', 'General Secretary', 101, 1, '2025-05-08 05:44:26'),
+(34, 'USG', 'Associate Secretary', 102, 1, '2025-05-08 05:44:26'),
+(35, 'USG', 'Treasurer', 69, 1, '2025-05-08 05:44:26'),
+(36, 'USG', 'Auditor', 73, 1, '2025-05-08 05:44:26'),
+(37, 'USG', 'Public Information Officer', 105, 1, '2025-05-08 05:44:26');
 
 -- --------------------------------------------------------
 
@@ -320,14 +342,14 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2021308598', '2021308598', 'student', 'BSIT'),
 ('2021308613', '2021308613', 'student', 'BSIT'),
 ('2021308634', '2021308634', 'student', 'BSIT'),
-('2021308638', '2021308638', 'student', 'BSIT'),
+('2021308638', '$2y$10$D6FNvYHBPR8vYTyJ15rHv.RWsvAPgifcFbm/mq2bnxF5h.GxrXO7m', 'student', 'BSIT'),
 ('2021308644', '2021308644', 'student', 'BSIT'),
 ('2021308701', '2021308701', 'student', 'BSIT'),
 ('2021308757', '2021308757', 'student', 'BSIT'),
 ('2021308797', '2021308797', 'student', 'BSIT'),
 ('2021308811', '2021308811', 'student', 'BSIT'),
 ('2021308829', '2021308829', 'student', 'BSIT'),
-('2021308886', '2021308886', 'student', 'BSIT'),
+('2021308886', '$2y$10$MTSCBDrOh6uHZb1xOlpNH.0trbXV4rNj8x25Dbwyo6pP9jkFe/qma', 'student', 'Voted'),
 ('2021308903', '2021308903', 'student', 'BSIT'),
 ('2021309357', '2021309357', 'student', 'BSIT'),
 ('2021309407', '2021309407', 'student', 'BSIT'),
@@ -345,7 +367,7 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2022307752', '2022307752', 'student', 'BSIT'),
 ('2022307754', '2022307754', 'student', 'BSIT'),
 ('2022307755', '2022307755', 'student', 'BSIT'),
-('2022307760', '2022307760', 'student', 'BSIT'),
+('2022307760', '$2y$10$Q.KHI.v8B0Ppq1DNLQ/gb.b8bLBaCYhrXrEyu3w49wcET1XqhT4My', 'student', 'Voted'),
 ('2022307763', '2022307763', 'student', 'BSIT'),
 ('2022307768', '2022307768', 'student', 'BSIT'),
 ('2022307792', '2022307792', 'student', 'BSIT'),
@@ -467,12 +489,12 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2022309772', '2022309772', 'student', 'BSIT'),
 ('2022309794', '2022309794', 'student', 'BSIT'),
 ('2022309796', '2022309796', 'student', 'BSIT'),
-('2022310016', '2022310016', 'student', 'BSIT'),
+('2022310016', '$2y$10$UxoCa8jJBFgrOL/tgDvZT.7uYxBc8HCBUSQPxXv8Cd3pte3Gpt09W', 'student', 'Voted'),
 ('2022310019', '2022310019', 'student', 'BSIT'),
 ('2022310023', '2022310023', 'student', 'BSIT'),
 ('2022310026', '2022310026', 'student', 'BSIT'),
 ('2022310033', '2022310033', 'student', 'BSIT'),
-('2022310039', '2022310039', 'student', 'BSIT'),
+('2022310039', '$2y$10$PF2LUqVf1ISzmbNXmbVgzegQXkYJljkdYkfnlhj5AgtwlSjtX9ov2', 'student', 'BSIT'),
 ('2022310040', '2022310040', 'student', 'BSIT'),
 ('2022310042', '2022310042', 'student', 'BSIT'),
 ('2022310065', '2022310065', 'student', 'BSIT'),
@@ -517,7 +539,7 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2022310830', '2022310830', 'student', 'BSIT'),
 ('2022310847', '2022310847', 'student', 'BSIT'),
 ('2022310850', '2022310850', 'student', 'BSIT'),
-('2022310853', '2022310853', 'student', 'BSIT'),
+('2022310853', '$2y$10$01cBiRdUnIUBbGkgA9NQUuf3RxzBB0jahUuNwRNYzswfQGcaEqxm.', 'student', 'BSIT'),
 ('2022310860', '2022310860', 'student', 'BSIT'),
 ('2022310869', '2022310869', 'student', 'BSIT'),
 ('2022310872', '2022310872', 'student', 'BSIT'),
@@ -577,7 +599,7 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2023304695', '2023304695', 'student', 'BSIT'),
 ('2023304699', '2023304699', 'student', 'BSIT'),
 ('2023304700', '2023304700', 'student', 'BSIT'),
-('2023304706', '2023304706', 'student', 'BSIT'),
+('2023304706', '$2y$10$5gg7qCodp9Y/GCm5tY2MfOPgPgq1dYcDWzXa/a/chknQvJqy2V9Ne', 'student', 'BSIT'),
 ('2023304707', '2023304707', 'student', 'BSIT'),
 ('2023304710', '2023304710', 'student', 'BSIT'),
 ('2023304712', '2023304712', 'student', 'BSIT'),
@@ -636,7 +658,7 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2023304880', '2023304880', 'student', 'BSIT'),
 ('2023304923', '2023304923', 'student', 'BSIT'),
 ('2023304925', '2023304925', 'student', 'BSIT'),
-('2023305009', '2023305009', 'student', 'BSIT'),
+('2023305009', '$2y$10$32b4ZRHbSEdKWnB6ETEExeZhohQsSJ70cT4DTE6YakoIeFBbg.wra', 'student', 'Voted'),
 ('2023305011', '$2y$10$VZBilNUMjYhp0dY7RwaMpuzI8l4pb4.wEo4MHoJcD9Vd7Lt7IPkn6', 'student', 'BSIT'),
 ('2023305012', '2023305012', 'student', 'BSIT'),
 ('2023305014', '2023305014', 'student', 'BSIT'),
@@ -1270,7 +1292,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2022310830', '2022310830@example.com', '1234567890', 'profile_pic28.jpg', '2025-05-02 06:56:14', '2025-05-02 06:56:14', 'BERNIE B LAPAD', 'BSIT 2E', 'Bachelor of Science in Information Technology', 3, 'M'),
 ('2022310847', '2022310847@example.com', '1234567890', 'profile_pic34.jpg', '2025-05-02 06:56:14', '2025-05-02 06:56:14', 'MARLON IÑIGO A. DE VERA', 'BSIT 2E', 'Bachelor of Science in Information Technology', 3, 'M'),
 ('2022310850', NULL, NULL, NULL, '2025-05-02 07:09:46', '2025-05-02 07:09:46', 'DUMAPIAS, GABRIEL NICO H.', 'BSIT 3E', 'Bachelor of Science in Information Technology', 3, 'M'),
-('2022310853', '2022310853@example.com', '1234567890', 'default.jpg', '2025-05-02 07:13:58', '2025-05-02 07:13:58', 'ARAGAN, KENNETH B.', 'BSIT 3F', 'Bachelor of Science in Information Technology', 3, 'M'),
+('2022310853', '2022310853@example.com', '1234567890', '2022310853_681c30a37c5e6_Screenshot 2025-05-07 143602.png', '2025-05-02 07:13:58', '2025-05-08 04:18:43', 'ARAGAN, KENNETH B.', 'BSIT 3F', 'Bachelor of Science in Information Technology', 3, 'Male'),
 ('2022310860', '2022310860@example.com', '1234567890', 'profile_pic24.jpg', '2025-05-02 06:59:22', '2025-05-02 06:59:22', 'ELYANNA LENE L TONGOL', 'BSIT 3A', 'Bachelor of Science in Information Technology', 3, 'F'),
 ('2022310869', '2022310869@example.com', '1234567890', 'profile_pic21.jpg', '2025-05-02 06:59:22', '2025-05-02 06:59:22', 'MARKLYN B MENCIAS', 'BSIT 3A', 'Bachelor of Science in Information Technology', 3, 'M'),
 ('2022310872', NULL, NULL, NULL, '2025-05-02 07:02:26', '2025-05-02 07:02:26', 'GAHAPON, JEMARIE C', 'BSIT 3B', 'Bachelor of Science in Information Technology', 3, 'F'),
@@ -1321,7 +1343,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2023304695', '2023304695@example.com', '09123456789', 'default_profile_pic.jpg', '2025-05-02 06:53:41', '2025-05-02 06:53:41', 'SUGALAM, TRIXIE', 'BSIT 2D', 'Bachelor of Science in Information Technology', 2, 'F'),
 ('2023304699', '2023304699@example.com', '09123456789', 'default_profile_pic.jpg', '2025-05-02 06:53:41', '2025-05-02 06:53:41', 'MANIABO, CHEN T', 'BSIT 2D', 'Bachelor of Science in Information Technology', 2, 'F'),
 ('2023304700', NULL, NULL, NULL, '2025-05-02 06:43:48', '2025-05-02 06:43:48', 'TAC-AN, LORIE A', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'F'),
-('2023304706', NULL, NULL, NULL, '2025-05-02 06:43:48', '2025-05-02 06:43:48', 'BALUYOS, ARLYN KAYE ALLONA D', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'F'),
+('2023304706', 'dsgbvsz@gmail.com', '09534181760', '2023304706_681c3ea9823a4_Screenshot 2025-05-07 143602.png', '2025-05-02 06:43:48', '2025-05-08 05:18:33', 'BALUYOS, ARLYN KAYE ALLONA D', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'Female'),
 ('2023304707', NULL, NULL, NULL, '2025-05-02 06:43:48', '2025-05-02 06:43:48', 'BARORO, JASON S', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'M'),
 ('2023304710', '2023304710@example.com', '1234567890', 'profile_pic8.jpg', '2025-05-02 06:56:14', '2025-05-02 06:56:14', 'APPLE JEAN N/A TIZON', 'BSIT 2E', 'Bachelor of Science in Information Technology', 2, 'F'),
 ('2023304712', '2023304712@example.com', '1234567890', 'profile_pic9.jpg', '2025-05-02 06:56:14', '2025-05-02 06:56:14', 'JOHNLEY L MATABALAN', 'BSIT 2E', 'Bachelor of Science in Information Technology', 2, 'M'),
@@ -1366,6 +1388,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2023304866', '2023304866@example.com', NULL, NULL, '2025-05-01 23:32:12', '2025-05-01 23:32:12', 'BACLE, DAISY MAE M', 'BSIT 1B', 'Bachelor of Science in Information Technology', 1, 'F'),
 ('2023304880', '2023304880@example.com', '1234567890', 'profile_pic13.jpg', '2025-05-02 06:56:14', '2025-05-02 06:56:14', 'TJ D CALO', 'BSIT 2E', 'Bachelor of Science in Information Technology', 2, 'M'),
 ('2023304923', '2023304923@example.com', '09123456789', 'default_profile_pic.jpg', '2025-05-02 06:50:55', '2025-05-02 06:50:55', 'BANAWA, FEMOUR FEITH M', 'BSIT 2C', 'Bachelor of Science in Information Technology', 2, 'F'),
+('2023305009', 'pvonjushua@gmail.com', '09756704510', '2023305009_681c4548acde5_Messenger_creation_B77691D2-D785-490F-917A-5E927E4F517E.jpeg', '2025-05-02 02:22:36', '2025-05-08 05:53:05', 'VON JUSHUA PEJE .', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'Male'),
 ('2023305011', 'heyranasilver@gmail.com', '09639786569', '2023305011_681b24f7b965c_1000009636.jpg', '2025-05-02 06:43:48', '2025-05-07 09:16:39', 'HEYRANA, SILVER MAE S', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'Female'),
 ('2023305012', '2023305012@example.com', '1234567890', 'profile_pic5.jpg', '2025-05-02 06:56:14', '2025-05-02 06:56:14', 'VERJIE MAE M DEMIT', 'BSIT 2E', 'Bachelor of Science in Information Technology', 2, 'F'),
 ('2023305014', NULL, NULL, NULL, '2025-05-02 06:43:48', '2025-05-02 06:43:48', 'CARREON, KENT NICHOLAS P', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'M'),
@@ -1482,10 +1505,10 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2024303375', NULL, NULL, NULL, '2025-05-02 06:38:26', '2025-05-02 06:38:26', 'CABUEÑOS, ALLAN MILES L', 'BSIT 1F', 'Bachelor of Science in Information Technology', 1, 'M'),
 ('2024303376', '2024303376@example.com', NULL, NULL, '2025-05-01 23:32:12', '2025-05-01 23:32:12', 'Alvilyn P. Lumasag', 'BSIT 1C', 'Bachelor of Science in Information Technology', 1, 'F'),
 ('2024303377', NULL, NULL, NULL, '2025-05-02 06:35:36', '2025-05-02 06:35:36', 'BUAN, JOHN ROY D.', 'BSIT 1E', 'Bachelor of Science in Information Technology', 1, 'M'),
-('2024303379', NULL, NULL, NULL, '2025-05-02 07:26:36', '2025-05-02 07:26:36', 'ALAMIN, DIANNE ANGELA M', 'BTLED-ICT 1', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 1, 'F'),
-('2024303380', NULL, NULL, NULL, '2025-05-01 23:32:12', '2025-05-01 23:32:12', 'VILLARIAS, HERVIL CRISTIAN H', 'BSIT 1D', 'Bachelor of Science in Information Technology', 1, 'M'),
-('2024303382', NULL, NULL, NULL, '2025-05-02 07:26:36', '2025-05-02 07:26:36', 'ADELA, RONALYN P', 'BTLED-ICT 1', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 1, 'F');
+('2024303379', NULL, NULL, NULL, '2025-05-02 07:26:36', '2025-05-02 07:26:36', 'ALAMIN, DIANNE ANGELA M', 'BTLED-ICT 1', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 1, 'F');
 INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+('2024303380', NULL, NULL, NULL, '2025-05-01 23:32:12', '2025-05-01 23:32:12', 'VILLARIAS, HERVIL CRISTIAN H', 'BSIT 1D', 'Bachelor of Science in Information Technology', 1, 'M'),
+('2024303382', NULL, NULL, NULL, '2025-05-02 07:26:36', '2025-05-02 07:26:36', 'ADELA, RONALYN P', 'BTLED-ICT 1', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 1, 'F'),
 ('2024303391', NULL, NULL, NULL, '2025-05-02 06:35:36', '2025-05-02 06:35:36', 'BACARRO, DON AARON JOSH GABRIEL M', 'BSIT 1E', 'Bachelor of Science in Information Technology', 1, 'M'),
 ('2024303401', '2024303401@example.com', NULL, NULL, '2025-05-01 23:32:12', '2025-05-01 23:32:12', 'OMAGUING, ALIANAH HASHEMAH S', 'BSIT 1B', 'Bachelor of Science in Information Technology', 1, 'F'),
 ('2024303404', '2024303404@example.com', NULL, NULL, '2025-05-01 23:32:12', '2025-05-01 23:32:12', 'MALINIS, MECKY', 'BSIT 1B', 'Bachelor of Science in Information Technology', 1, 'F'),
@@ -1676,7 +1699,29 @@ INSERT INTO `vote` (`vote_id`, `user_id`, `candidate_id`, `voted_at`, `vote_stat
 (12, '2022310520', 102, '2025-05-07 15:22:33', 'Voted'),
 (13, '2022310520', 103, '2025-05-07 15:22:33', 'Voted'),
 (14, '2022310520', 104, '2025-05-07 15:22:33', 'Voted'),
-(15, '2022310520', 105, '2025-05-07 15:22:33', 'Voted');
+(15, '2022310520', 105, '2025-05-07 15:22:33', 'Voted'),
+(16, '2021308886', 99, '2025-05-08 03:24:23', 'Voted'),
+(17, '2022307760', 99, '2025-05-08 04:21:18', 'Voted'),
+(18, '2022307760', 100, '2025-05-08 04:21:18', 'Voted'),
+(19, '2022307760', 101, '2025-05-08 04:21:18', 'Voted'),
+(20, '2022307760', 102, '2025-05-08 04:21:18', 'Voted'),
+(21, '2022307760', 103, '2025-05-08 04:21:18', 'Voted'),
+(22, '2022307760', 104, '2025-05-08 04:21:18', 'Voted'),
+(23, '2022307760', 105, '2025-05-08 04:21:18', 'Voted'),
+(24, '2022310016', 99, '2025-05-08 04:57:30', 'Voted'),
+(25, '2022310016', 100, '2025-05-08 04:57:30', 'Voted'),
+(26, '2022310016', 101, '2025-05-08 04:57:30', 'Voted'),
+(27, '2022310016', 102, '2025-05-08 04:57:30', 'Voted'),
+(28, '2022310016', 103, '2025-05-08 04:57:30', 'Voted'),
+(29, '2022310016', 104, '2025-05-08 04:57:30', 'Voted'),
+(30, '2022310016', 105, '2025-05-08 04:57:30', 'Voted'),
+(31, '2023305009', 99, '2025-05-08 05:44:26', 'Voted'),
+(32, '2023305009', 100, '2025-05-08 05:44:26', 'Voted'),
+(33, '2023305009', 101, '2025-05-08 05:44:26', 'Voted'),
+(34, '2023305009', 102, '2025-05-08 05:44:26', 'Voted'),
+(35, '2023305009', 69, '2025-05-08 05:44:26', 'Voted'),
+(36, '2023305009', 73, '2025-05-08 05:44:26', 'Voted'),
+(37, '2023305009', 105, '2025-05-08 05:44:26', 'Voted');
 
 --
 -- Indexes for dumped tables
@@ -1754,13 +1799,13 @@ ALTER TABLE `election_dates`
 -- AUTO_INCREMENT for table `result`
 --
 ALTER TABLE `result`
-  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- AUTO_INCREMENT for table `vote`
 --
 ALTER TABLE `vote`
-  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Constraints for dumped tables
