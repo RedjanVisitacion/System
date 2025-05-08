@@ -128,9 +128,14 @@ if (!$result) {
                 <span class="navbar-brand mb-0 h1 text-white">Election Results</span>
             </div>
             <div class="d-flex align-items-center">
-                <a href="dashboard_student.php" class="btn btn-outline-light me-2">
-                    <i class="bi bi-arrow-left"></i> Back
-                </a>
+           
+            <a href="<?php echo $_SESSION['role'] === 'officer' ? 'dashboard_officer.php' : 'dashboard_student.php'; ?>" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
+                <i class="bi bi-arrow-left fs-6"></i>
+                <span class="fw-semibold" style="font-size:1rem;">Back</span>
+            </a>    
+
+
+
                 <div class="dropdown">
                     <a href="#" class="btn btn-outline-light rounded-pill d-flex align-items-center" role="button" data-bs-toggle="dropdown">
                         <?php if ($profile_picture): ?>
