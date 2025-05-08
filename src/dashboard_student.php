@@ -2243,9 +2243,12 @@ function checkVotingStatus() {
           // Hide department selection and show message
           departmentSelection.style.display = 'none';
           candidatesContainer.innerHTML = `
-            <div class="alert alert-success">
-              <i class="bi bi-check-circle me-2"></i>
-              You have already cast your vote. Thank you for participating!
+            <div class="alert alert-success d-flex align-items-center">
+              <i class="bi bi-check-circle-fill me-2" style="font-size: 1.5rem;"></i>
+              <div>
+                <h6 class="mb-1">Thank you for voting!</h6>
+                <p class="mb-0">You have already cast your vote. Your participation is greatly appreciated.</p>
+              </div>
             </div>
           `;
           submitVoteBtn.style.display = 'none';
