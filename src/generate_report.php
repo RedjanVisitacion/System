@@ -108,45 +108,21 @@ $fullName = $userData['full_name'] ?? 'User';
             background: #f8d7da;
             border-radius: 8px;
         }
+
+
+        .navB{
+            margin-left: 20px;
+        }
     </style>
 </head>
 <body>
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="dashboard_officer.php">
-                <i class="fas fa-vote-yea me-2"></i>
-                Election System
+    <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:50px; z-index: 1050;">
+        <div class="navB">
+            <a href="<?php echo $_SESSION['role'] === 'officer' ? 'dashboard_officer.php' : 'dashboard_student.php'; ?>" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
+                <i class="bi bi-arrow-left fs-6"></i>
+                <span class="fw-semibold" style="font-size:1rem;">Back</span>
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="dashboar_officer.php">
-                            <i class="fas fa-home me-1"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="generate_report.php">
-                            <i class="fas fa-file-alt me-1"></i> Generate Report
-                        </a>
-                    </li>
-                </ul>
-                <div class="d-flex align-items-center">
-                    <span class="text-white me-3"><?php echo htmlspecialchars($fullName); ?></span>
-                    <!--<img src="img/<?php echo htmlspecialchars($profilePicture); ?>" 
-                         alt="Profile" 
-                         class="rounded-circle"
-                         style="width: 40px; height: 40px; object-fit: cover;">-->
-                    
-                         <img src="../img/icon.png" 
-                         alt="Profile" 
-                         class="rounded-circle"
-                         style="width: 40px; height: 40px; object-fit: cover;">
-                </div>
-            </div>
         </div>
     </nav>
 
