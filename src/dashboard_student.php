@@ -2229,6 +2229,45 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
 </div>
 
 <script>
+// Function to check voting status and update UI
+function checkVotingStatus() {
+  fetch('../src/get_voting_status.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const departmentSelection = document.getElementById('departmentSelection');
+        const candidatesContainer = document.getElementById('candidatesContainer');
+        const submitVoteBtn = document.getElementById('submitVoteBtn');
+        
+        if (data.hasVoted) {
+          // Hide department selection and show message
+          departmentSelection.style.display = 'none';
+          candidatesContainer.innerHTML = `
+            <div class="alert alert-success">
+              <i class="bi bi-check-circle me-2"></i>
+              You have already cast your vote. Thank you for participating!
+            </div>
+          `;
+          submitVoteBtn.style.display = 'none';
+        } else {
+          // Show department selection
+          departmentSelection.style.display = 'block';
+          candidatesContainer.innerHTML = '';
+          submitVoteBtn.style.display = 'block';
+        }
+      }
+    })
+    .catch(error => {
+      console.error('Error checking voting status:', error);
+    });
+}
+
+// Check voting status when modal is shown
+document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
+  checkVotingStatus();
+  checkElectionStatus();
+});
+
 // Function to load candidates based on selected department
 function loadCandidatesByDepartment(department) {
   const container = document.getElementById('candidatesContainer');
