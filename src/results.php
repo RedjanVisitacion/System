@@ -40,6 +40,36 @@ $result = mysqli_query($con, $query);
 if (!$result) {
     die("Query failed: " . mysqli_error($con));
 }
+
+function checkElectionTimeline($con) {
+    $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $election_dates = $result->fetch_assoc();
+    $stmt->close();
+
+    if (!$election_dates) {
+        return false;
+    }
+
+    $current_time = new DateTime();
+    $end_date = new DateTime($election_dates['end_date']);
+    $results_date = new DateTime($election_dates['results_date']);
+
+    // Can view results only if:
+    // 1. Current time is after end date (voting has ended)
+    // 2. Current time is after results date (results are released)
+    return ($current_time >= $end_date) && ($current_time >= $results_date);
+}
+
+// Get election dates for display
+$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+$stmt->execute();
+$result = $stmt->get_result();
+$election_dates = $result->fetch_assoc();
+$stmt->close();
+
+$can_view_results = checkElectionTimeline($con);
 ?>
 
 <!DOCTYPE html>
@@ -49,7 +79,7 @@ if (!$result) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Election Results</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -252,6 +282,100 @@ if (!$result) {
                 padding: 12px;
             }
         }
+
+        .results-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .results-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .position-title {
+            color: #2563eb;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        .candidate-result {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 10px;
+            background: #f8fafc;
+            transition: transform 0.2s;
+        }
+        .candidate-result:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .candidate-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 1rem;
+            border: 3px solid #2563eb;
+        }
+        .candidate-info {
+            flex-grow: 1;
+        }
+        .candidate-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .candidate-department {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        .vote-count {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2563eb;
+            margin-left: 1rem;
+        }
+        .progress {
+            height: 8px;
+            margin-top: 0.5rem;
+            background-color: #e5e7eb;
+        }
+        .progress-bar {
+            background-color: #2563eb;
+            transition: width 1s ease-in-out;
+        }
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+        .back-button {
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 768px) {
+            .results-container {
+                padding: 1rem;
+            }
+            .chart-container {
+                height: 300px;
+            }
+            .candidate-result {
+                flex-direction: column;
+                text-align: center;
+            }
+            .candidate-photo {
+                margin: 0 auto 1rem auto;
+            }
+            .vote-count {
+                margin: 1rem 0 0 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -277,188 +401,232 @@ if (!$result) {
                 </div>
             </div>
         <?php endif; ?>
-
-        <?php
-        $current_department = '';
-        $current_position = '';
-        $position_total_votes = 0;
-        $position_data = [];
-        
-        if (mysqli_num_rows($result) > 0) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                // Display department header if it changes
-                if ($current_department != $row['department']) {
-                    if ($current_department != '') {
-                        // Output the last position's chart
-                        if (!empty($position_data)) {
-                            outputPositionChart($current_position, $position_data);
-                        }
-                        echo '</div>'; // Close previous department div
-                    }
-                    $current_department = $row['department'];
-                    echo '<div class="department-section mb-4">';
-                    echo '<h3 class="department-header">' . htmlspecialchars($current_department) . '</h3>';
-                }
-                
-                // Display position header if it changes
-                if ($current_position != $row['position']) {
-                    if ($current_position != '') {
-                        // Output the previous position's chart
-                        if (!empty($position_data)) {
-                            outputPositionChart($current_position, $position_data);
-                        }
-                    }
-                    $current_position = $row['position'];
-                    $position_total_votes = 0;
-                    $position_data = [];
-                    echo '<h4 class="position-header">' . htmlspecialchars($current_position) . '</h4>';
-                }
-                
-                // Add to position total votes
-                $position_total_votes += $row['total_votes'];
-                
-                // Store data for chart
-                $position_data[] = [
-                    'name' => $row['name'],
-                    'votes' => $row['total_votes']
-                ];
-            }
-            
-            // Output the last position's chart
-            if (!empty($position_data)) {
-                outputPositionChart($current_position, $position_data);
-            }
-            
-            echo '</div>'; // Close last department div
-        } else {
-            echo '<div class="alert alert-info">No results available.</div>';
-        }
-
-        function outputPositionChart($position, $data) {
-            $labels = array_map(function($item) { return $item['name']; }, $data);
-            $votes = array_map(function($item) { return $item['votes']; }, $data);
-            $chartId = 'chart_' . md5($position);
-            
-            // Find the leading candidate
-            $maxVotes = max($votes);
-            $leadingIndex = array_search($maxVotes, $votes);
-            $leadingName = $labels[$leadingIndex];
-            
-            echo '<div class="position-section">';
-            echo '<div class="winner-badge"><i class="bi bi-trophy-fill"></i> Leading: ' . htmlspecialchars($leadingName) . '</div>';
-            echo '<div class="chart-container">';
-            echo '<canvas id="' . $chartId . '"></canvas>';
-            echo '</div>';
-            echo '</div>';
-            
-            echo '<script>
-                new Chart(document.getElementById("' . $chartId . '"), {
-                    type: "bar",
-                    data: {
-                        labels: ' . json_encode($labels) . ',
-                        datasets: [{
-                            label: "Votes",
-                            data: ' . json_encode($votes) . ',
-                            backgroundColor: function(context) {
-                                const index = context.dataIndex;
-                                const value = context.dataset.data[index];
-                                const max = Math.max(...context.dataset.data);
-                                return value === max ? 
-                                    "rgba(234, 179, 8, 0.85)" : // Gold color for winner
-                                    "rgba(37, 99, 235, 0.85)";
-                            },
-                            borderColor: function(context) {
-                                const index = context.dataIndex;
-                                const value = context.dataset.data[index];
-                                const max = Math.max(...context.dataset.data);
-                                return value === max ? 
-                                    "rgb(234, 179, 8)" : // Gold border for winner
-                                    "rgb(37, 99, 235)";
-                            },
-                            borderWidth: 2,
-                            borderRadius: 6,
-                            barThickness: 30,
-                            maxBarThickness: 40
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            title: {
-                                display: true,
-                                text: "Vote Distribution",
-                                font: {
-                                    size: 16,
-                                    family: "Poppins",
-                                    weight: "600"
-                                },
-                                padding: {
-                                    top: 5,
-                                    bottom: 15
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: "rgba(0, 0, 0, 0.8)",
-                                padding: 10,
-                                titleFont: {
-                                    size: 13,
-                                    family: "Poppins",
-                                    weight: "600"
-                                },
-                                bodyFont: {
-                                    size: 12,
-                                    family: "Poppins"
-                                },
-                                cornerRadius: 6,
-                                displayColors: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    precision: 0,
-                                    font: {
-                                        size: 11,
-                                        family: "Poppins"
-                                    },
-                                    padding: 8
-                                },
-                                grid: {
-                                    color: "rgba(0, 0, 0, 0.05)",
-                                    drawBorder: false
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    font: {
-                                        size: 11,
-                                        family: "Poppins"
-                                    },
-                                    padding: 8,
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                },
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        },
-                        animation: {
-                            duration: 1000,
-                            easing: "easeOutQuart"
-                        }
-                    }
-                });
-            </script>';
-        }
-        ?>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="results-container">
+        <div class="results-card">
+            <h2 class="text-center mb-4">Election Results</h2>
+            
+            <?php if ($can_view_results): ?>
+                <!-- Pie Chart Section -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="overallResultsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="departmentResultsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Results Section -->
+                <div id="resultsContainer">
+                    <!-- Results will be loaded here -->
+                </div>
+            <?php else: ?>
+                <div class="text-center py-5">
+                    <i class="bi bi-clock-history fs-1 text-muted"></i>
+                    <?php 
+                    $current_time = new DateTime();
+                    $end_date = new DateTime($election_dates['end_date']);
+                    if ($current_time < $end_date): 
+                    ?>
+                        <p class="mt-3 text-muted">Voting is still in progress. Results will be available after the election ends.</p>
+                    <?php else: ?>
+                        <p class="mt-3 text-muted">Results will be available after <?php echo date('F d, Y h:i A', strtotime($election_dates['results_date'])); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Function to fetch and display results
+        function fetchAndDisplayResults() {
+            <?php if ($can_view_results): ?>
+            fetch('get_results.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayResults(data.results);
+                        createPieCharts(data.results);
+                    } else {
+                        document.getElementById('resultsContainer').innerHTML = `
+                            <div class="no-results">
+                                <i class="bi bi-exclamation-circle fs-1"></i>
+                                <p class="mt-3">${data.message || 'No results available yet.'}</p>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching results:', error);
+                    document.getElementById('resultsContainer').innerHTML = `
+                        <div class="no-results">
+                            <i class="bi bi-exclamation-triangle fs-1"></i>
+                            <p class="mt-3">Error loading results. Please try again later.</p>
+                        </div>
+                    `;
+                });
+            <?php endif; ?>
+        }
+
+        // Function to create pie charts
+        function createPieCharts(results) {
+            // Overall Results Chart
+            const overallCtx = document.getElementById('overallResultsChart').getContext('2d');
+            const overallData = prepareOverallChartData(results);
+            new Chart(overallCtx, {
+                type: 'pie',
+                data: {
+                    labels: overallData.labels,
+                    datasets: [{
+                        data: overallData.data,
+                        backgroundColor: generateColors(overallData.labels.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Overall Voting Results',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+
+            // Department Results Chart
+            const deptCtx = document.getElementById('departmentResultsChart').getContext('2d');
+            const deptData = prepareDepartmentChartData(results);
+            new Chart(deptCtx, {
+                type: 'pie',
+                data: {
+                    labels: deptData.labels,
+                    datasets: [{
+                        data: deptData.data,
+                        backgroundColor: generateColors(deptData.labels.length),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Results by Department',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Helper function to prepare data for overall chart
+        function prepareOverallChartData(results) {
+            const data = {};
+            results.forEach(result => {
+                if (!data[result.position]) {
+                    data[result.position] = 0;
+                }
+                data[result.position] += result.votes;
+            });
+
+            return {
+                labels: Object.keys(data),
+                data: Object.values(data)
+            };
+        }
+
+        // Helper function to prepare data for department chart
+        function prepareDepartmentChartData(results) {
+            const data = {};
+            results.forEach(result => {
+                if (!data[result.department]) {
+                    data[result.department] = 0;
+                }
+                data[result.department] += result.votes;
+            });
+
+            return {
+                labels: Object.keys(data),
+                data: Object.values(data)
+            };
+        }
+
+        // Helper function to generate colors
+        function generateColors(count) {
+            const colors = [
+                '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe',
+                '#1d4ed8', '#1e40af', '#1e3a8a', '#172554', '#0f172a'
+            ];
+            return colors.slice(0, count);
+        }
+
+        // Function to display detailed results
+        function displayResults(results) {
+            const container = document.getElementById('resultsContainer');
+            const positions = [...new Set(results.map(r => r.position))];
+
+            container.innerHTML = positions.map(position => {
+                const positionResults = results.filter(r => r.position === position);
+                const totalVotes = positionResults.reduce((sum, r) => sum + r.votes, 0);
+
+                return `
+                    <div class="position-section mb-4">
+                        <h3 class="position-title">${position}</h3>
+                        ${positionResults.map(candidate => {
+                            const percentage = totalVotes > 0 ? (candidate.votes / totalVotes * 100).toFixed(1) : 0;
+                            return `
+                                <div class="candidate-result">
+                                    <img src="${candidate.photo || '../img/icon.png'}" 
+                                         alt="${candidate.name}" 
+                                         class="candidate-photo">
+                                    <div class="candidate-info">
+                                        <div class="candidate-name">${candidate.name}</div>
+                                        <div class="candidate-department">${candidate.department}</div>
+                                        <div class="progress">
+                                            <div class="progress-bar" 
+                                                 role="progressbar" 
+                                                 style="width: ${percentage}%" 
+                                                 aria-valuenow="${percentage}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="vote-count">
+                                        ${candidate.votes} votes
+                                        <div class="text-muted small">${percentage}%</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Load results when page loads
+        document.addEventListener('DOMContentLoaded', fetchAndDisplayResults);
+    </script>
 </body>
 </html> 

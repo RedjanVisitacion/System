@@ -46,8 +46,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   exit;
 }
 
+// Check if user has already voted
+$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ? AND vote_status = 'Voted'");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$vote_count = $result->fetch_assoc()['vote_count'];
+$stmt->close();
 
+$has_voted = $vote_count > 0;
 
+// Check election timeline
+$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+$stmt->execute();
+$result = $stmt->get_result();
+$election_dates = $result->fetch_assoc();
+$stmt->close();
+
+$can_view_results = false;
+if ($election_dates) {
+    $current_time = new DateTime();
+    $end_date = new DateTime($election_dates['end_date']);
+    $results_date = new DateTime($election_dates['results_date']);
+    
+    // Can view results only if:
+    // 1. Current time is after end date (voting has ended)
+    // 2. Current time is after results date (results are released)
+    $can_view_results = ($current_time >= $end_date) && ($current_time >= $results_date);
+}
+
+// Add this function at the top of the file after the require statements
+function checkElectionTimeline($con) {
+    $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $election_dates = $result->fetch_assoc();
+    $stmt->close();
+
+    if (!$election_dates) {
+        return false;
+    }
+
+    $current_time = new DateTime();
+    $end_date = new DateTime($election_dates['end_date']);
+    $results_date = new DateTime($election_dates['results_date']);
+
+    // Can view results only if:
+    // 1. Current time is after end date (voting has ended)
+    // 2. Current time is after results date (results are released)
+    return ($current_time >= $end_date) && ($current_time >= $results_date);
+}
+
+// Get election dates for display
+$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+$stmt->execute();
+$result = $stmt->get_result();
+$election_dates = $result->fetch_assoc();
+$stmt->close();
+
+$can_view_results = checkElectionTimeline($con);
 ?>
 
 
@@ -1477,7 +1534,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-white d-flex align-items-center" href="results.php">
+            <a class="nav-link text-white d-flex align-items-center" href="#" onclick="handleViewResultsClick(event)">
               <i class="bi bi-list-check"></i>
               <span class="sidebar-text">View Results</span>
             </a>
@@ -1534,7 +1591,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     
           <!-- Election Timeline -->
           <div class="col-12 col-lg-4 d-none d-lg-block">
-  <div class="calendar-card">
+            <div class="calendar-card">
               <div class="d-flex justify-content-between align-items-center mb-3">
                 <h5 class="mb-0">Election Timeline</h5>
               </div>
@@ -1555,6 +1612,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
             </div>
           </div>
 
+          <!-- Results Section -->
+          <?php if ($can_view_results): ?>
+          <div class="col-12 col-lg-8">
+              <div class="dashboard-card">
+                
+                  <div id="resultsContainer">
+                      <!-- Results will be loaded here -->
+                  </div>
+              </div>
+          </div>
+          <?php else: ?>
+          <div class="col-12 col-lg-8">
+              <div class="dashboard-card">
+                  <h5 class="mb-3">Election Results</h5>
+                  <div class="text-center py-4">
+                      <i class="bi bi-clock-history fs-1 text-muted"></i>
+                      <?php 
+                      $current_time = new DateTime();
+                      $end_date = new DateTime($election_dates['end_date']);
+                      if ($current_time < $end_date): 
+                      ?>
+                          <p class="mt-3 text-muted">Voting is still in progress. Results will be available after the election ends.</p>
+                      <?php else: ?>
+                          <p class="mt-3 text-muted">Results will be available after <?php echo date('F d, Y h:i A', strtotime($election_dates['results_date'])); ?></p>
+                      <?php endif; ?>
+                  </div>
+              </div>
+          </div>
+          <?php endif; ?>
         </div>
       </div>
     </div>
@@ -2919,6 +3005,108 @@ function showAlert(type, message) {
     alertDiv.remove();
   }, 5000);
 }
+
+// Function to handle View Results click
+function handleViewResultsClick(event) {
+    event.preventDefault();
+    
+    // Mobile sidebar handling
+    if (window.innerWidth <= 991.98) {
+        document.getElementById('sidebar').classList.remove('active');
+        document.getElementById('sidebarOverlay').classList.remove('active');
+        document.getElementById('mobileMenuBtn').classList.remove('active');
+    }
+
+    // Check election timeline
+    fetch('../src/get_election_dates.php')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const current_time = new Date();
+                const end_date = new Date(data.end_date);
+                const results_date = new Date(data.results_date);
+
+                // Create and show modal
+                const modalHtml = `
+                    <div class="modal fade" id="resultsTimelineModal" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Election Results</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div id="electionStatus" class="alert mb-4"></div>
+                                    <div class="text-center py-4">
+                                        <i class="bi bi-clock-history fs-1 text-muted mb-3"></i>
+                                        <p class="mb-0" id="resultsMessage"></p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Remove existing modal if any
+                const existingModal = document.getElementById('resultsTimelineModal');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                // Add new modal to body
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                // Show modal
+                const modal = new bootstrap.Modal(document.getElementById('resultsTimelineModal'));
+                modal.show();
+
+                // Update status and message
+                const statusEl = document.getElementById('electionStatus');
+                const messageEl = document.getElementById('resultsMessage');
+
+                if (current_time < end_date) {
+                    // Voting hasn't ended yet
+                    statusEl.className = 'alert alert-warning';
+                    statusEl.innerHTML = `<i class="bi bi-clock me-2"></i>Voting is still in progress`;
+                    messageEl.textContent = 'Results will be available after the election ends.';
+                } else if (current_time >= end_date && current_time < results_date) {
+                    // Voting has ended but results aren't released yet
+                    statusEl.className = 'alert alert-info';
+                    statusEl.innerHTML = `<i class="bi bi-info-circle me-2"></i>Voting period has ended`;
+                    messageEl.textContent = `Results will be available after ${formatDateTime(data.results_date)}`;
+                } else if (current_time >= results_date) {
+                    // Both voting has ended and results are released
+                    window.location.href = 'results.php';
+                }
+            } else {
+                alert('Error checking election timeline. Please try again later.');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error checking election timeline. Please try again later.');
+        });
+}
+
+// Function to format date and time
+function formatDateTime(dateString) {
+    const date = new Date(dateString);
+    if (isNaN(date)) return 'Invalid date';
+
+    return date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+    });
+}
+
+// ... rest of the existing code ...
 </script>
 
 <style>
