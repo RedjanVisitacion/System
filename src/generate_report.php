@@ -147,16 +147,9 @@ $fullName = $userData['full_name'] ?? 'User';
             
             <!-- Report Format Selection -->
             <h5 class="mb-3">Select Report Format</h5>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="format-option" data-format="json">
-                        <i class="fas fa-code"></i>
-                        <h5>JSON Format</h5>
-                        <p class="text-muted">Machine-readable format suitable for data processing</p>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="format-option" data-format="txt">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="format-option selected" data-format="txt">
                         <i class="fas fa-file-alt"></i>
                         <h5>Text Format</h5>
                         <p class="text-muted">Human-readable format with formatted text</p>
@@ -229,50 +222,83 @@ $fullName = $userData['full_name'] ?? 'User';
             generateBtn.disabled = !(startDate && endDate && selectedFormat);
         }
         
-        // Generate report
-        document.getElementById('generateBtn').addEventListener('click', async function() {
+        // Handle report generation
+        document.getElementById('generateBtn').addEventListener('click', function() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
             const generateBtn = this;
-            const loadingSpinner = document.querySelector('.loading-spinner');
+            const loadingSpinner = generateBtn.querySelector('.loading-spinner');
             const downloadLink = document.getElementById('downloadLink');
             const errorMessage = document.getElementById('errorMessage');
-            
-            // Reset UI
-            downloadLink.style.display = 'none';
-            errorMessage.style.display = 'none';
+
+            // Show loading state
             generateBtn.disabled = true;
             loadingSpinner.style.display = 'inline-block';
-            
-            try {
-                const response = await fetch('../src/generate_report.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: new URLSearchParams({
-                        format: selectedFormat,
-                        start_date: startDate,
-                        end_date: endDate
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    downloadLink.href = data.filepath;
-                    downloadLink.style.display = 'inline-block';
-                } else {
-                    errorMessage.textContent = data.message;
-                    errorMessage.style.display = 'block';
+            downloadLink.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Prepare form data
+            const formData = new FormData();
+            formData.append('format', selectedFormat);
+            formData.append('start_date', startDate);
+            formData.append('end_date', endDate);
+
+            // Send request to generate report
+            fetch('../function/generate_report.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
-            } catch (error) {
-                errorMessage.textContent = 'An error occurred while generating the report.';
+                // Check if the response is a file download
+                const contentType = response.headers.get('content-type');
+                if (contentType && (contentType.includes('application/json') || contentType.includes('text/plain'))) {
+                    return response.blob();
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data instanceof Blob) {
+                    // Handle file download
+                    const url = window.URL.createObjectURL(data);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `election_report_${new Date().toISOString().slice(0,10)}.${selectedFormat}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                    
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'alert alert-success mt-3';
+                    successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>Report downloaded successfully';
+                    document.querySelector('.report-card').appendChild(successMessage);
+                    setTimeout(() => successMessage.remove(), 3000);
+                } else if (data.success) {
+                    // Show success message
+                    const successMessage = document.createElement('div');
+                    successMessage.className = 'alert alert-success mt-3';
+                    successMessage.innerHTML = '<i class="fas fa-check-circle me-2"></i>' + data.message;
+                    document.querySelector('.report-card').appendChild(successMessage);
+                    setTimeout(() => successMessage.remove(), 3000);
+                } else {
+                    throw new Error(data.message || 'Failed to generate report');
+                }
+            })
+            .catch(error => {
+                // Show error message
+                errorMessage.textContent = error.message;
                 errorMessage.style.display = 'block';
-            } finally {
+                errorMessage.classList.add('animate__animated', 'animate__fadeIn');
+            })
+            .finally(() => {
+                // Reset button state
                 generateBtn.disabled = false;
                 loadingSpinner.style.display = 'none';
-            }
+            });
         });
     </script>
 </body>

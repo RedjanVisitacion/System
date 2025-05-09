@@ -2718,9 +2718,9 @@ function submitVote() {
     },
     body: JSON.stringify(voteData)
   })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
       alert('Vote submitted successfully!');
       // Update UI
       updateVotingStatus();
@@ -2730,11 +2730,11 @@ function submitVote() {
       if (castVoteModal) {
         castVoteModal.hide();
       }
-    } else {
+      } else {
       alert('Error: ' + (data.message || 'Failed to submit vote'));
-    }
-  })
-  .catch(error => {
+      }
+    })
+    .catch(error => {
     alert('Error: ' + error.message);
   })
   .finally(() => {

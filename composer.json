@@ -1,0 +1,20 @@
+{
+    "name": "election-system/reports",
+    "description": "Election System Report Generation",
+    "type": "project",
+    "require": {
+        "php": ">=7.4",
+        "tecnickcom/tcpdf": "^6.6",
+        "phpoffice/phpword": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "ElectionSystem\\": "src/"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    }
+} 
