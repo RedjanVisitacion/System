@@ -1334,12 +1334,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
                   <h3 class="fw-bold text-center">Time Remaining</h3>
                   <div class="card-body">
                     <p class="fs-4 text-center mb-0" id="timeRemaining">Loading...</p>
-                    <audio id="tickSound" preload="auto">
-                        <source src="../assets/sounds/tick.mp3" type="audio/mpeg">
-                    </audio>
-                    <audio id="timeRemainingSound" preload="auto" autoplay>
-                        <source src="../assets/sounds/time_remaining.mp3" type="audio/mpeg">
-                    </audio>
                   </div>
                 </div>
               </div>
@@ -2234,8 +2228,8 @@ function showCandidateProfile(candidate) {
   });
 
 
-
 //RealTime Countdown
+
 
 let countdownInterval;
 
@@ -2270,99 +2264,41 @@ function fetchElectionDatesAndStartCountdown() {
 }
 
 function startDynamicCountdown(startTime, endTime) {
-    clearInterval(countdownInterval);
-    const timeEl = document.getElementById('timeRemaining');
-    const tickSound = document.getElementById('tickSound');
-    const timeRemainingSound = document.getElementById('timeRemainingSound');
-    const departmentSelect = document.getElementById('department');
-    let lastSeconds = null;
-    let soundEnabled = true;
-    let soundPlayed = false;
+  clearInterval(countdownInterval);
+  const timeEl = document.getElementById('timeRemaining');
 
-    // Try to load both sounds
-    tickSound.load();
-    timeRemainingSound.load();
-    
-    // Handle sound loading errors
-    tickSound.onerror = function() {
-        console.log('Tick sound file could not be loaded');
-        soundEnabled = false;
-    };
-    
-    timeRemainingSound.onerror = function() {
-        console.log('Time remaining sound file could not be loaded');
-        soundEnabled = false;
-    };
+  function updateCountdown() {
+    const now = new Date();
+    let diff, label;
 
-    // Function to play sound with retry
-    function playTimeRemainingSound() {
-        if (!soundEnabled) return;
-        
-        timeRemainingSound.currentTime = 0;
-        const playPromise = timeRemainingSound.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log('Error playing time remaining sound:', error);
-                // Try to play again after a short delay
-                setTimeout(() => {
-                    timeRemainingSound.play().catch(e => {
-                        console.log('Retry failed:', e);
-                        soundEnabled = false;
-                    });
-                }, 1000);
-            });
-        }
+    if (now < startTime) {
+      diff = startTime - now;
+      label = 'Voting starts in ';
+      timeEl.style.color = ''; // default
+    } else if (now >= startTime && now < endTime) {
+      diff = endTime - now;
+      label = 'Voting ends in ';
+      timeEl.style.color = ''; // default
+    } else {
+      timeEl.textContent = 'Voting has ended';
+      timeEl.style.color = 'red';
+      clearInterval(countdownInterval);
+      return;
     }
 
-    function updateCountdown() {
-        const now = new Date();
-        let diff, label;
+    const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
+    const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+    const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
 
-        if (now < startTime) {
-            diff = startTime - now;
-            label = 'Voting starts in ';
-            timeEl.style.color = ''; // default
-            if (departmentSelect) {
-                departmentSelect.closest('.col-12.col-md-6').style.display = 'block';
-            }
-            soundPlayed = false;
-        } else if (now >= startTime && now < endTime) {
-            diff = endTime - now;
-            label = 'Voting ends in ';
-            timeEl.style.color = ''; // default
-            if (departmentSelect) {
-                departmentSelect.closest('.col-12.col-md-6').style.display = 'block';
-            }
+    timeEl.textContent = label + `${hours}:${minutes}:${seconds}`;
+  }
 
-            // Play time remaining sound when exactly 1 minute remains and hasn't been played yet
-            const minutes = Math.floor(diff / (1000 * 60));
-            if (minutes === 1 && !soundPlayed && soundEnabled) {
-                playTimeRemainingSound();
-                soundPlayed = true;
-            }
-        } else {
-            timeEl.textContent = 'Voting has ended';
-            timeEl.style.color = 'red';
-            if (departmentSelect) {
-                departmentSelect.closest('.col-12.col-md-6').style.display = 'none';
-            }
-            clearInterval(countdownInterval);
-            return;
-        }
-
-        const hours = String(Math.floor(diff / (1000 * 60 * 60))).padStart(2, '0');
-        const minutes = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
-        const seconds = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
-
-        timeEl.textContent = label + `${hours}:${minutes}:${seconds}`;
-    }
-
-    updateCountdown();
-    countdownInterval = setInterval(updateCountdown, 1000);
+  updateCountdown();
+  countdownInterval = setInterval(updateCountdown, 1000);
 }
 
 document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdown);
+
 
 
 
