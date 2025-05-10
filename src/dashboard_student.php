@@ -2713,53 +2713,36 @@ function loadCandidatesByDepartment(department) {
 // Function to select a candidate
 function selectCandidate(element, position, candidateId) {
   const positionSection = element.closest('.position-section');
-  const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
-  
-  // Define vote limits for different positions
   const voteLimits = {
     'Representative': 2,
     'default': 1
   };
-  
-  // Get the vote limit for this position (default to 1 if not specified)
   const voteLimit = voteLimits[position] || voteLimits.default;
-  
+
+  // Count selected candidates in this section
+  let selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
+
   // If already selected, deselect
   if (element.classList.contains('selected')) {
     element.classList.remove('selected');
   } else {
-    // Check if we've reached the vote limit for this position
     if (selectedCandidates.length >= voteLimit) {
-      // Show alert for reaching vote limit
-      const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-warning alert-dismissible fade show';
-      alertDiv.innerHTML = `
-        <div class="d-flex align-items-center">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          <div>
-            <strong>Vote Limit Reached!</strong> You can only select ${voteLimit} candidate${voteLimit > 1 ? 's' : ''} for ${position}.
-          </div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      `;
-      document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
-      
-      // Remove alert after 3 seconds
-      setTimeout(() => {
-        alertDiv.remove();
-      }, 3000);
+      showAlert('warning', `You can only select ${voteLimit} candidate${voteLimit > 1 ? 's' : ''} for ${position}.`);
       return;
     }
-    
-    // Select the new candidate
     element.classList.add('selected');
   }
-  
+
   // Update the badge to show remaining votes
+  selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected'); // update after change
   const badge = positionSection.querySelector('.badge');
   const remainingVotes = voteLimit - selectedCandidates.length;
-  badge.textContent = `${remainingVotes} vote${remainingVotes !== 1 ? 's' : ''} remaining`;
-  
+  if (selectedCandidates.length === 0) {
+    badge.textContent = `${voteLimit} vote${voteLimit > 1 ? 's' : ''} allowed`;
+  } else {
+    badge.textContent = `${remainingVotes} vote${remainingVotes !== 1 ? 's' : ''} remaining`;
+  }
+
   updateSubmitButtonState();
 }
 
@@ -2937,53 +2920,36 @@ document.getElementById('departmentSelect').addEventListener('change', function(
 // Function to select a candidate
 function selectCandidate(element, position, candidateId) {
   const positionSection = element.closest('.position-section');
-  const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
-  
-  // Define vote limits for different positions
   const voteLimits = {
     'Representative': 2,
     'default': 1
   };
-  
-  // Get the vote limit for this position (default to 1 if not specified)
   const voteLimit = voteLimits[position] || voteLimits.default;
-  
+
+  // Count selected candidates in this section
+  let selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
+
   // If already selected, deselect
   if (element.classList.contains('selected')) {
     element.classList.remove('selected');
   } else {
-    // Check if we've reached the vote limit for this position
     if (selectedCandidates.length >= voteLimit) {
-      // Show alert for reaching vote limit
-      const alertDiv = document.createElement('div');
-      alertDiv.className = 'alert alert-warning alert-dismissible fade show';
-      alertDiv.innerHTML = `
-        <div class="d-flex align-items-center">
-          <i class="bi bi-exclamation-triangle-fill me-2"></i>
-          <div>
-            <strong>Vote Limit Reached!</strong> You can only select ${voteLimit} candidate${voteLimit > 1 ? 's' : ''} for ${position}.
-          </div>
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      `;
-      document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
-      
-      // Remove alert after 3 seconds
-      setTimeout(() => {
-        alertDiv.remove();
-      }, 3000);
+      showAlert('warning', `You can only select ${voteLimit} candidate${voteLimit > 1 ? 's' : ''} for ${position}.`);
       return;
     }
-    
-    // Select the new candidate
     element.classList.add('selected');
   }
-  
+
   // Update the badge to show remaining votes
+  selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected'); // update after change
   const badge = positionSection.querySelector('.badge');
   const remainingVotes = voteLimit - selectedCandidates.length;
-  badge.textContent = `${remainingVotes} vote${remainingVotes !== 1 ? 's' : ''} remaining`;
-  
+  if (selectedCandidates.length === 0) {
+    badge.textContent = `${voteLimit} vote${voteLimit > 1 ? 's' : ''} allowed`;
+  } else {
+    badge.textContent = `${remainingVotes} vote${remainingVotes !== 1 ? 's' : ''} remaining`;
+  }
+
   updateSubmitButtonState();
 }
 
