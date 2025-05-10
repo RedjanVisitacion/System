@@ -11,21 +11,7 @@ function generateElectionReport($format = 'txt', $startDate = null, $endDate = n
     global $con;
 
     try {
-        // Validate date range
-        if ($startDate && $endDate) {
-            $startTimestamp = strtotime($startDate);
-            $endTimestamp = strtotime($endDate);
-            
-            if ($startTimestamp === false || $endTimestamp === false) {
-                throw new Exception("Invalid date format provided");
-            }
-            
-            if ($startTimestamp > $endTimestamp) {
-                throw new Exception("Start date cannot be after end date");
-            }
-        }
-
-        // Get election dates with enhanced query
+        // Fetch election periods
         $dateQuery = "SELECT * FROM election_dates";
         $params = [];
         $types = "";
@@ -38,148 +24,94 @@ function generateElectionReport($format = 'txt', $startDate = null, $endDate = n
 
         $dateQuery .= " ORDER BY id DESC";
         $stmt = $con->prepare($dateQuery);
-        if (!$stmt) {
-            throw new Exception("Failed to prepare election dates query: " . $con->error);
-        }
-        if (!empty($params)) {
-            if (!$stmt->bind_param($types, ...$params)) {
-                throw new Exception("Failed to bind parameters for election dates query: " . $stmt->error);
-            }
-        }
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to execute election dates query: " . $stmt->error);
-        }
+        if (!$stmt) throw new Exception("Failed to prepare election dates query: " . $con->error);
+        if (!empty($params)) $stmt->bind_param($types, ...$params);
+        if (!$stmt->execute()) throw new Exception("Failed to execute election dates query: " . $stmt->error);
         $electionDates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-        if (empty($electionDates)) {
-            return ['success' => false, 'message' => 'No election data found for the selected date range'];
-        }
+        if (empty($electionDates)) return ['success' => false, 'message' => 'No election data found for the selected date range'];
+        $stmt->close();
 
-        // Get candidates with enhanced query including department and position details
-        $candidateQuery = "
-            SELECT 
-                c.candidate_id, 
-                c.name, 
-                c.department, 
-                c.position, 
-                c.age, 
-                c.platform,
-                COALESCE(r.votes, 0) as votes,
-                r.published_at,
-                (SELECT COUNT(*) FROM vote v WHERE v.candidate_id = c.candidate_id) as total_votes_received
-            FROM candidate c 
-            LEFT JOIN result r ON c.candidate_id = r.candidate_id 
+        // Fetch candidates and votes
+        $stmt = $con->prepare("
+            SELECT c.candidate_id, c.name, c.department, c.position, c.age, c.platform,
+                   COALESCE(r.votes, 0) AS votes, r.published_at
+            FROM candidate c
+            LEFT JOIN result r ON c.candidate_id = r.candidate_id
             ORDER BY c.department, c.position, r.votes DESC
-        ";
-        $stmt = $con->prepare($candidateQuery);
-        if (!$stmt) {
-            throw new Exception("Failed to prepare candidates query: " . $con->error);
-        }
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to execute candidates query: " . $stmt->error);
-        }
+        ");
+        if (!$stmt) throw new Exception("Failed to prepare candidates query: " . $con->error);
+        if (!$stmt->execute()) throw new Exception("Failed to execute candidates query: " . $stmt->error);
         $candidates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
 
-        // Get department statistics with enhanced query and error handling
-        $deptQuery = "
-            SELECT 
-                u.department,
-                COUNT(DISTINCT u.user_id) as total_voters
+        // Fetch department stats
+        $stmt = $con->prepare("
+            SELECT u.department, COUNT(DISTINCT u.user_id) AS total_voters
             FROM user u
+            JOIN user_profile up ON u.user_id = up.user_id
             WHERE u.role = 'student'
             GROUP BY u.department
-        ";
-        
-        $stmt = $con->prepare($deptQuery);
-        if (!$stmt) {
-            throw new Exception("Failed to prepare department stats query: " . $con->error);
-        }
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to execute department stats query: " . $stmt->error);
-        }
+        ");
+        if (!$stmt) throw new Exception("Failed to prepare department stats query: " . $con->error);
+        if (!$stmt->execute()) throw new Exception("Failed to execute department stats query: " . $stmt->error);
         $departmentStats = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $stmt->close();
 
-        // Get total votes with enhanced query
-        $voteQuery = "
-            SELECT 
-                COUNT(DISTINCT user_id) as total_voters,
-                SUM(CASE WHEN voted_at BETWEEN ? AND ? THEN 1 ELSE 0 END) as votes_in_period
-            FROM vote
+        // Get total registered voters
+        $totalVotersQuery = "
+            SELECT COUNT(*) AS total_registered
+            FROM user u
+            JOIN user_profile up ON u.user_id = up.user_id
+            WHERE u.role = 'student'
         ";
-        
+        $stmt = $con->prepare($totalVotersQuery);
+        if (!$stmt) throw new Exception("Failed to prepare total voters query: " . $con->error);
+        if (!$stmt->execute()) throw new Exception("Failed to execute total voters query: " . $stmt->error);
+        $totalRegisteredVoters = $stmt->get_result()->fetch_assoc()['total_registered'];
+        $stmt->close();
+
+        // Fetch total votes
+        $voteQuery = "SELECT SUM(COALESCE(votes, 0)) AS total_votes FROM result";
         if ($startDate && $endDate) {
-            $stmt = $con->prepare($voteQuery);
-            if (!$stmt) {
-                throw new Exception("Failed to prepare total votes query: " . $con->error);
-            }
+            $voteQuery .= " WHERE published_at BETWEEN ? AND ?";
+        }
+        $stmt = $con->prepare($voteQuery);
+        if (!$stmt) throw new Exception("Failed to prepare total votes query: " . $con->error);
+        if ($startDate && $endDate) {
             if (!$stmt->bind_param("ss", $startDate, $endDate)) {
                 throw new Exception("Failed to bind parameters for total votes query: " . $stmt->error);
             }
-        } else {
-            $stmt = $con->prepare("SELECT COUNT(DISTINCT user_id) as total_voters FROM vote");
-            if (!$stmt) {
-                throw new Exception("Failed to prepare total votes query: " . $con->error);
-            }
         }
-        
-        if (!$stmt->execute()) {
-            throw new Exception("Failed to execute total votes query: " . $stmt->error);
-        }
-        $voteStats = $stmt->get_result()->fetch_assoc();
-        $totalVotes = intval($voteStats['votes_in_period'] ?? $voteStats['total_voters']);
-
-        // Get voting statistics
-        if ($startDate && $endDate) {
-            $votingStatsQuery = "
-                SELECT 
-                    DATE(voted_at) as vote_date,
-                    COUNT(*) as votes_per_day
-                FROM vote
-                WHERE voted_at BETWEEN ? AND ?
-                GROUP BY DATE(voted_at)
-                ORDER BY vote_date
-            ";
-            $stmt = $con->prepare($votingStatsQuery);
-            if (!$stmt) {
-                throw new Exception("Failed to prepare voting stats query: " . $con->error);
-            }
-            if (!$stmt->bind_param("ss", $startDate, $endDate)) {
-                throw new Exception("Failed to bind parameters for voting stats query: " . $stmt->error);
-            }
-            if (!$stmt->execute()) {
-                throw new Exception("Failed to execute voting stats query: " . $stmt->error);
-            }
-            $votingStats = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-        }
+        if (!$stmt->execute()) throw new Exception("Failed to execute total votes query: " . $stmt->error);
+        $row = $stmt->get_result()->fetch_assoc();
+        $totalVotes = intval($row['total_votes'] ?? 0);
+        $stmt->close();
 
         $reportData = [
-            'report_period' => [ 'start_date' => $startDate, 'end_date' => $endDate ],
+            'report_period' => ['start_date' => $startDate, 'end_date' => $endDate],
             'election_periods' => $electionDates,
             'department_statistics' => $departmentStats,
             'candidate_results' => $candidates,
             'total_votes_cast' => $totalVotes,
-            'voting_statistics' => $votingStats ?? [],
+            'total_registered_voters' => $totalRegisteredVoters,
             'generated_at' => date('Y-m-d H:i:s')
         ];
 
         $reportsDir = '../reports';
-        if (!file_exists($reportsDir)) {
-            if (!mkdir($reportsDir, 0777, true)) {
-                throw new Exception("Failed to create reports directory");
-            }
-        }
+        if (!file_exists($reportsDir)) mkdir($reportsDir, 0777, true);
 
         $timestamp = date('Y-m-d_H-i-s');
-        $dateRange = $startDate && $endDate ? '_' . date('Y-m-d', strtotime($startDate)) . '_to_' . date('Y-m-d', strtotime($endDate)) : '';
+        $dateRange = ($startDate && $endDate) ? '_' . date('Y-m-d', strtotime($startDate)) . '_to_' . date('Y-m-d', strtotime($endDate)) : '';
         $filename = "election_report{$dateRange}_{$timestamp}.{$format}";
         $filepath = "$reportsDir/$filename";
 
         if ($format === 'txt') {
             $textReport = generateTextReport($reportData);
-            if (file_put_contents($filepath, $textReport) === false) {
-                throw new Exception("Failed to write text report file");
-            }
+            if (file_put_contents($filepath, $textReport) === false) throw new Exception("Failed to write text report file");
+
+            // Output file content directly
             header('Content-Type: text/plain');
-            header('Content-Disposition: inline; filename="' . basename($filepath) . '"');
+            header('Content-Disposition: attachment; filename="' . basename($filepath) . '"');
             header('Content-Length: ' . filesize($filepath));
             readfile($filepath);
             unlink($filepath);
@@ -187,89 +119,77 @@ function generateElectionReport($format = 'txt', $startDate = null, $endDate = n
             throw new Exception("Invalid format specified");
         }
 
-        return [ 
-            'success' => true, 
-            'message' => 'Report generated successfully', 
-            'total_votes_cast' => $totalVotes,
-            'department_count' => count($departmentStats),
-            'candidate_count' => count($candidates)
-        ];
+        return ['success' => true, 'message' => 'Report generated successfully', 'total_votes_cast' => $totalVotes];
 
     } catch (Exception $e) {
         error_log("Report generation error: " . $e->getMessage());
-        return [ 'success' => false, 'message' => 'Error generating report: ' . $e->getMessage() ];
+        return ['success' => false, 'message' => 'Error generating report: ' . $e->getMessage()];
     }
 }
 
 function generateTextReport($data) {
     global $con;
-    $report = "ELECTION REPORT\n";
-    $report .= str_repeat("=", 50) . "\n\n";
 
-    // Report Header
+    $report = "ELECTION REPORT\n================\n\n";
+
     if ($data['report_period']['start_date'] && $data['report_period']['end_date']) {
-        $report .= "Report Period:\n";
-        $report .= "From: " . date('F j, Y', strtotime($data['report_period']['start_date'])) . "\n";
-        $report .= "To: " . date('F j, Y', strtotime($data['report_period']['end_date'])) . "\n\n";
+        $report .= "Report Period:\nFrom: " . date('F j, Y', strtotime($data['report_period']['start_date'])) . "\nTo: " . date('F j, Y', strtotime($data['report_period']['end_date'])) . "\n\n";
     }
 
-    // Election Periods
-    $report .= "Election Periods:\n";
-    $report .= str_repeat("-", 50) . "\n";
+    $report .= "Election Periods:\n-----------------\n";
     foreach ($data['election_periods'] as $period) {
-        $report .= "Start Date: " . date('F j, Y g:i A', strtotime($period['start_date'])) . "\n";
-        $report .= "End Date: " . date('F j, Y g:i A', strtotime($period['end_date'])) . "\n";
+        $report .= "Start: " . date('F j, Y g:i A', strtotime($period['start_date'])) . "\n";
+        $report .= "End: " . date('F j, Y g:i A', strtotime($period['end_date'])) . "\n";
         $report .= "Results Date: " . date('F j, Y g:i A', strtotime($period['results_date'])) . "\n\n";
     }
 
-    // Department Statistics
-    $report .= "Department Statistics:\n";
-    $report .= str_repeat("-", 50) . "\n";
-    $totalVoters = 0;
+    $report .= "Voter Statistics:\n-----------------\n";
+    $report .= "Total Registered Voters: {$data['total_registered_voters']}\n";
+    $report .= "Total Votes Cast: {$data['total_votes_cast']}\n";
+    $turnout = $data['total_registered_voters'] > 0 ? 
+        round(($data['total_votes_cast'] / $data['total_registered_voters']) * 100, 2) : 0;
+    $report .= "Voter Turnout: {$turnout}%\n\n";
+
+    $report .= "Department Statistics:\n-----------------------\n";
     foreach ($data['department_statistics'] as $dept) {
-        $report .= sprintf("%-20s: %d registered voters\n", 
-            $dept['department'], 
-            $dept['total_voters']
-        );
-        $totalVoters += $dept['total_voters'];
-    }
-    $report .= "\nTotal Registered Voters: " . $totalVoters . "\n";
-
-    // Voting Statistics
-    if (!empty($data['voting_statistics'])) {
-        $report .= "Voting Statistics:\n";
-        $report .= str_repeat("-", 50) . "\n";
-        foreach ($data['voting_statistics'] as $stat) {
-            $report .= date('F j, Y', strtotime($stat['vote_date'])) . ": " . $stat['votes_per_day'] . " votes\n";
-        }
-        $report .= "\n";
+        $report .= "{$dept['department']}: {$dept['total_voters']} registered voters\n";
     }
 
-    // Candidate Results
-    $report .= "Candidate Results:\n";
-    $report .= str_repeat("-", 50) . "\n";
+    // Voters list and count
+    $report .= "\nTotal Votes Cast: {$data['total_votes_cast']}\n\n";
+    $report .= "List of Voters:\n---------------\n";
+
+    $votedUsersQuery = "
+        SELECT DISTINCT u.user_id, up.full_name, up.program_name
+        FROM vote v
+        JOIN user u ON v.user_id = u.user_id
+        JOIN user_profile up ON u.user_id = up.user_id
+        ORDER BY up.full_name ASC
+    ";
+    $votedUsersResult = $con->query($votedUsersQuery);
+    while ($row = $votedUsersResult->fetch_assoc()) {
+        $report .= "- {$row['full_name']} ({$row['program_name']})\n";
+    }
+
+    // Candidate results
+    $report .= "\nCandidate Results:\n------------------\n";
     $currentDepartment = '';
     $currentPosition = '';
+
     foreach ($data['candidate_results'] as $candidate) {
         if ($candidate['department'] !== $currentDepartment) {
             $currentDepartment = $candidate['department'];
-            $report .= "\n" . strtoupper($currentDepartment) . "\n";
-            $report .= str_repeat("-", strlen($currentDepartment)) . "\n";
+            $report .= "\n{$currentDepartment}\n" . str_repeat('-', strlen($currentDepartment)) . "\n";
             $currentPosition = '';
         }
         if ($candidate['position'] !== $currentPosition) {
             $currentPosition = $candidate['position'];
-            $report .= "\n" . $currentPosition . ":\n";
+            $report .= "\n{$currentPosition}:\n";
         }
-        $report .= sprintf("%-30s: %d votes\n", $candidate['name'], $candidate['votes']);
+        $report .= "{$candidate['name']} - {$candidate['votes']} votes\n";
     }
 
-    // Report Footer
-    $report .= "\n" . str_repeat("=", 50) . "\n";
-    $report .= "Report generated at: " . date('F j, Y g:i A', strtotime($data['generated_at'])) . "\n";
-    $report .= "Total Votes Cast: " . $data['total_votes_cast'] . "\n";
-    $report .= str_repeat("=", 50) . "\n";
-
+    $report .= "\nReport generated at: " . date('F j, Y g:i A', strtotime($data['generated_at'])) . "\n";
     return $report;
 }
 
