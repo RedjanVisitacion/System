@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   if ($candidate) {
       // If photo exists, use the photo path, else fallback to default image
       $photoPath = !empty($candidate['photo']) 
-          ? $candidate['photo']
+          ? '../uploads/profile_pictures/' . htmlspecialchars($candidate['photo'])
           : '../img/icon.png';
 
       // Send the candidate data with the photo path

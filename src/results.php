@@ -115,7 +115,7 @@ $results = array();
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         // Format the photo path
-        $photo = !empty($row['photo']) ? '../uploads/profile_pictures' . $row['photo'] : '../img/icon.png';
+        $photo = !empty($row['photo']) ? $row['photo'] : '../img/icon.png';
         
         $results[] = array(
             'department' => $row['department'],
