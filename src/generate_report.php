@@ -354,10 +354,17 @@ $fullName = $userData['full_name'] ?? 'User';
             <h5 class="section-title">Select Report Format</h5>
             <div class="row justify-content-center">
                 <div class="col-md-4">
-                    <div class="format-option selected" data-format="txt">
+                    <div class="format-option" data-format="txt">
                         <i class="fas fa-file-alt"></i>
                         <h5>Text Format</h5>
                         <p class="text-muted">Human-readable format with formatted text</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="format-option selected" data-format="pdf">
+                        <i class="fas fa-file-pdf"></i>
+                        <h5>PDF Format</h5>
+                        <p class="text-muted">Printable document with professional layout</p>
                     </div>
                 </div>
             </div>
@@ -407,7 +414,7 @@ $fullName = $userData['full_name'] ?? 'User';
         });
         
         // Format selection with enhanced interaction
-        let selectedFormat = null;
+        let selectedFormat = 'pdf';
         document.querySelectorAll('.format-option').forEach(option => {
             option.addEventListener('click', function() {
                 document.querySelectorAll('.format-option').forEach(opt => {
@@ -452,7 +459,7 @@ $fullName = $userData['full_name'] ?? 'User';
             formData.append('end_date', endDate);
 
             // Send request to generate report
-            fetch('../function/generate_report.php', {
+            fetch('../function/generate_pdf_report.php', {
                 method: 'POST',
                 body: formData
             })
@@ -461,7 +468,7 @@ $fullName = $userData['full_name'] ?? 'User';
                     throw new Error('Network response was not ok');
                 }
                 const contentType = response.headers.get('content-type');
-                if (contentType && (contentType.includes('application/json') || contentType.includes('text/plain'))) {
+                if (contentType && (contentType.includes('application/json') || contentType.includes('text/plain') || contentType.includes('application/pdf'))) {
                     return response.blob();
                 }
                 return response.json();

@@ -104,6 +104,14 @@ function generateElectionReport($format = 'txt', $startDate = null, $endDate = n
             header('Content-Length: ' . filesize($filepath));
             readfile($filepath);
             unlink($filepath);
+        } else if ($format === 'pdf') {
+            // Redirect to PDF generation
+            require_once 'generate_pdf_report.php';
+            $result = generatePDFReport($format, $startDate, $endDate);
+            if (!$result['success']) {
+                throw new Exception($result['message']);
+            }
+            return $result;
         } else {
             throw new Exception("Invalid format specified");
         }
@@ -187,14 +195,72 @@ function generateTextReport($data, $format) {
     return $report;
 }
 
+function generatePDFReport($data) {
+    $html = '<h1 style="text-align:center;color:#0d6efd;">ELECTION REPORT</h1>';
+    $html .= '<hr style="border:1px solid #0d6efd;">';
+
+    if ($data['report_period']['start_date'] && $data['report_period']['end_date']) {
+        $html .= '<h3>Report Period:</h3>';
+        $html .= '<p>From: ' . date('F j, Y', strtotime($data['report_period']['start_date'])) . '</p>';
+        $html .= '<p>To: ' . date('F j, Y', strtotime($data['report_period']['end_date'])) . '</p><br>';
+    }
+
+    $html .= '<h3>Election Periods:</h3>';
+    foreach ($data['election_periods'] as $period) {
+        $html .= '<p>Start: ' . date('F j, Y g:i A', strtotime($period['start_date'])) . '</p>';
+        $html .= '<p>End: ' . date('F j, Y g:i A', strtotime($period['end_date'])) . '</p>';
+        $html .= '<p>Results Date: ' . date('F j, Y g:i A', strtotime($period['results_date'])) . '</p><br>';
+    }
+
+    $html .= '<h3>Voter Statistics:</h3>';
+    $html .= '<p>Total Registered Voters: ' . $data['total_registered_voters'] . '</p>';
+    $html .= '<p>Total Votes Cast: ' . $data['total_votes_cast'] . '</p>';
+    $turnout = $data['total_registered_voters'] > 0 ? 
+        round(($data['total_votes_cast'] / $data['total_registered_voters']) * 100, 2) : 0;
+    $html .= '<p>Voter Turnout: ' . $turnout . '%</p><br>';
+
+    $html .= '<h3>Department Statistics:</h3>';
+    foreach ($data['department_statistics'] as $dept) {
+        $html .= '<p>' . $dept['department'] . ': ' . $dept['total_voters'] . ' registered voters</p>';
+    }
+    $html .= '<br>';
+
+    $html .= '<h3>Candidate Results:</h3>';
+    $currentDepartment = '';
+    $currentPosition = '';
+
+    foreach ($data['candidate_results'] as $candidate) {
+        if ($candidate['department'] !== $currentDepartment) {
+            $currentDepartment = $candidate['department'];
+            $html .= '<h4>' . $currentDepartment . '</h4>';
+            $currentPosition = '';
+        }
+        if ($candidate['position'] !== $currentPosition) {
+            $currentPosition = $candidate['position'];
+            $html .= '<h5>' . $currentPosition . ':</h5>';
+        }
+        $html .= '<p>' . $candidate['name'] . ' - ' . $candidate['votes'] . ' votes</p>';
+    }
+
+    // Set timezone to Asia/Manila and get current time
+    date_default_timezone_set('Asia/Manila');
+    $currentTime = new DateTime();
+    $currentTime->modify('-3 hours');
+    $html .= '<hr style="border:1px solid #0d6efd;">';
+    $html .= '<p style="text-align:center;">Report generated at: ' . $currentTime->format('F j, Y g:i A') . ' (Philippine Time)</p>';
+    $html .= '<p style="text-align:center;">Generated Format: PDF</p>';
+
+    return $html;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
     $format = $_POST['format'] ?? 'txt';
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
 
-    if ($format !== 'txt') {
-        echo json_encode(['success' => false, 'message' => 'Only TXT format is supported']);
+    if ($format !== 'txt' && $format !== 'pdf') {
+        echo json_encode(['success' => false, 'message' => 'Only TXT or PDF formats are supported']);
         exit;
     }
 
