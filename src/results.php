@@ -115,7 +115,7 @@ $results = array();
 if ($result) {
     while ($row = mysqli_fetch_assoc($result)) {
         // Format the photo path
-        $photo = !empty($row['photo']) ? '../uploads/candidate_photos/' . $row['photo'] : '../img/icon.png';
+        $photo = !empty($row['photo']) ? '../uploads/profile_pictures' . $row['photo'] : '../img/icon.png';
         
         $results[] = array(
             'department' => $row['department'],
@@ -160,10 +160,10 @@ foreach ($results as $result) {
         .result-card {
             background: #fff;
             border: none;
-            border-radius: 12px;
+            border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             transition: all 0.3s ease;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             overflow: hidden;
         }
         .result-card:hover {
@@ -173,20 +173,168 @@ foreach ($results as $result) {
         .department-header {
             background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             color: white;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
             box-shadow: 0 4px 12px rgba(37,99,235,0.15);
         }
         .position-header {
             background: #f8fafc;
-            padding: 1rem 1.5rem;
-            margin: 1.5rem 0;
-            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin: 1rem 0;
+            border-radius: 6px;
             border-left: 4px solid #2563eb;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+        .candidate-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .candidate-photo {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #e5e7eb;
+        }
+        .candidate-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .candidate-details {
+            flex: 1;
+        }
+        .candidate-name {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .vote-info {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        .progress {
+            height: 6px;
+            margin-top: 0.35rem;
+        }
+        .progress-bar {
+            background-color: #2563eb;
+        }
+        .department-section {
+            margin-bottom: 1.5rem;
+        }
+        .department-title {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .position-title {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .candidates-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .chart-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: #1f2937;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        @media (max-width: 768px) {
+            .candidates-list {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            .candidate-card {
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 12px;
+            }
+            .candidate-photo {
+                width: 56px;
+                height: 56px;
+            }
+            .candidate-info {
+                gap: 1rem;
+            }
+            .candidate-name {
+                font-size: 1.15rem;
+                margin-bottom: 0.3rem;
+            }
+            .vote-info {
+                font-size: 1.05rem;
+            }
+            .progress {
+                height: 7px;
+                margin-top: 0.4rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .candidate-card {
+                padding: 0.85rem;
+                border-radius: 10px;
+            }
+            .candidate-photo {
+                width: 48px;
+                height: 48px;
+            }
+            .candidate-name {
+                font-size: 1rem;
+            }
+            .vote-info {
+                font-size: 0.95rem;
+            }
         }
         .votes-badge {
             background: #e0e7ff;
@@ -235,192 +383,9 @@ foreach ($results as $result) {
             font-size: 0.9rem;
             color: #15803d;
         }
-        .candidate-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        .candidate-photo {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #e5e7eb;
-        }
-        .candidate-details {
-            flex: 1;
-        }
-        .candidate-name {
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.25rem;
-        }
-        .candidate-position {
-            font-size: 0.85rem;
-            color: #6b7280;
-        }
-        .progress-container {
-            margin-top: 0.75rem;
-            background: #f1f5f9;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        .progress {
-            height: 8px;
-            background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
-            border-radius: 4px;
-        }
-        .total-votes {
-            background: #f8fafc;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            margin-top: 0.75rem;
-            font-weight: 500;
-            color: #2563eb;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .total-votes i {
-            font-size: 1.1rem;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
-            }
-            .department-header {
-                padding: 1rem;
-                margin: 1rem 0;
-            }
-            .position-header {
-                padding: 0.75rem 1rem;
-                margin: 1rem 0;
-            }
-            .candidate-photo {
-                width: 40px;
-                height: 40px;
-            }
-        }
-
         .backB{
             margin-left: 20px;
         }
-
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin: 20px 0;
-            padding: 15px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-
-        .winner-badge {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            background: #fbbf24;
-            color: #92400e;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 1;
-        }
-
-        .position-section {
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .position-title {
-            color: #1e40af;
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e5e7eb;
-        }
-
-        .department-group {
-            background: #f8fafc;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-
-        .department-title {
-            color: #4b5563;
-            font-size: 1.1rem;
-            margin-bottom: 15px;
-        }
-
-        .candidate-result {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            background: #fff;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .candidate-photo {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-        }
-
-        .candidate-info {
-            flex: 1;
-        }
-
-        .candidate-name {
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 5px;
-        }
-
-        .progress {
-            height: 8px;
-            background-color: #e5e7eb;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar {
-            background-color: #3b82f6;
-            transition: width 0.3s ease;
-        }
-
-        .vote-count {
-            text-align: right;
-            min-width: 100px;
-            font-weight: 600;
-            color: #1f2937;
-        }
-
-        .vote-count .small {
-            font-weight: normal;
-            color: #6b7280;
-        }
-
-        @media (max-width: 768px) {
-            .chart-container {
-                height: 250px;
-                margin: 15px 0;
-                padding: 12px;
-            }
-        }
-
         .results-container {
             padding: 2rem;
             max-width: 1200px;
@@ -496,73 +461,47 @@ foreach ($results as $result) {
         .back-button {
             margin-bottom: 2rem;
         }
-        @media (max-width: 768px) {
-            .results-container {
-                padding: 1rem;
-            }
-            .chart-container {
-                height: 300px;
-            }
-            .candidate-result {
-                flex-direction: column;
-                text-align: center;
-            }
-            .candidate-photo {
-                margin: 0 auto 1rem auto;
-            }
-            .vote-count {
-                margin: 1rem 0 0 0;
-            }
-        }
-
         .candidate-card {
             background: #fff;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1rem;
-            transition: all 0.2s ease;
+            border-radius: 6px;
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
-
         .candidate-card.text-muted {
             opacity: 0.7;
         }
-
         .candidate-photo {
-            width: 64px;
-            height: 64px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid #e5e7eb;
+            border: 1px solid #e5e7eb;
         }
-
         .candidate-info {
             flex: 1;
         }
-
         .candidate-name {
             font-weight: 600;
             color: #1f2937;
             margin-bottom: 0.5rem;
         }
-
         .candidate-votes {
             font-size: 0.875rem;
         }
-
         .vote-count, .vote-percentage {
             font-weight: 500;
         }
-
         .progress {
             background-color: #f3f4f6;
             border-radius: 3px;
         }
-
         .progress-bar {
             transition: width 0.6s ease;
         }
-
         .department-section {
             background: #fff;
             border-radius: 16px;
@@ -570,26 +509,16 @@ foreach ($results as $result) {
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-
         .position-section {
             background: #f8fafc;
             padding: 1.5rem;
             border-radius: 12px;
             margin-bottom: 1.5rem;
         }
-
-        .position-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-
         .position-subtitle {
             font-size: 0.875rem;
             color: #6b7280;
         }
-
         .chart-container {
             background: #fff;
             border-radius: 16px;
@@ -597,7 +526,6 @@ foreach ($results as $result) {
             margin-bottom: 2rem;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-
         .chart-title {
             color: #1f2937;
             font-size: 1.2rem;
@@ -605,13 +533,11 @@ foreach ($results as $result) {
             margin-bottom: 1rem;
             text-align: center;
         }
-
         .chart-wrapper {
             position: relative;
             height: 300px;
             margin-bottom: 1rem;
         }
-
         .chart-legend {
             display: flex;
             flex-wrap: wrap;
@@ -619,7 +545,6 @@ foreach ($results as $result) {
             gap: 1rem;
             margin-top: 1rem;
         }
-
         .legend-item {
             display: flex;
             align-items: center;
@@ -627,23 +552,39 @@ foreach ($results as $result) {
             font-size: 0.875rem;
             color: #4b5563;
         }
-
         .legend-color {
             width: 12px;
             height: 12px;
             border-radius: 2px;
         }
-
         .results-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
-
         @media (max-width: 768px) {
             .chart-wrapper {
                 height: 250px;
+            }
+        }
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .candidate-card {
+                padding: 0.5rem;
+            }
+            
+            .candidate-photo {
+                width: 38px;
+                height: 38px;
+            }
+            
+            .candidate-name {
+                font-size: 0.9rem;
+            }
+            
+            .vote-info {
+                font-size: 0.8rem;
             }
         }
     </style>
@@ -711,6 +652,34 @@ foreach ($results as $result) {
                 </div>
             <?php endif; ?>
         </div>
+    </div>
+
+    <!-- Candidate Profile Modal -->
+    <div class="modal fade" id="candidateProfileModal" tabindex="-1" aria-labelledby="candidateProfileModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+          <div class="modal-header d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <img id="candidateProfilePhoto" class="rounded-circle" alt="Candidate Photo"
+                   style="width: 56px; height: 56px; object-fit: cover; border: 2px solid #2563eb;">
+              <h5 class="modal-title mb-0" id="candidateProfileModalLabel">Candidate Name</h5>
+            </div>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div id="candidateProfileCard" class="card shadow rounded-4 border-0">
+              <div class="card-body">
+                <p class="mb-2"><strong>Department:</strong> <span id="profileDept"></span></p>
+                <p class="mb-2"><strong>Position:</strong> <span id="profilePosition"></span></p>
+                <div>
+                  <strong>Platform:</strong>
+                  <p id="profilePlatform" class="mt-1 mb-0"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -783,7 +752,7 @@ foreach ($results as $result) {
                             ${positionResults.map(candidate => {
                                 const percentage = totalVotes > 0 ? ((candidate.votes / totalVotes) * 100).toFixed(1) : 0;
                                 return `
-                                    <div class="candidate-card">
+                                    <div class="candidate-card" onclick="showCandidateProfile(${candidate.candidate_id})">
                                         <div class="candidate-info">
                                             <img src="${candidate.photo}" alt="${candidate.name}" class="candidate-photo">
                                             <div class="candidate-details">
@@ -897,6 +866,27 @@ foreach ($results as $result) {
 
         // Call the function when the page loads
         document.addEventListener('DOMContentLoaded', fetchAndDisplayResults);
+
+        function showCandidateProfile(candidateId) {
+            fetch(`get_candidate.php?candidate_id=${candidateId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.candidate) {
+                        document.getElementById('candidateProfileModalLabel').textContent = data.candidate.name || 'Candidate Profile';
+                        document.getElementById('profileDept').textContent = data.candidate.department || 'N/A';
+                        document.getElementById('profilePosition').textContent = data.candidate.position || 'N/A';
+                        document.getElementById('profilePlatform').textContent = data.candidate.platform || 'N/A';
+                        document.getElementById('candidateProfilePhoto').src = data.candidate.photo || '../img/icon.png';
+                        const profileModal = new bootstrap.Modal(document.getElementById('candidateProfileModal'));
+                        profileModal.show();
+                    } else {
+                        alert('Candidate profile not found.');
+                    }
+                })
+                .catch(() => {
+                    alert('Error loading candidate profile.');
+                });
+        }
     </script>
 </body>
 </html> 
