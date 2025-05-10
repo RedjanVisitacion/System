@@ -310,6 +310,21 @@ $fullName = $userData['full_name'] ?? 'User';
                 transform: translateY(-30px);
             }
         }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #generatedReport, #generatedReport * {
+                visibility: visible;
+            }
+            #generatedReport {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100vw;
+            }
+        }
     </style>
 </head>
 <body class="page-transition">
@@ -379,6 +394,7 @@ $fullName = $userData['full_name'] ?? 'User';
                 </button>
             </div>
             
+            
             <!-- Download Link -->
             <div class="text-center">
                 <a href="#" class="download-link" id="downloadLink" target="_blank">
@@ -389,6 +405,8 @@ $fullName = $userData['full_name'] ?? 'User';
             <!-- Messages -->
             <div class="error-message" id="errorMessage"></div>
             <div class="success-message" id="successMessage"></div>
+
+            <div id="generatedReport" style="display:none; margin-top:2rem;"></div>
         </div>
     </div>
 
@@ -508,27 +526,38 @@ $fullName = $userData['full_name'] ?? 'User';
                 }
             })
             .then(data => {
-                if (data instanceof Blob) {
-                    // Handle file download
+                if (data instanceof Blob && selectedFormat === 'pdf') {
+                    // Download as before
                     const url = window.URL.createObjectURL(data);
                     const a = document.createElement('a');
                     a.href = url;
-                    let fileExtension;
-                    switch(selectedFormat) {
-                        case 'pdf':
-                            fileExtension = 'pdf';
-                            break;
-                        default:
-                            fileExtension = 'txt';
-                    }
-                    a.download = `election_report_${new Date().toISOString().slice(0,10)}.${fileExtension}`;
+                    a.download = `election_report_${new Date().toISOString().slice(0,10)}.pdf`;
                     document.body.appendChild(a);
                     a.click();
-                    window.URL.revokeObjectURL(url);
                     a.remove();
-                    
-                    successMessage.textContent = `${selectedFormat.toUpperCase()} report downloaded successfully`;
+
+                    successMessage.textContent = 'PDF report downloaded successfully';
                     successMessage.style.display = 'block';
+
+                    // Show PDF in iframe for printing
+                    const generatedReport = document.getElementById('generatedReport');
+                    generatedReport.style.display = 'block';
+                    generatedReport.innerHTML = `<iframe id="pdfFrame" src="${url}" width="100%" height="600px" style="border:none;"></iframe>
+                        <div class="text-center mt-2">
+                            <button class="btn btn-primary" id="printPdfBtn">Print PDF</button>
+                        </div>`;
+                        
+
+                    // Add print and cleanup logic
+                    document.getElementById('printPdfBtn').onclick = function() {
+                        const frame = document.getElementById('pdfFrame');
+                        frame.contentWindow.focus();
+                        frame.contentWindow.print();
+                        // Optionally, revoke the URL after a delay
+                        setTimeout(() => {
+                            window.URL.revokeObjectURL(url);
+                        }, 10000); // 10 seconds after print
+                    };
                 } else if (typeof data === 'string') {
                     // Handle text file download
                     const blob = new Blob([data], { type: 'text/plain' });
@@ -543,6 +572,12 @@ $fullName = $userData['full_name'] ?? 'User';
                     
                     successMessage.textContent = 'Text report downloaded successfully';
                     successMessage.style.display = 'block';
+
+                    const generatedReport = document.getElementById('generatedReport');
+                    if (selectedFormat === 'txt' && typeof data === 'string') {
+                        generatedReport.style.display = 'block';
+                        generatedReport.innerHTML = `<pre style="white-space: pre-wrap; font-family: inherit;">${data}</pre>`;
+                    }
                 } else if (data.success) {
                     successMessage.textContent = data.message;
                     successMessage.style.display = 'block';
@@ -623,6 +658,25 @@ $fullName = $userData['full_name'] ?? 'User';
             section.style.transform = 'translateY(20px)';
             section.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
             observer.observe(section);
+        });
+
+        // Print functionality
+        document.getElementById('printBtn').addEventListener('click', function() {
+            const reportContent = document.getElementById('generatedReport');
+            if (!reportContent || !reportContent.innerHTML.trim()) {
+                alert('Please generate a report first.');
+                return;
+            }
+            const printWindow = window.open('', '', 'width=900,height=700');
+            printWindow.document.write('<html><head><title>Print Report</title>');
+            printWindow.document.write('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">');
+            printWindow.document.write('<style>body{background:#fff;}</style>');
+            printWindow.document.write('</head><body>');
+            printWindow.document.write(reportContent.outerHTML);
+            printWindow.document.write('</body></html>');
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
         });
     </script>
 </body>
