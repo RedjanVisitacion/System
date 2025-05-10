@@ -590,6 +590,7 @@ foreach ($results as $result) {
     </style>
 </head>
 <body>
+    <audio src="assets/resultBG.mp3" autoplay loop hidden></audio>
     <!-- Navbar -->
     
     <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:60px; z-index: 1050;">

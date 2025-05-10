@@ -548,6 +548,9 @@
   </style>
 </head>
 <body>
+
+     <audio src="assets/loginBG.mp3" autoplay hidden></audio>
+
   <div class="login-page-container">
     <div class="login-logo-side">
       <img src="../img/elecback.png" alt="ELECOM Logo" class="elecom-logo-img">

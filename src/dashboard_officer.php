@@ -1171,7 +1171,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   </style>
 </head>
 <body>
-  <!-- Top Bar -->
+    <audio src="assets/resultBG.mp3" autoplay loop hidden></audio>
+    <!-- Top Bar -->
   
   <nav class="navbar navbar-expand-lg position-sticky" style="background: #2563eb; height: 60px;">
     <div class="container-fluid px-2">
@@ -2279,6 +2280,13 @@ function startDynamicCountdown(startTime, endTime) {
       diff = endTime - now;
       label = 'Voting ends in ';
       timeEl.style.color = ''; // default
+      
+      // Check if there's 1 minute remaining
+      const minutesRemaining = Math.floor(diff / (1000 * 60));
+      if (minutesRemaining === 1) {
+        const audio = document.getElementById('countdownAudio');
+        audio.play();
+      }
     } else {
       timeEl.textContent = 'Voting has ended';
       timeEl.style.color = 'red';
