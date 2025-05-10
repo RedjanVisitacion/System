@@ -1436,9 +1436,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <select class="form-select" id="department" name="department" required>
                 <option value="">Select Department</option>
                 <option value="USG">USG</option>
-                <option value="BSIT">BSIT (SITE Officers)</option>
-                <option value="BFPT">BFPT (AFPROTECHS)</option>
-                <option value="BTLED">BTLED (PAFE)</option>
+                <option value="SITE">BSIT (SITE Officers)</option>
+                <option value="AFPROTECHS">BFPT (AFPROTECHS)</option>
+                <option value="PAFE">BTLED (PAFE)</option>
               </select>
             </div>
             <div class="col-12 col-md-6">

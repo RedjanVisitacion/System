@@ -2368,9 +2368,9 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
             <label class="form-label fw-bold">Select Department</label>
             <select class="form-select form-select-lg" id="departmentSelect">
               <option value="">Choose a department...</option>
-              <option value="BTLED">PAFE (PRIME Association of Future Educators)</option>
-              <option value="BSIT">SITE (Society of Information Technology Enthusiasts)</option>
-              <option value="BFPT">AFPROTECHS (Association of Food Processing Technology Students)</option>
+              <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
+              <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
+              <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
             </select>
           </div>
 
