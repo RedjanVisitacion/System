@@ -95,7 +95,7 @@ function generateElectionReport($format = 'txt', $startDate = null, $endDate = n
         $filepath = "$reportsDir/$filename";
 
         if ($format === 'txt') {
-            $textReport = generateTextReport($reportData);
+            $textReport = generateTextReport($reportData, $format);
             if (file_put_contents($filepath, $textReport) === false) throw new Exception("Failed to write text report file");
 
             // Output file content directly
@@ -116,7 +116,7 @@ function generateElectionReport($format = 'txt', $startDate = null, $endDate = n
     }
 }
 
-function generateTextReport($data) {
+function generateTextReport($data, $format) {
     global $con;
 
     $report = "ELECTION REPORT\n================\n\n";
@@ -183,6 +183,7 @@ function generateTextReport($data) {
     $currentTime = new DateTime();
     $currentTime->modify('-3 hours');
     $report .= "\nReport generated at: " . $currentTime->format('F j, Y g:i A') . " (Philippine Time)\n";
+    $report .= "Generated Format: " . strtoupper($format) . "\n";
     return $report;
 }
 
