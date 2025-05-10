@@ -1613,34 +1613,7 @@ $can_view_results = checkElectionTimeline($con);
           </div>
 
           <!-- Results Section -->
-          <?php if ($can_view_results): ?>
-          <div class="col-12 col-lg-8">
-              <div class="dashboard-card">
-                
-                  <div id="resultsContainer">
-                      <!-- Results will be loaded here -->
-                  </div>
-              </div>
-          </div>
-          <?php else: ?>
-          <div class="col-12 col-lg-8">
-              <div class="dashboard-card">
-                  <h5 class="mb-3">Election Results</h5>
-                  <div class="text-center py-4">
-                      <i class="bi bi-clock-history fs-1 text-muted"></i>
-                      <?php 
-                      $current_time = new DateTime();
-                      $end_date = new DateTime($election_dates['end_date']);
-                      if ($current_time < $end_date): 
-                      ?>
-                          <p class="mt-3 text-muted">Voting is still in progress. Results will be available after the election ends.</p>
-                      <?php else: ?>
-                          <p class="mt-3 text-muted">Results will be available after <?php echo date('F d, Y h:i A', strtotime($election_dates['results_date'])); ?></p>
-                      <?php endif; ?>
-                  </div>
-              </div>
-          </div>
-          <?php endif; ?>
+          
         </div>
       </div>
     </div>
@@ -2650,12 +2623,15 @@ function loadCandidatesByDepartment(department) {
 
         let html = '';
         for (const [position, candidates] of Object.entries(positions)) {
+          // Set vote limit based on position
+          const voteLimit = position === 'Representative' ? 2 : 1;
+          
           html += `
             <div class="position-section mb-4">
               <div class="position-header">
                 <h6 class="position-title mb-2">
                   ${position}
-                  <span class="badge bg-primary ms-2">1 vote</span>
+                  <span class="badge bg-primary ms-2">${voteLimit} vote${voteLimit > 1 ? 's' : ''} allowed</span>
                 </h6>
               </div>
               <div class="candidates-list">
@@ -2695,15 +2671,50 @@ function selectCandidate(element, position, candidateId) {
   const positionSection = element.closest('.position-section');
   const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
   
+  // Define vote limits for different positions
+  const voteLimits = {
+    'Representative': 2,
+    'default': 1
+  };
+  
+  // Get the vote limit for this position (default to 1 if not specified)
+  const voteLimit = voteLimits[position] || voteLimits.default;
+  
   // If already selected, deselect
   if (element.classList.contains('selected')) {
     element.classList.remove('selected');
   } else {
-    // Deselect any previously selected candidate for this position
-    selectedCandidates.forEach(card => card.classList.remove('selected'));
+    // Check if we've reached the vote limit for this position
+    if (selectedCandidates.length >= voteLimit) {
+      // Show alert for reaching vote limit
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+      alertDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <div>
+            <strong>Vote Limit Reached!</strong> You can only select ${voteLimit} candidate${voteLimit > 1 ? 's' : ''} for ${position}.
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
+      
+      // Remove alert after 3 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+      return;
+    }
+    
     // Select the new candidate
     element.classList.add('selected');
   }
+  
+  // Update the badge to show remaining votes
+  const badge = positionSection.querySelector('.badge');
+  const remainingVotes = voteLimit - selectedCandidates.length;
+  badge.textContent = `${remainingVotes} vote${remainingVotes !== 1 ? 's' : ''} remaining`;
   
   updateSubmitButtonState();
 }
@@ -2884,15 +2895,50 @@ function selectCandidate(element, position, candidateId) {
   const positionSection = element.closest('.position-section');
   const selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
   
+  // Define vote limits for different positions
+  const voteLimits = {
+    'Representative': 2,
+    'default': 1
+  };
+  
+  // Get the vote limit for this position (default to 1 if not specified)
+  const voteLimit = voteLimits[position] || voteLimits.default;
+  
   // If already selected, deselect
   if (element.classList.contains('selected')) {
     element.classList.remove('selected');
-    } else {
-    // Deselect any previously selected candidate for this position
-    selectedCandidates.forEach(card => card.classList.remove('selected'));
+  } else {
+    // Check if we've reached the vote limit for this position
+    if (selectedCandidates.length >= voteLimit) {
+      // Show alert for reaching vote limit
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-warning alert-dismissible fade show';
+      alertDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          <div>
+            <strong>Vote Limit Reached!</strong> You can only select ${voteLimit} candidate${voteLimit > 1 ? 's' : ''} for ${position}.
+          </div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      `;
+      document.querySelector('.modal-body').insertBefore(alertDiv, document.querySelector('#candidatesContainer'));
+      
+      // Remove alert after 3 seconds
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+      return;
+    }
+    
     // Select the new candidate
     element.classList.add('selected');
   }
+  
+  // Update the badge to show remaining votes
+  const badge = positionSection.querySelector('.badge');
+  const remainingVotes = voteLimit - selectedCandidates.length;
+  badge.textContent = `${remainingVotes} vote${remainingVotes !== 1 ? 's' : ''} remaining`;
   
   updateSubmitButtonState();
 }
