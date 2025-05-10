@@ -1612,7 +1612,7 @@ $can_view_results = checkElectionTimeline($con);
             </div>
           </div>
 
-          <!-- Results Section -->
+
           
         </div>
       </div>
@@ -2366,18 +2366,17 @@ document.getElementById('castVoteModal').addEventListener('shown.bs.modal', func
           <div id="departmentSelection" class="mb-4">
             <label class="form-label fw-bold">Select Department</label>
             <select class="form-select form-select-lg" id="departmentSelect">
-            <option value="">Choose a department...</option>
-            <option value="USG">USG (University Student Government)</option>
-            <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
-            <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
-            <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
-          </select>
-        </div>
+              <option value="">Choose a department...</option>
+              <option value="PAFE">PAFE (PRIME Association of Future Educators)</option>
+              <option value="SITE">SITE (Society of Information Technology Enthusiasts)</option>
+              <option value="AFPROTECHS">AFPROTECHS (Association of Food Processing Technology Students)</option>
+            </select>
+          </div>
 
-        <!-- Candidates Container -->
+          <!-- Candidates Container -->
           <div id="candidatesContainer" class="candidates-wrapper">
-          <!-- Candidates will be loaded here -->
-        </div>
+            <!-- Candidates will be loaded here -->
+          </div>
 
           <!-- Action Buttons -->
           <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
@@ -2605,54 +2604,98 @@ function loadCandidatesByDepartment(department) {
     .then(response => response.json())
     .then(data => {
       if (data.success && Array.isArray(data.candidates)) {
+        // Get both USG candidates and department-specific candidates
+        const usgCandidates = data.candidates.filter(c => c.department === 'USG');
         const departmentCandidates = data.candidates.filter(c => c.department === department);
         
-        if (departmentCandidates.length === 0) {
+        // Combine USG and department candidates
+        const allCandidates = [...usgCandidates, ...departmentCandidates];
+        
+        if (allCandidates.length === 0) {
           container.innerHTML = '<div class="alert alert-info">No candidates found for this department.</div>';
           return;
         }
 
-        // Group candidates by position
+        // Group candidates by position and department
         const positions = {};
-        departmentCandidates.forEach(candidate => {
-          if (!positions[candidate.position]) {
-            positions[candidate.position] = [];
+        allCandidates.forEach(candidate => {
+          const key = `${candidate.position}_${candidate.department}`;
+          if (!positions[key]) {
+            positions[key] = {
+              position: candidate.position,
+              department: candidate.department,
+              candidates: []
+            };
           }
-          positions[candidate.position].push(candidate);
+          positions[key].candidates.push(candidate);
         });
 
         let html = '';
-        for (const [position, candidates] of Object.entries(positions)) {
-          // Set vote limit based on position
-          const voteLimit = position === 'Representative' ? 2 : 1;
-          
-          html += `
-            <div class="position-section mb-4">
-              <div class="position-header">
-                <h6 class="position-title mb-2">
-                  ${position}
-                  <span class="badge bg-primary ms-2">${voteLimit} vote${voteLimit > 1 ? 's' : ''} allowed</span>
-                </h6>
-              </div>
-              <div class="candidates-list">
-                ${candidates.map(candidate => `
-                  <div class="candidate-card" 
-                       onclick="selectCandidate(this, '${position}', ${candidate.candidate_id})"
-                       data-position="${position}"
-                       data-candidate-id="${candidate.candidate_id}">
-                    <img src="${candidate.photo || '../img/icon.png'}" 
-                         alt="${candidate.name}" 
-                         class="candidate-photo">
-                    <div class="candidate-info">
-                      <div class="candidate-name">${candidate.name}</div>
-                      <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
+        // First show USG candidates
+        Object.values(positions)
+          .filter(group => group.department === 'USG')
+          .forEach(group => {
+            const voteLimit = group.position === 'Representative' ? 2 : 1;
+            html += `
+              <div class="position-section mb-4">
+                <div class="position-header">
+                  <h6 class="position-title mb-2">
+                    ${group.position} (USG)
+                    <span class="badge bg-primary ms-2">${voteLimit} vote${voteLimit > 1 ? 's' : ''} allowed</span>
+                  </h6>
+                </div>
+                <div class="candidates-list">
+                  ${group.candidates.map(candidate => `
+                    <div class="candidate-card" 
+                         onclick="selectCandidate(this, '${group.position}', ${candidate.candidate_id})"
+                         data-position="${group.position}"
+                         data-candidate-id="${candidate.candidate_id}">
+                      <img src="${candidate.photo || '../img/icon.png'}" 
+                           alt="${candidate.name}" 
+                           class="candidate-photo">
+                      <div class="candidate-info">
+                        <div class="candidate-name">${candidate.name}</div>
+                        <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
+                      </div>
                     </div>
-                  </div>
-                `).join('')}
+                  `).join('')}
+                </div>
               </div>
-            </div>
-          `;
-        }
+            `;
+          });
+
+        // Then show department-specific candidates
+        Object.values(positions)
+          .filter(group => group.department === department)
+          .forEach(group => {
+            const voteLimit = group.position === 'Representative' ? 2 : 1;
+            html += `
+              <div class="position-section mb-4">
+                <div class="position-header">
+                  <h6 class="position-title mb-2">
+                    ${group.position} (${department})
+                    <span class="badge bg-primary ms-2">${voteLimit} vote${voteLimit > 1 ? 's' : ''} allowed</span>
+                  </h6>
+                </div>
+                <div class="candidates-list">
+                  ${group.candidates.map(candidate => `
+                    <div class="candidate-card" 
+                         onclick="selectCandidate(this, '${group.position}', ${candidate.candidate_id})"
+                         data-position="${group.position}"
+                         data-candidate-id="${candidate.candidate_id}">
+                      <img src="${candidate.photo || '../img/icon.png'}" 
+                           alt="${candidate.name}" 
+                           class="candidate-photo">
+                      <div class="candidate-info">
+                        <div class="candidate-name">${candidate.name}</div>
+                        <div class="candidate-platform">${candidate.platform || 'No platform available'}</div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+          });
 
         container.innerHTML = html;
         updateSubmitButtonState();

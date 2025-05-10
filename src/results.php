@@ -26,21 +26,7 @@ $stmt->close();
 
 $has_voted = $vote_count > 0;
 
-// Query to get results with candidate information
-$query = "SELECT r.department, r.position, c.name, c.candidate_id, 
-          SUM(r.votes) as total_votes, MAX(r.published_at) as published_at
-          FROM result r 
-          JOIN candidate c ON r.candidate_id = c.candidate_id 
-          GROUP BY r.department, r.position, c.candidate_id, c.name
-          ORDER BY r.department, r.position, total_votes DESC";
-
-$result = mysqli_query($con, $query);
-
-// Check if query was successful
-if (!$result) {
-    die("Query failed: " . mysqli_error($con));
-}
-
+// Function to check election timeline
 function checkElectionTimeline($con) {
     $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
     $stmt->execute();
@@ -56,9 +42,6 @@ function checkElectionTimeline($con) {
     $end_date = new DateTime($election_dates['end_date']);
     $results_date = new DateTime($election_dates['results_date']);
 
-    // Can view results only if:
-    // 1. Current time is after end date (voting has ended)
-    // 2. Current time is after results date (results are released)
     return ($current_time >= $end_date) && ($current_time >= $results_date);
 }
 
@@ -69,7 +52,87 @@ $result = $stmt->get_result();
 $election_dates = $result->fetch_assoc();
 $stmt->close();
 
+// Check if results can be viewed
 $can_view_results = checkElectionTimeline($con);
+
+// Define position order for each department
+$positionOrder = [
+    'USG' => [
+        'President',
+        'Vice President',
+        'General Secretary',
+        'Associate Secretary',
+        'Treasurer',
+        'Auditor',
+        'Public Information Officer',
+        'BSIT Representative',
+        'BTLED Representative',
+        'BFPT Representative'
+    ],
+    'PAFE' => [
+        'President',
+        'Vice President',
+        'General Secretary',
+        'Associate Secretary',
+        'Treasurer',
+        'Auditor',
+        'Public Information Officer'
+    ],
+    'SITE' => [
+        'President',
+        'Vice President',
+        'General Secretary',
+        'Associate Secretary',
+        'Treasurer',
+        'Auditor',
+        'Public Information Officer'
+    ],
+    'AFPROTECHS' => [
+        'President',
+        'Vice President',
+        'General Secretary',
+        'Associate Secretary',
+        'Treasurer',
+        'Auditor',
+        'Public Information Officer'
+    ]
+];
+
+// Fetch all candidates and their votes
+$query = "SELECT c.department, c.position, c.name, c.candidate_id, c.photo,
+          COALESCE(SUM(r.votes), 0) as votes
+          FROM candidate c
+          LEFT JOIN result r ON c.candidate_id = r.candidate_id 
+          WHERE c.department IN ('USG', 'PAFE', 'SITE', 'AFPROTECHS')
+          GROUP BY c.department, c.position, c.candidate_id, c.name, c.photo
+          ORDER BY FIELD(c.department, 'USG', 'PAFE', 'SITE', 'AFPROTECHS'), 
+                   c.position, 
+                   votes DESC";
+
+$result = mysqli_query($con, $query);
+$results = array();
+
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        // Format the photo path
+        $photo = !empty($row['photo']) ? '../uploads/candidate_photos/' . $row['photo'] : '../img/icon.png';
+        
+        $results[] = array(
+            'department' => $row['department'],
+            'position' => $row['position'],
+            'name' => $row['name'],
+            'candidate_id' => $row['candidate_id'],
+            'photo' => $photo,
+            'votes' => (int)$row['votes']
+        );
+    }
+}
+
+// Initialize total votes
+$totalVotes = 0;
+foreach ($results as $result) {
+    $totalVotes += $result['votes'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -271,8 +334,83 @@ $can_view_results = checkElectionTimeline($con);
         }
 
         .position-section {
-            margin-bottom: 2rem;
-            position: relative;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .position-title {
+            color: #1e40af;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .department-group {
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .department-title {
+            color: #4b5563;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        .candidate-result {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #fff;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .candidate-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .candidate-info {
+            flex: 1;
+        }
+
+        .candidate-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 5px;
+        }
+
+        .progress {
+            height: 8px;
+            background-color: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        .vote-count {
+            text-align: right;
+            min-width: 100px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .vote-count .small {
+            font-weight: normal;
+            color: #6b7280;
         }
 
         @media (max-width: 768px) {
@@ -376,6 +514,138 @@ $can_view_results = checkElectionTimeline($con);
                 margin: 1rem 0 0 0;
             }
         }
+
+        .candidate-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .candidate-card.text-muted {
+            opacity: 0.7;
+        }
+
+        .candidate-photo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+
+        .candidate-info {
+            flex: 1;
+        }
+
+        .candidate-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .candidate-votes {
+            font-size: 0.875rem;
+        }
+
+        .vote-count, .vote-percentage {
+            font-weight: 500;
+        }
+
+        .progress {
+            background-color: #f3f4f6;
+            border-radius: 3px;
+        }
+
+        .progress-bar {
+            transition: width 0.6s ease;
+        }
+
+        .department-section {
+            background: #fff;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .position-section {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+
+        .position-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .position-subtitle {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .chart-container {
+            background: #fff;
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-title {
+            color: #1f2937;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .chart-wrapper {
+                height: 250px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -445,64 +715,140 @@ $can_view_results = checkElectionTimeline($con);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Function to fetch and display results
+        // Initialize results data from PHP
+        const initialResults = <?php echo json_encode($results); ?>;
+        const canViewResults = <?php echo json_encode($can_view_results); ?>;
+        const hasVoted = <?php echo json_encode($has_voted); ?>;
+
         function fetchAndDisplayResults() {
             <?php if ($can_view_results): ?>
-            fetch('get_results.php')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        displayResults(data.results);
-                        createPieCharts(data.results);
+            // Use the initial results data
+            if (initialResults && initialResults.length > 0) {
+                displayResults(initialResults);
+                createPieCharts(initialResults);
                     } else {
-                        document.getElementById('resultsContainer').innerHTML = `
-                            <div class="no-results">
-                                <i class="bi bi-exclamation-circle fs-1"></i>
-                                <p class="mt-3">${data.message || 'No results available yet.'}</p>
+                const container = document.getElementById('resultsContainer');
+                container.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="bi bi-exclamation-circle text-warning" style="font-size: 3rem;"></i>
+                        <p class="mt-3">No results available yet.</p>
                             </div>
                         `;
                     }
-                })
-                .catch(error => {
-                    console.error('Error fetching results:', error);
-                    document.getElementById('resultsContainer').innerHTML = `
-                        <div class="no-results">
-                            <i class="bi bi-exclamation-triangle fs-1"></i>
-                            <p class="mt-3">Error loading results. Please try again later.</p>
+            <?php else: ?>
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-clock text-primary" style="font-size: 3rem;"></i>
+                    <p class="mt-3">Results will be available after the election period ends.</p>
+                </div>
+            `;
+            <?php endif; ?>
+        }
+
+        // Function to display results
+        function displayResults(results) {
+            const container = document.getElementById('resultsContainer');
+            const departments = ['USG', 'PAFE', 'SITE', 'AFPROTECHS'];
+            let html = '';
+
+            departments.forEach(department => {
+                const departmentResults = results.filter(r => r.department === department);
+                if (departmentResults.length > 0) {
+                    html += `
+                        <div class="department-section">
+                            <h3 class="department-title mb-4">${department}</h3>
+                            ${displayDepartmentResults(departmentResults)}
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Function to display department results
+        function displayDepartmentResults(results) {
+            const positions = [...new Set(results.map(r => r.position))];
+            let html = '';
+
+            positions.forEach(position => {
+                const positionResults = results.filter(r => r.position === position);
+                const totalVotes = positionResults.reduce((sum, r) => sum + r.votes, 0);
+
+                html += `
+                    <div class="position-section">
+                        <h4 class="position-title">${position}</h4>
+                        <div class="candidates-list">
+                            ${positionResults.map(candidate => {
+                                const percentage = totalVotes > 0 ? ((candidate.votes / totalVotes) * 100).toFixed(1) : 0;
+                                return `
+                                    <div class="candidate-card">
+                                        <div class="candidate-info">
+                                            <img src="${candidate.photo}" alt="${candidate.name}" class="candidate-photo">
+                                            <div class="candidate-details">
+                                                <h5 class="candidate-name">${candidate.name}</h5>
+                                                <div class="vote-info">
+                                                    <span class="vote-count">${candidate.votes} votes</span>
+                                                    <span class="vote-percentage">(${percentage}%)</span>
+                                                </div>
+                                                <div class="progress mt-2">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                         style="width: ${percentage}%" 
+                                                         aria-valuenow="${percentage}" 
+                                                         aria-valuemin="0" 
+                                                         aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
                         </div>
                     `;
                 });
-            <?php endif; ?>
+
+            return html;
         }
 
         // Function to create pie charts
         function createPieCharts(results) {
             // Overall Results Chart
             const overallCtx = document.getElementById('overallResultsChart').getContext('2d');
-            const overallData = prepareOverallChartData(results);
+            const departmentTotals = {};
+            
+            results.forEach(result => {
+                if (!departmentTotals[result.department]) {
+                    departmentTotals[result.department] = 0;
+                }
+                departmentTotals[result.department] += result.votes;
+            });
+
             new Chart(overallCtx, {
                 type: 'pie',
                 data: {
-                    labels: overallData.labels,
+                    labels: Object.keys(departmentTotals),
                     datasets: [{
-                        data: overallData.data,
-                        backgroundColor: generateColors(overallData.labels.length),
-                        borderWidth: 1
+                        data: Object.values(departmentTotals),
+                        backgroundColor: [
+                            '#2563eb',
+                            '#7c3aed',
+                            '#db2777',
+                            '#ea580c'
+                        ]
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
                     plugins: {
+                        legend: {
+                            position: 'bottom'
+                        },
                         title: {
                             display: true,
-                            text: 'Overall Voting Results',
-                            font: {
-                                size: 16
-                            }
-                        },
-                        legend: {
-                            position: 'right'
+                            text: 'Overall Vote Distribution'
                         }
                     }
                 }
@@ -510,122 +856,46 @@ $can_view_results = checkElectionTimeline($con);
 
             // Department Results Chart
             const deptCtx = document.getElementById('departmentResultsChart').getContext('2d');
-            const deptData = prepareDepartmentChartData(results);
+            const positionTotals = {};
+            
+            results.forEach(result => {
+                if (!positionTotals[result.position]) {
+                    positionTotals[result.position] = 0;
+                }
+                positionTotals[result.position] += result.votes;
+            });
+
             new Chart(deptCtx, {
-                type: 'pie',
+                type: 'bar',
                 data: {
-                    labels: deptData.labels,
+                    labels: Object.keys(positionTotals),
                     datasets: [{
-                        data: deptData.data,
-                        backgroundColor: generateColors(deptData.labels.length),
-                        borderWidth: 1
+                        label: 'Total Votes',
+                        data: Object.values(positionTotals),
+                        backgroundColor: '#2563eb'
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
                     plugins: {
+                        legend: {
+                            display: false
+                        },
                         title: {
                             display: true,
-                            text: 'Results by Department',
-                            font: {
-                                size: 16
+                            text: 'Votes by Position'
                             }
                         },
-                        legend: {
-                            position: 'right'
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }
             });
         }
 
-        // Helper function to prepare data for overall chart
-        function prepareOverallChartData(results) {
-            const data = {};
-            results.forEach(result => {
-                if (!data[result.position]) {
-                    data[result.position] = 0;
-                }
-                data[result.position] += result.votes;
-            });
-
-            return {
-                labels: Object.keys(data),
-                data: Object.values(data)
-            };
-        }
-
-        // Helper function to prepare data for department chart
-        function prepareDepartmentChartData(results) {
-            const data = {};
-            results.forEach(result => {
-                if (!data[result.department]) {
-                    data[result.department] = 0;
-                }
-                data[result.department] += result.votes;
-            });
-
-            return {
-                labels: Object.keys(data),
-                data: Object.values(data)
-            };
-        }
-
-        // Helper function to generate colors
-        function generateColors(count) {
-            const colors = [
-                '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe',
-                '#1d4ed8', '#1e40af', '#1e3a8a', '#172554', '#0f172a'
-            ];
-            return colors.slice(0, count);
-        }
-
-        // Function to display detailed results
-        function displayResults(results) {
-            const container = document.getElementById('resultsContainer');
-            const positions = [...new Set(results.map(r => r.position))];
-
-            container.innerHTML = positions.map(position => {
-                const positionResults = results.filter(r => r.position === position);
-                const totalVotes = positionResults.reduce((sum, r) => sum + r.votes, 0);
-
-                return `
-                    <div class="position-section mb-4">
-                        <h3 class="position-title">${position}</h3>
-                        ${positionResults.map(candidate => {
-                            const percentage = totalVotes > 0 ? (candidate.votes / totalVotes * 100).toFixed(1) : 0;
-                            return `
-                                <div class="candidate-result">
-                                    <img src="${candidate.photo || '../img/icon.png'}" 
-                                         alt="${candidate.name}" 
-                                         class="candidate-photo">
-                                    <div class="candidate-info">
-                                        <div class="candidate-name">${candidate.name}</div>
-                                        <div class="candidate-department">${candidate.department}</div>
-                                        <div class="progress">
-                                            <div class="progress-bar" 
-                                                 role="progressbar" 
-                                                 style="width: ${percentage}%" 
-                                                 aria-valuenow="${percentage}" 
-                                                 aria-valuemin="0" 
-                                                 aria-valuemax="100">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="vote-count">
-                                        ${candidate.votes} votes
-                                        <div class="text-muted small">${percentage}%</div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Load results when page loads
+        // Call the function when the page loads
         document.addEventListener('DOMContentLoaded', fetchAndDisplayResults);
     </script>
 </body>
