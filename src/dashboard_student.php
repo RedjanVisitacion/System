@@ -1444,6 +1444,9 @@ $can_view_results = checkElectionTimeline($con);
   </style>
 </head>
 <body>
+  <!-- Smoke Effect Canvas -->
+    <canvas id="smoke-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+    
     <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
   <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
   <!-- Top Bar -->

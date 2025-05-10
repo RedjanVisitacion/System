@@ -1171,6 +1171,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   </style>
 </head>
 <body>
+    <!-- Smoke Effect Canvas -->
+    <canvas id="smoke-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+    <!-- Floating Dragon -->
+     <img id="dragon-float" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:30px;height:auto;z-index:10;pointer-events:none;opacity:0.85;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">
     <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
       <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
     <!-- Top Bar -->
@@ -2724,5 +2728,98 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
   });
   </script>
   
+  <script>
+    // Enhanced Mobile Legends-style smoke effect
+    (function() {
+      const canvas = document.getElementById('smoke-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      window.addEventListener('resize', () => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      });
+
+      // Smoke particle system (layered, swirling)
+      const layers = 3;
+      const particlesPerLayer = 18;
+      const allParticles = [];
+      const baseColors = [
+        'rgba(13,110,253,0.10)', // blue
+        'rgba(255,255,255,0.08)', // white
+        'rgba(37,99,235,0.09)'   // deep blue
+      ];
+      function randomBetween(a, b) { return a + Math.random() * (b - a); }
+      function createParticle(layer) {
+        const baseRadius = [90, 60, 40][layer];
+        return {
+          x: randomBetween(0, width),
+          y: randomBetween(height * 0.2, height * 0.8),
+          radius: randomBetween(baseRadius, baseRadius + 40),
+          color: baseColors[layer],
+          alpha: randomBetween(0.13, 0.22) + layer * 0.05,
+          speed: randomBetween(0.12, 0.32) + layer * 0.08,
+          swirl: randomBetween(0.002, 0.008) * (Math.random() > 0.5 ? 1 : -1),
+          angle: randomBetween(0, Math.PI * 2),
+          layer
+        };
+      }
+      for (let l = 0; l < layers; l++) {
+        for (let i = 0; i < particlesPerLayer; i++) {
+          allParticles.push(createParticle(l));
+        }
+      }
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        for (let p of allParticles) {
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 60 - p.layer * 15;
+          ctx.fill();
+          ctx.restore();
+          // Swirl and float
+          p.angle += p.swirl;
+          p.x += Math.cos(p.angle) * (0.3 + p.layer * 0.2);
+          p.y -= p.speed;
+          // Respawn if out of view
+          if (p.y + p.radius < 0 || p.x + p.radius < 0 || p.x - p.radius > width) {
+            Object.assign(p, createParticle(p.layer));
+            p.y = height + p.radius;
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+  </script>
+  <script>
+    // Floating dragon animation
+    (function() {
+      const dragon = document.getElementById('dragon-float');
+      if (!dragon) return;
+      let direction = 1;
+      let pos = 0;
+      let max = window.innerWidth - 140;
+      let min = 0;
+      function animateDragon() {
+        pos += direction * 1.2;
+        if (pos > max) { direction = -1; dragon.style.transform = 'scaleX(-1)'; }
+        if (pos < min) { direction = 1; dragon.style.transform = 'scaleX(1)'; }
+        dragon.style.left = pos + 'px';
+        requestAnimationFrame(animateDragon);
+      }
+      window.addEventListener('resize', () => { max = window.innerWidth - 140; });
+      animateDragon();
+    })();
+  </script>
 </body>
 </html>
