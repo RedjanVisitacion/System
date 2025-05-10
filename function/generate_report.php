@@ -70,22 +70,11 @@ function generateElectionReport($format = 'txt', $startDate = null, $endDate = n
         $totalRegisteredVoters = $stmt->get_result()->fetch_assoc()['total_registered'];
         $stmt->close();
 
-        // Fetch total votes
-        $voteQuery = "SELECT SUM(COALESCE(votes, 0)) AS total_votes FROM result";
-        if ($startDate && $endDate) {
-            $voteQuery .= " WHERE published_at BETWEEN ? AND ?";
-        }
-        $stmt = $con->prepare($voteQuery);
-        if (!$stmt) throw new Exception("Failed to prepare total votes query: " . $con->error);
-        if ($startDate && $endDate) {
-            if (!$stmt->bind_param("ss", $startDate, $endDate)) {
-                throw new Exception("Failed to bind parameters for total votes query: " . $stmt->error);
-            }
-        }
-        if (!$stmt->execute()) throw new Exception("Failed to execute total votes query: " . $stmt->error);
-        $row = $stmt->get_result()->fetch_assoc();
-        $totalVotes = intval($row['total_votes'] ?? 0);
-        $stmt->close();
+        // Fetch total votes cast
+        $totalVotesQuery = "SELECT COUNT(DISTINCT user_id) as total_votes FROM vote";
+        $totalVotesResult = $con->query($totalVotesQuery);
+        if (!$totalVotesResult) throw new Exception("Failed to execute total votes query: " . $con->error);
+        $totalVotes = $totalVotesResult->fetch_assoc()['total_votes'];
 
         $reportData = [
             'report_period' => ['start_date' => $startDate, 'end_date' => $endDate],
