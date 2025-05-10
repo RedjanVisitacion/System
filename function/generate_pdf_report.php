@@ -183,6 +183,22 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
             }
         }
 
+        // List of Voters
+        $html .= '<h3>List of Voters:</h3>';
+        $html .= '<ul style="margin-left:20px;">';
+        $votedUsersQuery = "
+            SELECT DISTINCT u.user_id, up.full_name, up.program_name
+            FROM vote v
+            JOIN user u ON v.user_id = u.user_id
+            JOIN user_profile up ON u.user_id = up.user_id
+            ORDER BY up.full_name ASC
+        ";
+        $votedUsersResult = $con->query($votedUsersQuery);
+        while ($row = $votedUsersResult->fetch_assoc()) {
+            $html .= '<li>' . htmlspecialchars($row['full_name']) . ' (' . htmlspecialchars($row['program_name']) . ')</li>';
+        }
+        $html .= '</ul><br>';
+
         // Set timezone to Asia/Manila and get current time
         date_default_timezone_set('Asia/Manila');
         $currentTime = new DateTime();

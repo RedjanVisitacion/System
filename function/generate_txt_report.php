@@ -170,20 +170,30 @@ function generateTextReport($data, $format) {
 
     // Candidate results
     $report .= "\nCandidate Results:\n------------------\n";
-    $currentDepartment = '';
-    $currentPosition = '';
-
+    $groupedCandidates = [];
     foreach ($data['candidate_results'] as $candidate) {
-        if ($candidate['department'] !== $currentDepartment) {
-            $currentDepartment = $candidate['department'];
-            $report .= "\n{$currentDepartment}\n" . str_repeat('-', strlen($currentDepartment)) . "\n";
-            $currentPosition = '';
+        $dept = $candidate['department'];
+        $pos = $candidate['position'];
+        $name = $candidate['name'];
+        if (!isset($groupedCandidates[$dept])) {
+            $groupedCandidates[$dept] = [];
         }
-        if ($candidate['position'] !== $currentPosition) {
-            $currentPosition = $candidate['position'];
-            $report .= "\n{$currentPosition}:\n";
+        if (!isset($groupedCandidates[$dept][$pos])) {
+            $groupedCandidates[$dept][$pos] = [];
         }
-        $report .= "{$candidate['name']} - {$candidate['votes']} votes\n";
+        if (!isset($groupedCandidates[$dept][$pos][$name])) {
+            $groupedCandidates[$dept][$pos][$name] = 0;
+        }
+        $groupedCandidates[$dept][$pos][$name] += (int)$candidate['votes'];
+    }
+    foreach ($groupedCandidates as $dept => $positions) {
+        $report .= "\n{$dept}\n" . str_repeat('-', strlen($dept)) . "\n";
+        foreach ($positions as $pos => $cands) {
+            $report .= "\n{$pos}:\n";
+            foreach ($cands as $name => $votes) {
+                $report .= "{$name} - {$votes} votes\n";
+            }
+        }
     }
 
     // Set timezone to Asia/Manila and get current time
@@ -226,20 +236,30 @@ function generatePDFReport($data) {
     $html .= '<br>';
 
     $html .= '<h3>Candidate Results:</h3>';
-    $currentDepartment = '';
-    $currentPosition = '';
-
+    $groupedCandidates = [];
     foreach ($data['candidate_results'] as $candidate) {
-        if ($candidate['department'] !== $currentDepartment) {
-            $currentDepartment = $candidate['department'];
-            $html .= '<h4>' . $currentDepartment . '</h4>';
-            $currentPosition = '';
+        $dept = $candidate['department'];
+        $pos = $candidate['position'];
+        $name = $candidate['name'];
+        if (!isset($groupedCandidates[$dept])) {
+            $groupedCandidates[$dept] = [];
         }
-        if ($candidate['position'] !== $currentPosition) {
-            $currentPosition = $candidate['position'];
-            $html .= '<h5>' . $currentPosition . ':</h5>';
+        if (!isset($groupedCandidates[$dept][$pos])) {
+            $groupedCandidates[$dept][$pos] = [];
         }
-        $html .= '<p>' . $candidate['name'] . ' - ' . $candidate['votes'] . ' votes</p>';
+        if (!isset($groupedCandidates[$dept][$pos][$name])) {
+            $groupedCandidates[$dept][$pos][$name] = 0;
+        }
+        $groupedCandidates[$dept][$pos][$name] += (int)$candidate['votes'];
+    }
+    foreach ($groupedCandidates as $dept => $positions) {
+        $html .= '<h4>' . $dept . '</h4>';
+        foreach ($positions as $pos => $cands) {
+            $html .= '<h5>' . $pos . ':</h5>';
+            foreach ($cands as $name => $votes) {
+                $html .= '<p>' . $name . ' - ' . $votes . ' votes</p>';
+            }
+        }
     }
 
     // Set timezone to Asia/Manila and get current time
