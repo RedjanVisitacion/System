@@ -12,9 +12,10 @@ $user_profile = $result->fetch_assoc();
 $stmt->close();
 
 // Set profile picture path
-$profile_picture = !empty($user_profile['profile_picture']) 
-    ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture'])
+$profile_picture = isset($user_profile['profile_picture']) && !empty($user_profile['profile_picture']) 
+    ? '../uploads/profile_pictures/' . htmlspecialchars($user_profile['profile_picture']) 
     : '../img/icon.png';
+
 
 // Fetch and display candidate details (with photo)
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
@@ -1480,7 +1481,7 @@ $can_view_results = checkElectionTimeline($con);
         <div class="dropdown">
           <a href="#" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500; min-width:120px;" role="button" id="desktopProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <?php if ($profile_picture): ?>
-              <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
+              <img src="<?php echo $profile_picture; ?>" alt="use data to see photos" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; margin-right: 8px;">
             <?php else: ?>
               <span class="d-flex align-items-center justify-content-center" style="width:32px; height:32px; background:#e0e7ef; border-radius:50%; margin-right:8px;">
                 <i class="bi bi-person-circle" style="font-size:1.5rem; color:#2563eb;"></i>

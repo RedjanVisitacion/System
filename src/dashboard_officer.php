@@ -48,6 +48,9 @@ if ($candidate_id) {
 
 
 
+
+
+
 // ✅ Add Candidate Submission Logic
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['department'], $_POST['position'],$_POST['age'], $_POST['age'], $_POST['info'], $_FILES['profile_pic'])) {
     header('Content-Type: application/json');
@@ -1177,7 +1180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
           <div class="dropdown">
             <a href="#" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;" role="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
               <?php if ($profile_picture): ?>
-                <img src="<?php echo $profile_picture; ?>" alt="Profile Picture" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
+                <img src="<?php echo $profile_picture; ?>" alt="use data to see photos" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #fff;">
               <?php else: ?>
                 <i class="bi bi-person-circle"></i>
               <?php endif; ?>
@@ -1434,7 +1437,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
               <input type="number" class="form-control" id="age" name="age" min="1" required>
             </div>
 
-            <div class="col-12 col-md-6">
+            <div class="col-12 col-md">
               <label for="department" class="form-label">Department</label>
               <select class="form-select" id="department" name="department" required>
                 <option value="">Select Department</option>

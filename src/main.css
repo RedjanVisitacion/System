@@ -10764,4 +10764,16 @@ textarea.form-control-lg {
   .d-print-none {
     display: none !important;
   }
+}
+.back-btn-container {
+  margin-left: 0px;
+  margin-top: 0px;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 0;
+  margin-left: 0;
 }/*# sourceMappingURL=main.css.map */
