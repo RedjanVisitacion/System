@@ -182,7 +182,7 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         $pdf->writeHTML($html, true, false, true, false, '');
 
         // Create reports directory if it doesn't exist
-        $reportsDir = '../reports';
+        $reportsDir = __DIR__ . '/../reports';
         if (!file_exists($reportsDir)) {
             mkdir($reportsDir, 0777, true);
         }
@@ -196,12 +196,29 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         // Output PDF file
         $pdf->Output($filepath, 'F');
 
-        // Send file to browser
+        // Check if file was created successfully
+        if (!file_exists($filepath)) {
+            throw new Exception("Failed to create PDF file");
+        }
+
+        // Clear any previous output
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
+
+        // Set headers for PDF download
         header('Content-Type: application/pdf');
         header('Content-Disposition: attachment; filename="' . basename($filepath) . '"');
         header('Content-Length: ' . filesize($filepath));
+        header('Cache-Control: private, max-age=0, must-revalidate');
+        header('Pragma: public');
+
+        // Read and output file
         readfile($filepath);
+
+        // Delete the file after sending
         unlink($filepath);
+        exit;
 
         return ['success' => true, 'message' => 'PDF report generated successfully'];
 
@@ -213,28 +230,38 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
 
 // Handle POST request
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    header('Content-Type: application/json');
     $format = $_POST['format'] ?? 'pdf';
     $startDate = $_POST['start_date'] ?? null;
     $endDate = $_POST['end_date'] ?? null;
 
     if ($format !== 'pdf') {
+        header('Content-Type: application/json');
         echo json_encode(['success' => false, 'message' => 'Only PDF format is supported']);
         exit;
     }
 
     if ($startDate && $endDate) {
         if (!strtotime($startDate) || !strtotime($endDate)) {
+            header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Invalid date format']);
             exit;
         }
         if (strtotime($startDate) > strtotime($endDate)) {
+            header('Content-Type: application/json');
             echo json_encode(['success' => false, 'message' => 'Start date cannot be after end date']);
             exit;
         }
     }
 
-    $result = generatePDFReport($format, $startDate, $endDate);
-    echo json_encode($result);
+    try {
+        $result = generatePDFReport($format, $startDate, $endDate);
+        if (!$result['success']) {
+            header('Content-Type: application/json');
+            echo json_encode($result);
+        }
+    } catch (Exception $e) {
+        header('Content-Type: application/json');
+        echo json_encode(['success' => false, 'message' => 'Error generating PDF: ' . $e->getMessage()]);
+    }
     exit;
 }

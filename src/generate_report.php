@@ -353,14 +353,14 @@ $fullName = $userData['full_name'] ?? 'User';
             <!-- Report Format Selection -->
             <h5 class="section-title">Select Report Format</h5>
             <div class="row justify-content-center">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="format-option" data-format="txt">
                         <i class="fas fa-file-alt"></i>
                         <h5>Text Format</h5>
                         <p class="text-muted">Human-readable format with formatted text</p>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <div class="format-option selected" data-format="pdf">
                         <i class="fas fa-file-pdf"></i>
                         <h5>PDF Format</h5>
@@ -459,19 +459,53 @@ $fullName = $userData['full_name'] ?? 'User';
             formData.append('end_date', endDate);
 
             // Send request to generate report
-            fetch('../function/generate_pdf_report.php', {
+            const endpoint = selectedFormat === 'pdf' ? 
+                '../function/generate_pdf_report.php' : 
+                '../function/generate_txt_report.php';
+
+            fetch(endpoint, {
                 method: 'POST',
                 body: formData
             })
-            .then(response => {
+            .then(async response => {
                 if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                    // Try to parse as JSON, but fallback to text (HTML error page)
+                    let errorText = await response.text();
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        throw new Error(errorData.message || 'Network response was not ok');
+                    } catch (e) {
+                        // Not JSON, probably HTML error page
+                        throw new Error('Server error: ' + errorText.substring(0, 100) + '...');
+                    }
                 }
+
                 const contentType = response.headers.get('content-type');
-                if (contentType && (contentType.includes('application/json') || contentType.includes('text/plain') || contentType.includes('application/pdf'))) {
-                    return response.blob();
+                const responseClone = response.clone();
+
+                try {
+                    if (contentType && contentType.includes('application/json')) {
+                        return await response.json();
+                    } else if (contentType && contentType.includes('text/plain')) {
+                        return await response.text();
+                    } else if (contentType && (
+                        contentType.includes('application/pdf') ||
+                        contentType.includes('application/vnd.openxmlformats-officedocument.wordprocessingml.document') ||
+                        contentType.includes('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+                    )) {
+                        return await response.blob();
+                    } else {
+                        // Fallback handling
+                        const text = await response.text();
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            return await responseClone.blob();
+                        }
+                    }
+                } catch (error) {
+                    return await responseClone.blob();
                 }
-                return response.json();
             })
             .then(data => {
                 if (data instanceof Blob) {
@@ -479,33 +513,48 @@ $fullName = $userData['full_name'] ?? 'User';
                     const url = window.URL.createObjectURL(data);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = `election_report_${new Date().toISOString().slice(0,10)}.${selectedFormat}`;
+                    let fileExtension;
+                    switch(selectedFormat) {
+                        case 'pdf':
+                            fileExtension = 'pdf';
+                            break;
+                        default:
+                            fileExtension = 'txt';
+                    }
+                    a.download = `election_report_${new Date().toISOString().slice(0,10)}.${fileExtension}`;
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
                     a.remove();
                     
-                    // Show success message
-                    successMessage.textContent = 'Report downloaded successfully';
+                    successMessage.textContent = `${selectedFormat.toUpperCase()} report downloaded successfully`;
                     successMessage.style.display = 'block';
-                    successMessage.classList.add('animate__animated', 'animate__fadeIn');
+                } else if (typeof data === 'string') {
+                    // Handle text file download
+                    const blob = new Blob([data], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `election_report_${new Date().toISOString().slice(0,10)}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                    
+                    successMessage.textContent = 'Text report downloaded successfully';
+                    successMessage.style.display = 'block';
                 } else if (data.success) {
-                    // Show success message
                     successMessage.textContent = data.message;
                     successMessage.style.display = 'block';
-                    successMessage.classList.add('animate__animated', 'animate__fadeIn');
                 } else {
                     throw new Error(data.message || 'Failed to generate report');
                 }
             })
             .catch(error => {
-                // Show error message
                 errorMessage.textContent = error.message;
                 errorMessage.style.display = 'block';
-                errorMessage.classList.add('animate__animated', 'animate__fadeIn');
             })
             .finally(() => {
-                // Reset button state
                 generateBtn.disabled = false;
                 loadingSpinner.style.display = 'none';
             });

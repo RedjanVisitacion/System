@@ -3,7 +3,7 @@
         'name' => 'election-system/reports',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => '6133ee0c6f28cb3d2a1609a41c42655272550a11',
+        'reference' => '5ba4c986fea935ac27ab4d269a144064a2e9a1e5',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'election-system/reports' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => '6133ee0c6f28cb3d2a1609a41c42655272550a11',
+            'reference' => '5ba4c986fea935ac27ab4d269a144064a2e9a1e5',
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
