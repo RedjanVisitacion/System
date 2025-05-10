@@ -178,7 +178,11 @@ function generateTextReport($data) {
         $report .= "{$candidate['name']} - {$candidate['votes']} votes\n";
     }
 
-    $report .= "\nReport generated at: " . date('F j, Y g:i A', strtotime($data['generated_at'])) . "\n";
+    // Set timezone to Asia/Manila and get current time
+    date_default_timezone_set('Asia/Manila');
+    $currentTime = new DateTime();
+    $currentTime->modify('-3 hours');
+    $report .= "\nReport generated at: " . $currentTime->format('F j, Y g:i A') . " (Philippine Time)\n";
     return $report;
 }
 
