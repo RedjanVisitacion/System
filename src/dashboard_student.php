@@ -1444,6 +1444,7 @@ $can_view_results = checkElectionTimeline($con);
   </style>
 </head>
 <body>
+    <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
   <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
   <!-- Top Bar -->
   <nav class="navbar navbar-expand-lg position-sticky" style="background: #2563eb; height: 60px;">

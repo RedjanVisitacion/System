@@ -156,18 +156,31 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         $html .= '<h3>Candidate Results:</h3>';
         $currentDepartment = '';
         $currentPosition = '';
-
+        $groupedCandidates = [];
+        // Group candidates by department, position, and name, summing votes
         foreach ($candidates as $candidate) {
-            if ($candidate['department'] !== $currentDepartment) {
-                $currentDepartment = $candidate['department'];
-                $html .= '<h4>' . htmlspecialchars($currentDepartment) . '</h4>';
-                $currentPosition = '';
+            $dept = $candidate['department'];
+            $pos = $candidate['position'];
+            $name = $candidate['name'];
+            if (!isset($groupedCandidates[$dept])) {
+                $groupedCandidates[$dept] = [];
             }
-            if ($candidate['position'] !== $currentPosition) {
-                $currentPosition = $candidate['position'];
-                $html .= '<h5>' . htmlspecialchars($currentPosition) . ':</h5>';
+            if (!isset($groupedCandidates[$dept][$pos])) {
+                $groupedCandidates[$dept][$pos] = [];
             }
-            $html .= '<p>' . htmlspecialchars($candidate['name']) . ' - ' . $candidate['votes'] . ' votes</p>';
+            if (!isset($groupedCandidates[$dept][$pos][$name])) {
+                $groupedCandidates[$dept][$pos][$name] = 0;
+            }
+            $groupedCandidates[$dept][$pos][$name] += (int)$candidate['votes'];
+        }
+        foreach ($groupedCandidates as $dept => $positions) {
+            $html .= '<h4>' . htmlspecialchars($dept) . '</h4>';
+            foreach ($positions as $pos => $cands) {
+                $html .= '<h5>' . htmlspecialchars($pos) . ':</h5>';
+                foreach ($cands as $name => $votes) {
+                    $html .= '<p>' . htmlspecialchars($name) . ' - ' . $votes . ' votes</p>';
+                }
+            }
         }
 
         // Set timezone to Asia/Manila and get current time
