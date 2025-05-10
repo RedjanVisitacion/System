@@ -550,6 +550,7 @@
 <body>
 
      <audio src="assets/loginBG.mp3" autoplay hidden></audio>
+     <audio src="assets/loginBGM.mp3" autoplay loop hidden></audio>
 
   <div class="login-page-container">
     <div class="login-logo-side">

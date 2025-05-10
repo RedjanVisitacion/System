@@ -3167,6 +3167,81 @@ function formatDateTime(dateString) {
     });
 }
 
+
+
+
+ // Enhanced Mobile Legends-style smoke effect
+    (function() {
+      const canvas = document.getElementById('smoke-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      window.addEventListener('resize', () => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      });
+
+      // Smoke particle system (layered, swirling)
+      const layers = 3;
+      const particlesPerLayer = 18;
+      const allParticles = [];
+      const baseColors = [
+        'rgba(13,110,253,0.10)', // blue
+        'rgba(255,255,255,0.08)', // white
+        'rgba(37,99,235,0.09)'   // deep blue
+      ];
+      function randomBetween(a, b) { return a + Math.random() * (b - a); }
+      function createParticle(layer) {
+        const baseRadius = [90, 60, 40][layer];
+        return {
+          x: randomBetween(0, width),
+          y: randomBetween(height * 0.2, height * 0.8),
+          radius: randomBetween(baseRadius, baseRadius + 40),
+          color: baseColors[layer],
+          alpha: randomBetween(0.13, 0.22) + layer * 0.05,
+          speed: randomBetween(0.12, 0.32) + layer * 0.08,
+          swirl: randomBetween(0.002, 0.008) * (Math.random() > 0.5 ? 1 : -1),
+          angle: randomBetween(0, Math.PI * 2),
+          layer
+        };
+      }
+      for (let l = 0; l < layers; l++) {
+        for (let i = 0; i < particlesPerLayer; i++) {
+          allParticles.push(createParticle(l));
+        }
+      }
+      function draw() {
+        ctx.clearRect(0, 0, width, height);
+        for (let p of allParticles) {
+          ctx.save();
+          ctx.globalAlpha = p.alpha;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, 2 * Math.PI);
+          ctx.fillStyle = p.color;
+          ctx.shadowColor = p.color;
+          ctx.shadowBlur = 60 - p.layer * 15;
+          ctx.fill();
+          ctx.restore();
+          // Swirl and float
+          p.angle += p.swirl;
+          p.x += Math.cos(p.angle) * (0.3 + p.layer * 0.2);
+          p.y -= p.speed;
+          // Respawn if out of view
+          if (p.y + p.radius < 0 || p.x + p.radius < 0 || p.x - p.radius > width) {
+            Object.assign(p, createParticle(p.layer));
+            p.y = height + p.radius;
+          }
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
 // ... rest of the existing code ...
 </script>
 

@@ -328,6 +328,10 @@ $fullName = $userData['full_name'] ?? 'User';
     </style>
 </head>
 <body class="page-transition">
+
+
+        <audio src="assets/resultBG.mp3" autoplay loop hidden></audio>
+
     <!-- Navigation Bar -->
     <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:50px; z-index: 1050;">
         <div class="navB">

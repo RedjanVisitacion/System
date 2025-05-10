@@ -516,6 +516,9 @@ $stmt->close();
     </style>
 </head>
 <body class="bg-light">
+
+    <audio src="assets/profileBG.mp3" autoplay hidden></audio>
+
     <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:60px; z-index: 1050;">
         <div class="">
             <a href="<?php echo $_SESSION['role'] === 'officer' ? 'dashboard_officer.php' : 'dashboard_student.php'; ?>" class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1" style="font-weight:500;">
