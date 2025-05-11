@@ -1174,8 +1174,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <!-- Smoke Effect Canvas -->
     <canvas id="smoke-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
     <!-- Floating Dragon -->
-     <img id="dragon-float" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:30px;height:auto;z-index:10;pointer-events:none;opacity:0.85;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">
-    <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
+     <img id="dragon-float" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:50px;height:auto;z-index:10;pointer-events:none;opacity:0.85;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">
+    <img id="dragon-floatz" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:30px;height:auto;z-index:10;pointer-events:none;opacity:0.85;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">
+    
+     <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
       <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
     <!-- Top Bar -->
   
@@ -2812,13 +2814,34 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
       let min = 0;
       function animateDragon() {
         pos += direction * 1.2;
-        if (pos > max) { direction = -1; dragon.style.transform = 'scaleX(-1)'; }
-        if (pos < min) { direction = 1; dragon.style.transform = 'scaleX(1)'; }
+        if (pos > max) { direction = -2; dragon.style.transform = 'scaleX(-2)'; }
+        if (pos < min) { direction = 2; dragon.style.transform = 'scaleX(2)'; }
         dragon.style.left = pos + 'px';
         requestAnimationFrame(animateDragon);
       }
-      window.addEventListener('resize', () => { max = window.innerWidth - 140; });
+      window.addEventListener('resize', () => { max = window.innerWidth - 350; });
       animateDragon();
+   
+    })();
+
+    // Floating dragon animation
+    (function() {
+      const dragon = document.getElementById('dragon-floatz');
+      if (!dragon) return;
+      let direction = 3;
+      let pos = 0;
+      let max = window.innerWidth - 140;
+      let min = 0;
+      function animateDragon() {
+        pos += direction * 1.2;
+        if (pos > max) { direction = -2; dragon.style.transform = 'scaleX(-2)'; }
+        if (pos < min) { direction = 2; dragon.style.transform = 'scaleX(2)'; }
+        dragon.style.left = pos + 'px';
+        requestAnimationFrame(animateDragon);
+      }
+      window.addEventListener('resize', () => { max = window.innerWidth - 350; });
+      animateDragon();
+
     })();
   </script>
 </body>
