@@ -1450,7 +1450,9 @@ $can_view_results = checkElectionTimeline($con);
     <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
   <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
   <!-- Top Bar -->
-  <nav class="navbar navbar-expand-lg position-sticky" style="background: linear-gradient(90deg, rgb(26, 57, 119), rgb(72, 74, 80)); height: 60px;">
+ <nav class="navbar navbar-expand-lg position-sticky" style="background: linear-gradient(100deg,rgb(8, 53, 145), #b5b8be); height: 60px;">
+
+
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
