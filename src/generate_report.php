@@ -333,7 +333,7 @@ $fullName = $userData['full_name'] ?? 'User';
         <audio src="assets/resultBG.mp3" autoplay loop hidden></audio>
 
     <!-- Navigation Bar -->
-    <nav class="navbar navbar-dark bg-primary shadow-sm" style="min-height:50px; z-index: 1050;">
+    <nav class="navbar navbar-dark bg-primary shadow-sm" style="background: linear-gradient(90deg, rgb(26, 57, 119), rgb(72, 74, 80)); height: 60px;">
         <div class="navB">
             <a href="<?php echo $_SESSION['role'] === 'officer' ? 'dashboard_officer.php' : 'dashboard_student.php'; ?>" 
                class="btn btn-outline-light rounded-pill d-flex align-items-center gap-2 px-3 py-1 back-btn" 

@@ -775,7 +775,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     @media (max-width: 991.98px) {
       .mobile-menu-btn {
         display: block;
-        margin-left: 130px;
+        margin-left: 90px;
       }
       
       .elecom-logo {
@@ -1174,14 +1174,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <!-- Smoke Effect Canvas -->
     <canvas id="smoke-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
     <!-- Floating Dragon -->
-     <img id="dragon-float" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:50px;height:auto;z-index:10;pointer-events:none;opacity:0.85;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">
-    <img id="dragon-floatz" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:30px;height:auto;z-index:10;pointer-events:none;opacity:0.85;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">
+    <!-- <img id="dragon-float" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:50px;height:auto;z-index:10;pointer-events:none;opacity:0.45;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">
+    <img id="dragon-floatz" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:500px;height:auto;z-index:10;pointer-events:none;opacity:0.95;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">-->
     
      <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
       <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
     <!-- Top Bar -->
   
-  <nav class="navbar navbar-expand-lg position-sticky" style="background: #2563eb; height: 60px;">
+  <nav class="navbar navbar-expand-lg position-sticky" style="background: linear-gradient(90deg, rgb(26, 57, 119), rgb(72, 74, 80)); height: 60px;">
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">

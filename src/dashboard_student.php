@@ -737,7 +737,7 @@ $can_view_results = checkElectionTimeline($con);
     @media (max-width: 991.98px) {
       .mobile-menu-btn {
         display: block;
-        margin-left: 130px;
+        margin-left: 90px; 
       }
 
       .elecom-logo {
@@ -1450,7 +1450,7 @@ $can_view_results = checkElectionTimeline($con);
     <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
   <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
   <!-- Top Bar -->
-  <nav class="navbar navbar-expand-lg position-sticky" style="background: #2563eb; height: 60px;">
+  <nav class="navbar navbar-expand-lg position-sticky" style="background: linear-gradient(90deg, rgb(26, 57, 119), rgb(72, 74, 80)); height: 60px;">
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
@@ -3191,7 +3191,7 @@ function formatDateTime(dateString) {
       const particlesPerLayer = 18;
       const allParticles = [];
       const baseColors = [
-        'rgba(13,110,253,0.10)', // blue
+        'rgba(14, 80, 179, 0.1)', // blue
         'rgba(255,255,255,0.08)', // white
         'rgba(37,99,235,0.09)'   // deep blue
       ];
