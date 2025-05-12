@@ -102,6 +102,9 @@
       text-align: center;
       text-decoration: none;
       color: #222;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease forwards;
     }
     .highlight {
       color: #2563eb;
@@ -114,6 +117,10 @@
       text-decoration: none;
       letter-spacing: 1px;
       text-shadow: 0 2px 4px rgba(37,99,235,0.08);
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 0.8s ease forwards 0.3s;
     }
     .subtitle {
       color: #888;
@@ -549,6 +556,16 @@
     }
     .loading-glow {
       text-shadow: 0 0 8px #2563eb88, 0 0 16px #60a5fa44;
+    }
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
