@@ -28,7 +28,7 @@ $has_voted = $vote_count > 0;
 
 // Function to check election timeline
 function checkElectionTimeline($con) {
-    $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+    $stmt = $con->prepare("SELECT results_date FROM election_dates WHERE id = 1");
     $stmt->execute();
     $result = $stmt->get_result();
     $election_dates = $result->fetch_assoc();
@@ -39,21 +39,20 @@ function checkElectionTimeline($con) {
     }
 
     $current_time = new DateTime();
-    $end_date = new DateTime($election_dates['end_date']);
     $results_date = new DateTime($election_dates['results_date']);
 
-    return ($current_time >= $end_date) && ($current_time >= $results_date);
+    return $current_time >= $results_date;
 }
 
-// Get election dates for display
+// Get election dates
 $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
 $stmt->execute();
 $result = $stmt->get_result();
 $election_dates = $result->fetch_assoc();
 $stmt->close();
 
-// Check if results can be viewed
 $can_view_results = checkElectionTimeline($con);
+
 
 // Define position order for each department
 $positionOrder = [
@@ -616,43 +615,39 @@ foreach ($results as $result) {
     </div>
 
     <div class="results-container">
-        <div class="results-card">
-            <h2 class="text-center mb-4">Election Results</h2>
-            
-            <?php if ($can_view_results): ?>
-                <!-- Pie Chart Section -->
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="chart-container">
-                            <canvas id="overallResultsChart"></canvas>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="chart-container">
-                            <canvas id="departmentResultsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
+       <div class="results-card">
+    <h2 class="text-center mb-4">Election Results</h2>
 
-                <!-- Detailed Results Section -->
-                <div id="resultsContainer">
-                    <!-- Results will be loaded here -->
+    <?php if ($can_view_results): ?>
+        <!-- Pie Chart Section -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <canvas id="overallResultsChart"></canvas>
                 </div>
-            <?php else: ?>
-                <div class="text-center py-5">
-                    <i class="bi bi-clock-history fs-1 text-muted"></i>
-                    <?php 
-                    $current_time = new DateTime();
-                    $end_date = new DateTime($election_dates['end_date']);
-                    if ($current_time < $end_date): 
-                    ?>
-                        <p class="mt-3 text-muted">Voting is still in progress. Results will be available after the election ends.</p>
-                    <?php else: ?>
-                        <p class="mt-3 text-muted">Results will be available after <?php echo date('F d, Y h:i A', strtotime($election_dates['results_date'])); ?></p>
-                    <?php endif; ?>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <canvas id="departmentResultsChart"></canvas>
                 </div>
-            <?php endif; ?>
+            </div>
         </div>
+
+        <!-- Detailed Results Section -->
+        <div id="resultsContainer">
+            <!-- Results will be loaded here -->
+        </div>
+    <?php else: ?>
+        <div class="text-center py-5">
+            <i class="bi bi-clock-history fs-1 text-muted"></i>
+            <p class="mt-3 text-muted">
+                Results will be available after 
+                <?php echo date('F d, Y h:i A', strtotime($election_dates['results_date'])); ?>
+            </p>
+        </div>
+    <?php endif; ?>
+</div>
+
     </div>
 
     <!-- Candidate Profile Modal -->
