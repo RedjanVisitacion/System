@@ -155,12 +155,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 
 
 ?>
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
+
+<!-- Include Day.js + plugin -->
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/dayjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dayjs@1/plugin/customParseFormat.js"></script>
+<script>
+  dayjs.extend(dayjs_plugin_customParseFormat);
+</script>
+
+<!-- Your external JS -->
+<script src="js/election_dates.js"></script>
+
+
   <meta charset="UTF-8">
   <title>Electoral Commission Dashboard</title>
   <link rel="icon" href="../img/icon.png"/>
@@ -2186,17 +2196,27 @@ function showCandidateProfile(candidate) {
     }
   };
 
+// Requires dayjs + customParseFormat plugin loaded in HTML
 
- //Election date
- function setElectionDates() {
-  const startDate = document.getElementById('startDate').value;
-  const endDate = document.getElementById('endDate').value;
-  const resultsDate = document.getElementById('resultsDate').value;
+document.addEventListener('DOMContentLoaded', () => {
+  fetchElectionDatesAndStartCountdown();
+  loadElectionDatesIntoInputs();
+});
 
-  if (!startDate || !endDate || !resultsDate) {
+// Save election dates
+function setElectionDates() {
+  const startDateRaw = document.getElementById('startDate').value;
+  const endDateRaw = document.getElementById('endDate').value;
+  const resultsDateRaw = document.getElementById('resultsDate').value;
+
+  if (!startDateRaw || !endDateRaw || !resultsDateRaw) {
     alert('Please fill in all date fields.');
     return;
   }
+
+  const startDate = dayjs(startDateRaw).format('YYYY-MM-DD HH:mm:ss');
+  const endDate = dayjs(endDateRaw).format('YYYY-MM-DD HH:mm:ss');
+  const resultsDate = dayjs(resultsDateRaw).format('YYYY-MM-DD HH:mm:ss');
 
   fetch('../src/get_election_dates.php', {
     method: 'POST',
@@ -2210,10 +2230,9 @@ function showCandidateProfile(candidate) {
   })
   .then(response => response.json())
   .then(data => {
-    console.log(data);
     alert(data.message);
     if (data.success && typeof updateElectionDates === 'function') {
-      updateElectionDates(); // Optional refresh function
+      updateElectionDates();
     }
   })
   .catch(error => {
@@ -2222,23 +2241,20 @@ function showCandidateProfile(candidate) {
   });
 }
 
-  // Load Dates into Inputs
-  document.addEventListener('DOMContentLoaded', () => {
-    fetch('../src/get_election_dates.php')
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          document.getElementById('startDate').value = new Date(data.start_date).toISOString().slice(0, 16);
-          document.getElementById('endDate').value = new Date(data.end_date).toISOString().slice(0, 16);
-          document.getElementById('resultsDate').value = new Date(data.results_date).toISOString().slice(0, 16);
-        }
-      });
-  });
+// Load dates into input fields
+function loadElectionDatesIntoInputs() {
+  fetch('../src/get_election_dates.php')
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById('startDate').value = dayjs(data.start_date).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('endDate').value = dayjs(data.end_date).format('YYYY-MM-DDTHH:mm');
+        document.getElementById('resultsDate').value = dayjs(data.results_date).format('YYYY-MM-DDTHH:mm');
+      }
+    });
+}
 
-
-//RealTime Countdown
-
-
+// Countdown handling
 let countdownInterval;
 
 function fetchElectionDatesAndStartCountdown() {
@@ -2282,17 +2298,16 @@ function startDynamicCountdown(startTime, endTime) {
     if (now < startTime) {
       diff = startTime - now;
       label = 'Voting starts in ';
-      timeEl.style.color = ''; // default
+      timeEl.style.color = '';
     } else if (now >= startTime && now < endTime) {
       diff = endTime - now;
       label = 'Voting ends in ';
-      timeEl.style.color = ''; // default
-      
-      // Check if there's 1 minute remaining
+      timeEl.style.color = '';
+
       const minutesRemaining = Math.floor(diff / (1000 * 60));
       if (minutesRemaining === 1) {
         const audio = document.getElementById('countdownAudio');
-        audio.play();
+        if (audio) audio.play();
       }
     } else {
       timeEl.textContent = 'Voting has ended';
@@ -2311,9 +2326,6 @@ function startDynamicCountdown(startTime, endTime) {
   updateCountdown();
   countdownInterval = setInterval(updateCountdown, 1000);
 }
-
-document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdown);
-
 
 
 
@@ -2846,3 +2858,5 @@ document.addEventListener('DOMContentLoaded', fetchElectionDatesAndStartCountdow
   </script>
 </body>
 </html>
+
+
