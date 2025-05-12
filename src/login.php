@@ -27,11 +27,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, rgba(57, 66, 77, 0.5) 0%, rgba(6, 73, 117, 0.9) 100%), url('../img/votE.jpg');
+     /* background: linear-gradient(135deg, rgba(57, 66, 77, 0.5) 0%, rgba(6, 73, 117, 0.9) 100%), url('../img/votE.jpg');
+     */
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
+      background: linear-gradient(rgba(30,41,59,0.7), rgba(75, 84, 105, 0.5)),
+                url('../img/bg.gif') center/cover no-repeat fixed;
+      min-height: 100vh;
     }
     .login-page-container {
       display: flex;
