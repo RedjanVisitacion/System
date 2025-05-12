@@ -1178,7 +1178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     <img id="dragon-floatz" src="../img/dragon.gif"  style="position:fixed;top:80px;left:0;width:500px;height:auto;z-index:10;pointer-events:none;opacity:0.95;transition:filter 0.3s;filter:drop-shadow(0 8px 16px rgba(0,0,0,0.18));">-->
     
      <audio src="assets/welcomeBG.mp3" autoplay hidden></audio>
-      <audio src="assets/studentBG.mp3" autoplay loop hidden></audio>
+      <!--<audio src="assets/studentBG.mp3" autoplay loop hidden></audio>-->
     <!-- Top Bar -->
   
   <nav class="navbar navbar-expand-lg position-sticky" style="background: linear-gradient(90deg, rgb(26, 57, 119), rgb(72, 74, 80)); height: 60px;">
