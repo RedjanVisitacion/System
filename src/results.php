@@ -41,8 +41,13 @@ function checkElectionTimeline($con) {
     $current_time = new DateTime();
     $results_date = new DateTime($election_dates['results_date']);
 
+    $results_date->sub(new DateInterval('PT180M'));
+
+
     return $current_time >= $results_date;
 }
+
+
 
 // Get election dates
 $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
