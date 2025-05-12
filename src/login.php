@@ -27,15 +27,12 @@
       display: flex;
       align-items: center;
       justify-content: center;
-     /* background: linear-gradient(135deg, rgba(57, 66, 77, 0.5) 0%, rgba(6, 73, 117, 0.9) 100%), url('../img/votE.jpg');
-     */
+      background: linear-gradient(135deg, rgba(57, 66, 77, 0.5) 0%, rgba(6, 73, 117, 0.9) 100%), url('../img/votE.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       background-attachment: fixed;
-      background: linear-gradient(rgba(30,41,59,0.7), rgba(75, 84, 105, 0.5)),
-                url('../img/bg.gif') center/cover no-repeat fixed;
-      min-height: 100vh;
+      
     }
     .login-page-container {
       display: flex;
@@ -48,6 +45,10 @@
       box-shadow: 0 8px 40px rgba(60,60,100,0.13), 0 2px 8px rgba(37,99,235,0.08);
       overflow: hidden;
       background: rgba(255,255,255,0.15);
+      background: linear-gradient(rgba(210, 213, 218, 0.7), rgba(230, 234, 243, 0.5)),
+                url('../img/bg.gif') center/cover no-repeat fixed;
+    
+
       backdrop-filter: blur(8px);
     }
     .login-logo-side {

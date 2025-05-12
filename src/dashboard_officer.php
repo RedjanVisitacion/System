@@ -185,6 +185,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     body {
       font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
       background: #f6fafd;
+      background: linear-gradient(rgba(255, 255, 255, 0.7), rgba(39, 39, 41, 0.5)),
+                url('../img/voteBG.gif') center/cover no-repeat fixed;
+      min-height: 100vh;
       padding-top: 0;
       
     }
