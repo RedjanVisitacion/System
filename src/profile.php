@@ -207,7 +207,8 @@ $stmt->close();
 
     <style>
         .profile-card {
-    background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+    background: linear-gradient(135deg, rgba(136, 153, 196, 0.85) 0%, hsla(0, 0.00%, 100.00%, 0.70) 50%, rgba(248,250,252,0.7) 100%),
+                url('') center/cover no-repeat;
     border-radius: 24px;
     box-shadow: 0 8px 32px rgba(37,99,235,0.10);
     padding: 2.8rem 2.2rem 2.2rem;
@@ -511,6 +512,11 @@ $stmt->close();
     }
 }
 
+body.bg-light {
+    background: linear-gradient(rgba(30,41,59,0.7), rgba(75, 84, 105, 0.5)),
+                url('../img/bg.gif') center/cover no-repeat fixed;
+    min-height: 100vh;
+}
 
         
     </style>

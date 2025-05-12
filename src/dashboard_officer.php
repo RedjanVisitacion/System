@@ -186,6 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
       background: #f6fafd;
       padding-top: 0;
+      
     }
     .navbar {
       position: fixed;
