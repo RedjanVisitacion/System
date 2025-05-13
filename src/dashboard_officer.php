@@ -1225,9 +1225,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       </div>
 
        <!-- Notification Icon -->
-        <a href="notify.php" class="notification-icon position-relative me-3 d-none d-lg-inline-flex" title="Notifications">
-           <i class="bi bi-bell" style="font-size: 1.2rem; color: #fff;"></i>
-        </a>
+        <!-- Message Icon -->
+       <!-- <a href="messages.php" class="notification-icon position-relative me-3 d-none d-lg-inline-flex" title="Messages">
+          <i class="bi bi-chat" style="font-size: 1.2rem; color: #fff;"></i>
+        </a> -->
+
       <div class="profile-button d-none d-lg-block">
         <div class="dropdown">
           <a href="#" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500; min-width:120px;" role="button" id="desktopProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
