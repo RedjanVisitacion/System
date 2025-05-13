@@ -1225,7 +1225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
       </div>
 
        <!-- Notification Icon -->
-        <a href="#" class="notification-icon position-relative me-3 d-none d-lg-inline-flex" title="Notifications">
+        <a href="notify.php" class="notification-icon position-relative me-3 d-none d-lg-inline-flex" title="Notifications">
            <i class="bi bi-bell" style="font-size: 1.2rem; color: #fff;"></i>
         </a>
       <div class="profile-button d-none d-lg-block">
