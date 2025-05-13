@@ -1498,11 +1498,7 @@ $can_view_results = checkElectionTimeline($con);
       </div>
 
 
-        <!-- Notification Icon -->
-        <a href="#" class="notification-icon position-relative me-3 d-none d-lg-inline-flex" title="Notifications">
-          <i class="bi bi-bell" style="font-size: 1.2rem; color: #fff;"></i>
-          <span class="notification-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">3</span>
-        </a>
+       
 
       <div class="profile-button d-none d-lg-block">
       
