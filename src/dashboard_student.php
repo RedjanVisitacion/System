@@ -1445,6 +1445,10 @@ $can_view_results = checkElectionTimeline($con);
   animation: shake 0.5s ease;
 }
 
+.notification-icon{
+  margin-right: 30px;
+}
+
   </style>
 </head>
 <body>
@@ -1460,6 +1464,9 @@ $can_view_results = checkElectionTimeline($con);
     <div class="container-fluid px-2">
       <div class="d-flex align-items-center justify-content-between w-100">
         <div class="d-flex align-items-center">
+
+        
+        
           <div class="dropdown">
             <a href="#" class="btn btn-link text-light d-lg-none p-0 d-flex align-items-center gap-2" style="font-size: 1.5rem; text-decoration: none;" role="button" id="mobileProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
               <?php if ($profile_picture): ?>
@@ -1477,6 +1484,7 @@ $can_view_results = checkElectionTimeline($con);
               <li><a class="dropdown-item d-flex align-items-center gap-2 text-danger" href="logout.php"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
             </ul>
           </div>
+          
           <img src="../img/icon.png" alt="Electoral Commission Logo" class="elecom-logo d-none d-lg-block" style="width:44px; height:44px; background:#fff; border-radius:50%; margin-right:14px; box-shadow:0 2px 8px rgba(37,99,235,0.10);">
           <span class="navbar-brand mb-0 h1 electoral-commission-title d-none d-lg-block" style="font-size:1.5rem;">Electoral Commission</span>
         </div>
@@ -1488,7 +1496,16 @@ $can_view_results = checkElectionTimeline($con);
 
 
       </div>
+
+
+        <!-- Notification Icon -->
+        <a href="#" class="notification-icon position-relative me-3 d-none d-lg-inline-flex" title="Notifications">
+          <i class="bi bi-bell" style="font-size: 1.2rem; color: #fff;"></i>
+          <span class="notification-badge position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.7rem;">3</span>
+        </a>
+
       <div class="profile-button d-none d-lg-block">
+      
         <div class="dropdown">
           <a href="#" class="btn btn-outline-light rounded-pill d-flex align-items-center" style="font-weight:500; min-width:120px;" role="button" id="desktopProfileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <?php if ($profile_picture): ?>
