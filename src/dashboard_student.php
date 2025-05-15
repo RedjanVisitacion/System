@@ -2944,11 +2944,15 @@ document.getElementById('departmentSelect').addEventListener('change', function(
 // Function to select a candidate
 function selectCandidate(element, position, candidateId) {
   const positionSection = element.closest('.position-section');
-  const voteLimits = {
-    'Representative': 2,
-    'default': 1
-  };
-  const voteLimit = voteLimits[position] || voteLimits.default;
+
+  const usgRepresentatives = [
+    "BTLED Representative",
+    "BSIT Representative",
+    "BFPT Representative"
+  ];
+
+  // Determine vote limit
+  const voteLimit = usgRepresentatives.includes(position) ? 2 : 1;
 
   // Count selected candidates in this section
   let selectedCandidates = positionSection.querySelectorAll('.candidate-card.selected');
@@ -2976,6 +2980,7 @@ function selectCandidate(element, position, candidateId) {
 
   updateSubmitButtonState();
 }
+
 
 // Check voting status when modal is shown
 document.getElementById('castVoteModal').addEventListener('shown.bs.modal', function () {
