@@ -21,70 +21,167 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
     global $con;
 
     try {
+        // Verify database connection
+        if ($con->connect_error) {
+            throw new Exception("Database connection failed: " . $con->connect_error);
+        }
+
         // Fetch election periods
         $dateQuery = "SELECT * FROM election_dates";
         $params = [];
         $types = "";
 
         if ($startDate && $endDate) {
-            $dateQuery .= " WHERE (start_date BETWEEN ? AND ?) OR (end_date BETWEEN ? AND ?) OR (? BETWEEN start_date AND end_date)";
-            $params = [$startDate, $endDate, $startDate, $endDate, $startDate];
-            $types = "sssss";
+            // Modified query to be more inclusive of date ranges
+            $dateQuery .= " WHERE 
+                (start_date <= ? AND end_date >= ?) OR  -- Election period contains the entire date range
+                (start_date BETWEEN ? AND ?) OR        -- Start date falls within the range
+                (end_date BETWEEN ? AND ?) OR          -- End date falls within the range
+                (? BETWEEN start_date AND end_date)    -- Any date in range falls within an election period
+            ";
+            $params = [
+                $endDate, $startDate,    // For first condition
+                $startDate, $endDate,    // For second condition
+                $startDate, $endDate,    // For third condition
+                $startDate               // For fourth condition
+            ];
+            $types = "sssssss";
         }
 
         $dateQuery .= " ORDER BY id DESC";
+        
+        // Debug information
+        error_log("Date Query: " . $dateQuery);
+        error_log("Parameters: " . print_r($params, true));
+        
         $stmt = $con->prepare($dateQuery);
-        if (!$stmt) throw new Exception("Failed to prepare election dates query: " . $con->error);
-        if (!empty($params)) $stmt->bind_param($types, ...$params);
-        if (!$stmt->execute()) throw new Exception("Failed to execute election dates query: " . $stmt->error);
-        $electionDates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-        if (empty($electionDates)) return ['success' => false, 'message' => 'No election data found for the selected date range'];
+        if (!$stmt) {
+            throw new Exception("Failed to prepare election dates query: " . $con->error);
+        }
+        
+        if (!empty($params)) {
+            if (!$stmt->bind_param($types, ...$params)) {
+                throw new Exception("Failed to bind parameters: " . $stmt->error);
+            }
+        }
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to execute election dates query: " . $stmt->error);
+        }
+        
+        $result = $stmt->get_result();
+        if (!$result) {
+            throw new Exception("Failed to get result: " . $stmt->error);
+        }
+        
+        $electionDates = $result->fetch_all(MYSQLI_ASSOC);
+        
+        // Debug information
+        error_log("Number of election dates found: " . count($electionDates));
+        error_log("Election dates: " . print_r($electionDates, true));
+        
+        if (empty($electionDates)) {
+            // If no dates found, try getting all election dates without date range
+            $fallbackQuery = "SELECT * FROM election_dates ORDER BY id DESC";
+            $fallbackResult = $con->query($fallbackQuery);
+            if ($fallbackResult) {
+                $electionDates = $fallbackResult->fetch_all(MYSQLI_ASSOC);
+                if (!empty($electionDates)) {
+                    error_log("Using fallback query - found " . count($electionDates) . " election dates");
+                } else {
+                    throw new Exception('No election data found in the database');
+                }
+            } else {
+                throw new Exception('No election data found for the selected date range and fallback query failed');
+            }
+        }
         $stmt->close();
 
-        // Fetch candidates and votes
-        $stmt = $con->prepare("
+        // Fetch candidates and votes with error handling
+        $candidatesQuery = "
             SELECT c.candidate_id, c.name, c.department, c.position, c.age, c.platform,
                    COALESCE(r.votes, 0) AS votes, r.published_at
             FROM candidate c
             LEFT JOIN result r ON c.candidate_id = r.candidate_id
             ORDER BY c.department, c.position, r.votes DESC
-        ");
-        if (!$stmt) throw new Exception("Failed to prepare candidates query: " . $con->error);
-        if (!$stmt->execute()) throw new Exception("Failed to execute candidates query: " . $stmt->error);
-        $candidates = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        ";
+        
+        $stmt = $con->prepare($candidatesQuery);
+        if (!$stmt) {
+            throw new Exception("Failed to prepare candidates query: " . $con->error);
+        }
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to execute candidates query: " . $stmt->error);
+        }
+        
+        $result = $stmt->get_result();
+        if (!$result) {
+            throw new Exception("Failed to get candidates result: " . $stmt->error);
+        }
+        
+        $candidates = $result->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
 
-        // Fetch department stats
-        $stmt = $con->prepare("
+        // Fetch department stats with error handling
+        $deptStatsQuery = "
             SELECT u.department, COUNT(DISTINCT u.user_id) AS total_voters
             FROM user u
             JOIN user_profile up ON u.user_id = up.user_id
             WHERE u.role = 'student'
             GROUP BY u.department
-        ");
-        if (!$stmt) throw new Exception("Failed to prepare department stats query: " . $con->error);
-        if (!$stmt->execute()) throw new Exception("Failed to execute department stats query: " . $stmt->error);
-        $departmentStats = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        ";
+        
+        $stmt = $con->prepare($deptStatsQuery);
+        if (!$stmt) {
+            throw new Exception("Failed to prepare department stats query: " . $con->error);
+        }
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to execute department stats query: " . $stmt->error);
+        }
+        
+        $result = $stmt->get_result();
+        if (!$result) {
+            throw new Exception("Failed to get department stats result: " . $stmt->error);
+        }
+        
+        $departmentStats = $result->fetch_all(MYSQLI_ASSOC);
         $stmt->close();
 
-        // Get total registered voters
+        // Get total registered voters with error handling
         $totalVotersQuery = "
             SELECT COUNT(*) AS total_registered
             FROM user u
             JOIN user_profile up ON u.user_id = up.user_id
             WHERE u.role = 'student'
         ";
+        
         $stmt = $con->prepare($totalVotersQuery);
-        if (!$stmt) throw new Exception("Failed to prepare total voters query: " . $con->error);
-        if (!$stmt->execute()) throw new Exception("Failed to execute total voters query: " . $stmt->error);
-        $totalRegisteredVoters = $stmt->get_result()->fetch_assoc()['total_registered'];
+        if (!$stmt) {
+            throw new Exception("Failed to prepare total voters query: " . $con->error);
+        }
+        
+        if (!$stmt->execute()) {
+            throw new Exception("Failed to execute total voters query: " . $stmt->error);
+        }
+        
+        $result = $stmt->get_result();
+        if (!$result) {
+            throw new Exception("Failed to get total voters result: " . $stmt->error);
+        }
+        
+        $totalRegisteredVoters = $result->fetch_assoc()['total_registered'];
         $stmt->close();
 
-        // Fetch total votes cast
+        // Fetch total votes cast with error handling
         $totalVotesQuery = "SELECT COUNT(DISTINCT user_id) as total_votes FROM vote";
-        $totalVotesResult = $con->query($totalVotesQuery);
-        if (!$totalVotesResult) throw new Exception("Failed to execute total votes query: " . $con->error);
-        $totalVotes = $totalVotesResult->fetch_assoc()['total_votes'];
+        $result = $con->query($totalVotesQuery);
+        if (!$result) {
+            throw new Exception("Failed to execute total votes query: " . $con->error);
+        }
+        
+        $totalVotes = $result->fetch_assoc()['total_votes'];
 
         // Create new PDF document
         $pdf = new TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
