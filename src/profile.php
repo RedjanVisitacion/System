@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Fetch current user data
-    $stmt = $mysqli->prepare("SELECT * FROM user_profile WHERE user_id = ?");
+    $stmt = $mysqli->prepare("SELECT * FROM elecom_user_profile WHERE user_id = ?");
     $stmt->bind_param("s", $logged_user_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -102,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Save profile if no errors
     if (empty($errors)) {
         if ($existingProfile) {
-            $sql = "UPDATE user_profile SET full_name = ?, section_name = ?, program_name = ?, year_level = ?, gender = ?, email = ?, phone = ?, updated_at = CURRENT_TIMESTAMP()";
+            $sql = "UPDATE elecom_user_profile SET full_name = ?, section_name = ?, program_name = ?, year_level = ?, gender = ?, email = ?, phone = ?, updated_at = CURRENT_TIMESTAMP()";
             $params = [$full_name, $section_name, $program_name, $year_level, $gender, $email, $phone];
 
             if ($profile_picture) {
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $stmt->close();
         } else {
-            $sql = "INSERT INTO user_profile (user_id, full_name, section_name, program_name, year_level, gender, email, phone, profile_picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO elecom_user_profile (user_id, full_name, section_name, program_name, year_level, gender, email, phone, profile_picture) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $mysqli->prepare($sql);
             $stmt->bind_param("sssssssss", $logged_user_id, $full_name, $section_name, $program_name, $year_level, $gender, $email, $phone, $profile_picture);
             
@@ -139,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Update password if provided
         if (!empty($new_password) && empty($errors)) {
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
-            $stmt = $mysqli->prepare("UPDATE user SET password = ? WHERE user_id = ?");
+            $stmt = $mysqli->prepare("UPDATE elecom_user SET password = ? WHERE user_id = ?");
             $stmt->bind_param("ss", $hashed_password, $logged_user_id);
             
             if (!$stmt->execute()) {
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         isset($_POST['delete_photo']) && $_POST['delete_photo'] == '1'
     ) {
         // Only handle photo deletion
-        $stmt = $mysqli->prepare("SELECT profile_picture FROM user_profile WHERE user_id = ?");
+        $stmt = $mysqli->prepare("SELECT profile_picture FROM elecom_user_profile WHERE user_id = ?");
         $stmt->bind_param("s", $logged_user_id);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -166,7 +166,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (file_exists($file)) {
                 unlink($file);
             }
-            $stmt = $mysqli->prepare("UPDATE user_profile SET profile_picture = NULL WHERE user_id = ?");
+            $stmt = $mysqli->prepare("UPDATE elecom_user_profile SET profile_picture = NULL WHERE user_id = ?");
             $stmt->bind_param("s", $logged_user_id);
             $stmt->execute();
             $stmt->close();
@@ -178,8 +178,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // Fetch profile for display
 $stmt = $mysqli->prepare("SELECT u.user_id, u.role, u.department, up.email, up.phone, up.profile_picture, up.full_name, up.section_name, up.program_name, up.year_level, up.gender 
-                         FROM user u 
-                         LEFT JOIN user_profile up ON u.user_id = up.user_id 
+                         FROM elecom_user u 
+                         LEFT JOIN elecom_user_profile up ON u.user_id = up.user_id 
                          WHERE u.user_id = ?");
 $stmt->bind_param("s", $logged_user_id);
 $stmt->execute();

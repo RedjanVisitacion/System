@@ -4,7 +4,7 @@ require_once 'connection.php';
 
 // Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
-$stmt = $con->prepare("SELECT profile_picture, full_name FROM user_profile WHERE user_id = ?");
+$stmt = $con->prepare("SELECT profile_picture, full_name FROM elecom_user_profile WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -26,7 +26,7 @@ $candidate_id = $_GET['candidate_id'] ?? null;
 $candidate_photo = null;
 
 if ($candidate_id) {
-    $stmt = $con->prepare("SELECT photo FROM candidate WHERE candidate_id = ?");
+    $stmt = $con->prepare("SELECT photo FROM elecom_candidate WHERE candidate_id = ?");
     $stmt->bind_param("i", $candidate_id);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
 
 
     // Check if the candidate already exists
-    $check_stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE name = ? AND department = ? AND position = ?");
+    $check_stmt = $con->prepare("SELECT candidate_id FROM elecom_candidate WHERE name = ? AND department = ? AND position = ?");
     $check_stmt->bind_param("sss", $name, $department, $position);
     $check_stmt->execute();
     $check_result = $check_stmt->get_result();
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['full_name'], $_POST['
     }
 
     // Insert candidate data along with profile picture into the database
-    $stmt = $con->prepare("INSERT INTO candidate (name, department, position,age, platform, photo) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt = $con->prepare("INSERT INTO elecom_candidate (name, department, position,age, platform, photo) VALUES (?, ?, ?, ?, ?, ?)");
     if ($stmt) {
         $stmt->bind_param("ssssss", $name, $department, $position,$age, $platform, $photoPath);
         if ($stmt->execute()) {
@@ -128,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   $candidate_id = $_GET['candidate_id'];
 
   // Fetch candidate details including photo and age
-  $stmt = $con->prepare("SELECT name, department, position, age, platform, photo FROM candidate WHERE candidate_id = ?");
+  $stmt = $con->prepare("SELECT name, department, position, age, platform, photo FROM elecom_candidate WHERE candidate_id = ?");
   $stmt->bind_param("i", $candidate_id);
   $stmt->execute();
   $result = $stmt->get_result();

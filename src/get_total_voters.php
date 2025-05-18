@@ -5,9 +5,9 @@ header('Content-Type: application/json');
 try {
     $stmt = $con->prepare("
         SELECT COUNT(*) AS total_voters 
-        FROM user 
-        JOIN user_profile ON user.user_id = user_profile.user_id
-        WHERE user.role = 'student'
+        FROM elecom_user 
+        JOIN elecom_user_profile ON elecom_user.user_id = elecom_user_profile.user_id
+        WHERE elecom_user.role = 'student'
     ");
     $stmt->execute();
     $result = $stmt->get_result();

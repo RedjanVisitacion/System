@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Upsert into DB (Insert or Update if ID = 1 exists)
         $stmt = $con->prepare("
-            INSERT INTO election_dates (id, start_date, end_date, results_date)
+            INSERT INTO elecom_election_dates (id, start_date, end_date, results_date)
             VALUES (1, ?, ?, ?)
             ON DUPLICATE KEY UPDATE
                 start_date = VALUES(start_date),
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // GET: Fetch current election dates
-$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM elecom_election_dates WHERE id = 1");
 $stmt->execute();
 $result = $stmt->get_result();
 $dates = $result->fetch_assoc();

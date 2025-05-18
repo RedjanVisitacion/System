@@ -4,7 +4,7 @@ require_once 'connection.php';
 
 // Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
-$stmt = $con->prepare("SELECT profile_picture, full_name FROM user_profile WHERE user_id = ?");
+$stmt = $con->prepare("SELECT profile_picture, full_name FROM elecom_user_profile WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -17,7 +17,7 @@ $profile_picture = !empty($user_profile['profile_picture'])
     : '../img/icon.png';
 
 // Check if user has already voted
-$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ? AND vote_status = 'Voted'");
+$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM elecom_vote WHERE user_id = ? AND vote_status = 'Voted'");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -28,7 +28,7 @@ $has_voted = $vote_count > 0;
 
 // Function to check election timeline
 function checkElectionTimeline($con) {
-    $stmt = $con->prepare("SELECT results_date FROM election_dates WHERE id = 1");
+    $stmt = $con->prepare("SELECT results_date FROM elecom_election_dates WHERE id = 1");
     $stmt->execute();
     $result = $stmt->get_result();
     $election_dates = $result->fetch_assoc();
@@ -50,7 +50,7 @@ function checkElectionTimeline($con) {
 
 
 // Get election dates
-$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM elecom_election_dates WHERE id = 1");
 $stmt->execute();
 $result = $stmt->get_result();
 $election_dates = $result->fetch_assoc();
@@ -105,8 +105,8 @@ $positionOrder = [
 // Fetch all candidates and their votes
 $query = "SELECT c.department, c.position, c.name, c.candidate_id, c.photo,
           COALESCE(SUM(r.votes), 0) as votes
-          FROM candidate c
-          LEFT JOIN result r ON c.candidate_id = r.candidate_id 
+          FROM elecom_candidate c
+          LEFT JOIN elecom_result r ON c.candidate_id = r.candidate_id 
           WHERE c.department IN ('USG', 'PAFE', 'SITE', 'AFPROTECHS')
           GROUP BY c.department, c.position, c.candidate_id, c.name, c.photo
           ORDER BY FIELD(c.department, 'USG', 'PAFE', 'SITE', 'AFPROTECHS'), 

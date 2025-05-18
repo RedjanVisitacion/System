@@ -1,9 +1,9 @@
 <?php
 // Define database credentials
 define("DB_USER", 'root');
-define("DB_PASSWORD", 'Dilikom@gsaba2025');
+define("DB_PASSWORD", '');
 define("DB_NAME", 'elecom');
-define("DB_HOST", '114.29.238.76');
+define("DB_HOST", 'localhost');
 
 // Create a database connection
 $con = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);

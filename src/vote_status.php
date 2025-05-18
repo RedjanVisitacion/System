@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_type']) || $_SESSION['user_type'] !== 'student') {
 $user_id = $_SESSION['user_id'];
 
 // Check if user profile exists and is complete
-$stmt = $con->prepare("SELECT * FROM user_profile WHERE user_id = ?");
+$stmt = $con->prepare("SELECT * FROM elecom_user_profile WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -26,7 +26,7 @@ if (!$user_profile) {
 }
 
 // Check if user has already voted
-$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ? AND vote_status = 'Voted'");
+$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM elecom_vote WHERE user_id = ? AND vote_status = 'Voted'");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -54,7 +54,7 @@ foreach ($data['votes'] as $vote) {
     }
 
     // Check if candidate exists and matches the position
-    $stmt = $con->prepare("SELECT candidate_id FROM candidate WHERE candidate_id = ? AND position = ?");
+    $stmt = $con->prepare("SELECT candidate_id FROM elecom_candidate WHERE candidate_id = ? AND position = ?");
     $stmt->bind_param("is", $vote['candidate_id'], $vote['position']);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -72,7 +72,7 @@ try {
     // First, insert 'Not Already Voted' status for all positions
     foreach ($data['votes'] as $vote) {
         // Insert initial 'Not Already Voted' status
-        $stmt = $con->prepare("INSERT INTO vote (user_id, candidate_id, vote_status) VALUES (?, ?, 'Not Already Voted')");
+        $stmt = $con->prepare("INSERT INTO elecom_vote (user_id, candidate_id, vote_status) VALUES (?, ?, 'Not Already Voted')");
         $stmt->bind_param("si", $user_id, $vote['candidate_id']);
         
         if (!$stmt->execute()) {
@@ -83,7 +83,7 @@ try {
 
     // Then update all votes to 'Voted' status
     foreach ($data['votes'] as $vote) {
-        $stmt = $con->prepare("UPDATE vote SET vote_status = 'Voted' WHERE user_id = ? AND candidate_id = ?");
+        $stmt = $con->prepare("UPDATE elecom_vote SET vote_status = 'Voted' WHERE user_id = ? AND candidate_id = ?");
         $stmt->bind_param("si", $user_id, $vote['candidate_id']);
         
         if (!$stmt->execute()) {

@@ -2,7 +2,7 @@
 require_once 'connection.php';
 header('Content-Type: application/json');
 
-$query = "SELECT COUNT(*) as total_candidates FROM candidate";
+$query = "SELECT COUNT(*) as total_candidates FROM elecom_candidate";
 $result = $con->query($query);
 
 if ($result) {

@@ -4,7 +4,7 @@ require_once 'connection.php';
 
 // Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
-$stmt = $con->prepare("SELECT profile_picture, full_name FROM user_profile WHERE user_id = ?");
+$stmt = $con->prepare("SELECT profile_picture, full_name FROM elecom_user_profile WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
   $candidate_id = $_GET['candidate_id'];
 
   // Fetch candidate details including photo
-  $stmt = $con->prepare("SELECT name, department, position, platform, photo FROM candidate WHERE candidate_id = ?");
+  $stmt = $con->prepare("SELECT name, department, position, platform, photo FROM elecom_candidate WHERE candidate_id = ?");
   $stmt->bind_param("i", $candidate_id);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
 }
 
 // Check if user has already voted
-$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ? AND vote_status = 'Voted'");
+$stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM elecom_vote WHERE user_id = ? AND vote_status = 'Voted'");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -58,7 +58,7 @@ $stmt->close();
 $has_voted = $vote_count > 0;
 
 // Check election timeline
-$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM elecom_election_dates WHERE id = 1");
 $stmt->execute();
 $result = $stmt->get_result();
 $election_dates = $result->fetch_assoc();
@@ -78,7 +78,7 @@ if ($election_dates) {
 
 // Add this function at the top of the file after the require statements
 function checkElectionTimeline($con) {
-    $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+    $stmt = $con->prepare("SELECT start_date, end_date, results_date FROM elecom_election_dates WHERE id = 1");
     $stmt->execute();
     $result = $stmt->get_result();
     $election_dates = $result->fetch_assoc();
@@ -99,7 +99,7 @@ function checkElectionTimeline($con) {
 }
 
 // Get election dates for display
-$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM election_dates WHERE id = 1");
+$stmt = $con->prepare("SELECT start_date, end_date, results_date FROM elecom_election_dates WHERE id = 1");
 $stmt->execute();
 $result = $stmt->get_result();
 $election_dates = $result->fetch_assoc();

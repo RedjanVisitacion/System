@@ -10,7 +10,7 @@ if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'officer') {
 
 // Fetch user's profile picture and full name
 $user_id = $_SESSION['user_id'];
-$stmt = $con->prepare("SELECT profile_picture, full_name FROM user_profile WHERE user_id = ?");
+$stmt = $con->prepare("SELECT profile_picture, full_name FROM elecom_user_profile WHERE user_id = ?");
 $stmt->bind_param("s", $user_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -23,7 +23,7 @@ $profile_picture = !empty($user_profile['profile_picture'])
     : '../img/icon.png';
 
 // Get all departments
-$departments_query = "SELECT DISTINCT department FROM result ORDER BY department";
+$departments_query = "SELECT DISTINCT department FROM elecom_result ORDER BY department";
 $departments_result = mysqli_query($con, $departments_query);
 $departments = [];
 while ($row = mysqli_fetch_assoc($departments_result)) {
@@ -36,8 +36,8 @@ $selected_position = isset($_GET['position']) ? $_GET['position'] : '';
 
 // Build the query
 $query = "SELECT r.*, c.name 
-          FROM result r 
-          JOIN candidate c ON r.candidate_id = c.candidate_id";
+          FROM elecom_result r 
+          JOIN elecom_candidate c ON r.candidate_id = c.candidate_id";
 
 $where_conditions = [];
 if ($selected_department) {

@@ -6,7 +6,7 @@ if (isset($_GET['candidate_id'])) {
     $candidate_id = $_GET['candidate_id'];
 
     // Fetch candidate details including photo
-    $stmt = $con->prepare("SELECT candidate_id, name, department, position, platform, photo FROM candidate WHERE candidate_id = ?");
+    $stmt = $con->prepare("SELECT candidate_id, name, department, position, platform, photo FROM elecom_candidate WHERE candidate_id = ?");
     $stmt->bind_param("i", $candidate_id);
     $stmt->execute();
     $result = $stmt->get_result();

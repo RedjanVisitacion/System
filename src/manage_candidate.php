@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         // Update existing candidate
-        $sql = "UPDATE candidate SET name = ?, department = ?, position = ?, age = ?, platform = ?";
+        $sql = "UPDATE elecom_candidate SET name = ?, department = ?, position = ?, age = ?, platform = ?";
         $params = [$name, $department, $position, $age, $platform];
         $types = "sssis";
         
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
-        $stmt = $con->prepare("INSERT INTO candidate (name, department, position, age, platform, photo) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt = $con->prepare("INSERT INTO elecom_candidate (name, department, position, age, platform, photo) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->bind_param("sssiss", $name, $department, $position, $age, $platform, $photo);
         
         if ($stmt->execute()) {

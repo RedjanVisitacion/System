@@ -19,8 +19,8 @@ $user_id = $_SESSION['user_id'];
 try {
     // First check if user exists and get their role
     $stmt = $con->prepare("SELECT u.role, up.full_name 
-                          FROM user u 
-                          LEFT JOIN user_profile up ON u.user_id = up.user_id 
+                          FROM elecom_user u 
+                          LEFT JOIN elecom_user_profile up ON u.user_id = up.user_id 
                           WHERE u.user_id = ?");
     if (!$stmt) {
         throw new Exception("Database prepare error: " . $con->error);
@@ -50,7 +50,7 @@ try {
     }
 
     // Check if user has already voted
-    $stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ? AND vote_status = 'Voted'");
+    $stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM elecom_vote WHERE user_id = ? AND vote_status = 'Voted'");
     if (!$stmt) {
         throw new Exception("Database prepare error: " . $con->error);
     }
@@ -65,7 +65,7 @@ try {
     $stmt->close();
 
     // Check election dates
-    $stmt = $con->prepare("SELECT start_date, end_date FROM election_dates WHERE id = 1");
+    $stmt = $con->prepare("SELECT start_date, end_date FROM elecom_election_dates WHERE id = 1");
     if (!$stmt) {
         throw new Exception("Database prepare error: " . $con->error);
     }

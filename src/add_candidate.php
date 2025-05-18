@@ -38,7 +38,7 @@ if (strlen($name) > 255) {
 
 try {
     // Prepare and execute the insert statement
-    $stmt = $con->prepare("INSERT INTO candidate (name) VALUES (?)");
+    $stmt = $con->prepare("INSERT INTO elecom_candidate (name) VALUES (?)");
     if (!$stmt) {
         throw new Exception("Failed to prepare statement: " . $con->error);
     }

@@ -3,7 +3,7 @@ require_once 'connection.php';
 require_once 'check_session.php';
 
 // Get user profile picture and full name
-$stmt = $con->prepare("SELECT profile_picture, full_name FROM user_profile WHERE user_id = ?");
+$stmt = $con->prepare("SELECT profile_picture, full_name FROM elecom_user_profile WHERE user_id = ?");
 $stmt->bind_param("i", $_SESSION['user_id']);
 $stmt->execute();
 $result = $stmt->get_result();

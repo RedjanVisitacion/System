@@ -25,7 +25,7 @@ try {
     $user_id = $_SESSION['user_id'];
 
     // Check if user has already voted
-    $check_stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM vote WHERE user_id = ?");
+    $check_stmt = $con->prepare("SELECT COUNT(*) as vote_count FROM elecom_vote WHERE user_id = ?");
     $check_stmt->bind_param("s", $user_id);
     $check_stmt->execute();
     $result = $check_stmt->get_result();
@@ -37,13 +37,13 @@ try {
     }
 
     // Prepare vote insert
-    $vote_stmt = $con->prepare("INSERT INTO vote (user_id, candidate_id, vote_status) VALUES (?, ?, 'Voted')");
+    $vote_stmt = $con->prepare("INSERT INTO elecom_vote (user_id, candidate_id, vote_status) VALUES (?, ?, 'Voted')");
 
     // Prepare for getting position
-    $position_stmt = $con->prepare("SELECT position FROM candidate WHERE candidate_id = ?");
+    $position_stmt = $con->prepare("SELECT position FROM elecom_candidate WHERE candidate_id = ?");
 
     // Prepare for result insert/update
-    $result_stmt = $con->prepare("INSERT INTO result (department, position, candidate_id, votes)
+    $result_stmt = $con->prepare("INSERT INTO elecom_result (department, position, candidate_id, votes)
                                   VALUES (?, ?, ?, 1)
                                   ON DUPLICATE KEY UPDATE votes = votes + 1");
 

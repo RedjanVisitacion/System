@@ -29,28 +29,28 @@ try {
     error_log("Transaction started");
 
     // 1. Delete all votes
-    $stmt = $con->prepare("DELETE FROM vote");
+    $stmt = $con->prepare("DELETE FROM elecom_vote");
     if (!$stmt) throw new Exception("Failed DELETE vote: " . $con->error);
     $stmt->execute();
     $stmt->close();
     error_log("Votes deleted");
 
     // 2. Reset vote status (if tracked)
-    $stmt = $con->prepare("UPDATE user SET department = NULL WHERE role = 'student'");
+    $stmt = $con->prepare("UPDATE elecom_user SET department = NULL WHERE role = 'student'");
     if (!$stmt) throw new Exception("Failed UPDATE user: " . $con->error);
     $stmt->execute();
     $stmt->close();
     error_log("User vote status reset");
 
     // 3. Clear results
-    $stmt = $con->prepare("DELETE FROM result");
+    $stmt = $con->prepare("DELETE FROM elecom_result");
     if (!$stmt) throw new Exception("Failed DELETE result: " . $con->error);
     $stmt->execute();
     $stmt->close();
     error_log("Results deleted");
 
     // 4. Reset election status
-    $stmt = $con->prepare("UPDATE election_dates SET status = 'pending' WHERE status = 'completed'");
+    $stmt = $con->prepare("UPDATE elecom_election_dates SET status = 'pending' WHERE status = 'completed'");
     if (!$stmt) throw new Exception("Failed UPDATE election_dates: " . $con->error);
     $stmt->execute();
     $stmt->close();

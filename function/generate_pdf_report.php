@@ -27,7 +27,7 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         }
 
         // Fetch election periods
-        $dateQuery = "SELECT * FROM election_dates";
+        $dateQuery = "SELECT * FROM elecom_election_dates";
         $params = [];
         $types = "";
 
@@ -101,8 +101,8 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         $candidatesQuery = "
             SELECT c.candidate_id, c.name, c.department, c.position, c.age, c.platform,
                    COALESCE(r.votes, 0) AS votes, r.published_at
-            FROM candidate c
-            LEFT JOIN result r ON c.candidate_id = r.candidate_id
+            FROM elecom_candidate c
+            LEFT JOIN elecom_result r ON c.candidate_id = r.candidate_id
             ORDER BY c.department, c.position, r.votes DESC
         ";
         
@@ -126,8 +126,8 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         // Fetch department stats with error handling
         $deptStatsQuery = "
             SELECT u.department, COUNT(DISTINCT u.user_id) AS total_voters
-            FROM user u
-            JOIN user_profile up ON u.user_id = up.user_id
+            FROM elecom_user u
+            JOIN elecom_user_profile up ON u.user_id = up.user_id
             WHERE u.role = 'student'
             GROUP BY u.department
         ";
@@ -152,8 +152,8 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         // Get total registered voters with error handling
         $totalVotersQuery = "
             SELECT COUNT(*) AS total_registered
-            FROM user u
-            JOIN user_profile up ON u.user_id = up.user_id
+            FROM elecom_user u
+            JOIN elecom_user_profile up ON u.user_id = up.user_id
             WHERE u.role = 'student'
         ";
         
@@ -175,7 +175,7 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         $stmt->close();
 
         // Fetch total votes cast with error handling
-        $totalVotesQuery = "SELECT COUNT(DISTINCT user_id) as total_votes FROM vote";
+        $totalVotesQuery = "SELECT COUNT(DISTINCT user_id) as total_votes FROM elecom_vote";
         $result = $con->query($totalVotesQuery);
         if (!$result) {
             throw new Exception("Failed to execute total votes query: " . $con->error);
@@ -285,9 +285,9 @@ function generatePDFReport($format = 'pdf', $startDate = null, $endDate = null) 
         $html .= '<ul style="margin-left:20px;">';
         $votedUsersQuery = "
             SELECT DISTINCT u.user_id, up.full_name, up.program_name
-            FROM vote v
-            JOIN user u ON v.user_id = u.user_id
-            JOIN user_profile up ON u.user_id = up.user_id
+            FROM elecom_vote v
+            JOIN elecom_user u ON v.user_id = u.user_id
+            JOIN elecom_user_profile up ON u.user_id = up.user_id
             ORDER BY up.full_name ASC
         ";
         $votedUsersResult = $con->query($votedUsersQuery);

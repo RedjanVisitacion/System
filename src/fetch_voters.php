@@ -14,9 +14,9 @@ $query = "
         up.program_name,
         up.gender,
         up.profile_picture
-    FROM user_profile up
+    FROM elecom_user_profile up
     WHERE up.user_id IN (
-        SELECT user_id FROM user WHERE role = 'student'
+        SELECT user_id FROM elecom_user WHERE role = 'student'
     )
     ORDER BY up.full_name ASC
 ";

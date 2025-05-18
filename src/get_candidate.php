@@ -6,7 +6,7 @@ header('Content-Type: application/json');
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['candidate_id'])) {
     $candidate_id = $_GET['candidate_id'];
     
-    $stmt = $con->prepare("SELECT candidate_id, name, department, position, age, platform, photo FROM candidate WHERE candidate_id = ?");
+    $stmt = $con->prepare("SELECT candidate_id, name, department, position, age, platform, photo FROM elecom_candidate WHERE candidate_id = ?");
     $stmt->bind_param("i", $candidate_id);
     $stmt->execute();
     $result = $stmt->get_result();

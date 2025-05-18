@@ -5,7 +5,7 @@ include_once 'connection.php';
 function fetchCandidatesSorted($conn) {
   // Define custom order for departments
   $query = "
-    SELECT * FROM candidate
+    SELECT * FROM elecom_candidate
     ORDER BY 
       FIELD(department, 'USG', 'BSIT', 'BTLED', 'BFPT'), 
       position ASC, 

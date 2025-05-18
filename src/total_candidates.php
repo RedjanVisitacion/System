@@ -2,7 +2,7 @@
 require_once 'connection.php';
 
 // Query to count total candidates
-$query = "SELECT COUNT(*) as total_candidates FROM candidate";
+$query = "SELECT COUNT(*) as total_candidates FROM elecom_candidate";
 $result = $con->query($query);
 
 if ($result) {

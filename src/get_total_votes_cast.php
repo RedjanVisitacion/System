@@ -4,16 +4,16 @@ session_start();
 
 try {
     // Get total votes
-    $totalVotesQuery = "SELECT COUNT(DISTINCT user_id) as total_votes FROM vote";
+    $totalVotesQuery = "SELECT COUNT(DISTINCT user_id) as total_votes FROM elecom_vote";
     $totalVotesResult = $con->query($totalVotesQuery);
     $totalVotes = $totalVotesResult->fetch_assoc()['total_votes'];
 
     // Get list of users who have voted
     $votedUsersQuery = "
         SELECT DISTINCT u.user_id, up.full_name, up.program_name
-        FROM vote v
-        JOIN user u ON v.user_id = u.user_id
-        JOIN user_profile up ON u.user_id = up.user_id
+        FROM elecom_vote v
+        JOIN elecom_user u ON v.user_id = u.user_id
+        JOIN elecom_user_profile up ON u.user_id = up.user_id
         ORDER BY up.full_name ASC
     ";
     $votedUsersResult = $con->query($votedUsersQuery);

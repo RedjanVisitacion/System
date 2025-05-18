@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['candidate_id'])) {
     $placeholders = implode(',', array_fill(0, count($filteredIds), '?'));
     $types = str_repeat('i', count($filteredIds)); // all IDs are integers
 
-    $stmt = $con->prepare("DELETE FROM candidate WHERE candidate_id IN ($placeholders)");
+    $stmt = $con->prepare("DELETE FROM elecom_candidate WHERE candidate_id IN ($placeholders)");
     if (!$stmt) {
         echo json_encode(['success' => false, 'message' => 'Failed to prepare statement.']);
         exit;

@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $userId = trim($data['userId']);
     $password = trim($data['password']);
 
-    $stmt = $con->prepare("SELECT * FROM user WHERE user_id = ?");
+    $stmt = $con->prepare("SELECT * FROM elecom_user WHERE user_id = ?");
     $stmt->bind_param("s", $userId);
     $stmt->execute();
     $result = $stmt->get_result();
