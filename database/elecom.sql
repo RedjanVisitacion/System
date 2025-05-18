@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 15, 2025 at 05:51 PM
+-- Generation Time: May 18, 2025 at 08:26 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -24,10 +24,10 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `candidate`
+-- Table structure for table `elecom_candidate`
 --
 
-CREATE TABLE `candidate` (
+CREATE TABLE `elecom_candidate` (
   `candidate_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `department` varchar(20) NOT NULL,
@@ -38,10 +38,10 @@ CREATE TABLE `candidate` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `candidate`
+-- Dumping data for table `elecom_candidate`
 --
 
-INSERT INTO `candidate` (`candidate_id`, `name`, `department`, `position`, `age`, `platform`, `photo`) VALUES
+INSERT INTO `elecom_candidate` (`candidate_id`, `name`, `department`, `position`, `age`, `platform`, `photo`) VALUES
 (139, 'Evan John Dago-oc', 'USG', 'President', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/6826056dcd14b.png'),
 (140, 'John Rey Cabuguas', 'USG', 'Vice-President', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/682605d92c388.png'),
 (141, 'Karl Luis Bogahod', 'USG', 'General Secretary', 19, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.', 'uploads/682607720a7f0.png'),
@@ -61,31 +61,34 @@ INSERT INTO `candidate` (`candidate_id`, `name`, `department`, `position`, `age`
 (155, 'Therese Katrina C. Baculi', 'SITE', 'Associate Secretary', 19, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260aaa15bb5.png'),
 (156, 'Christine L. Acla', 'SITE', 'Treasurer', 19, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260ad09adc8.png'),
 (157, 'Eleazar J. Cinco', 'SITE', 'Auditor', 19, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260b019055d.png'),
-(158, ' Christ Jissel L. Roxas', 'SITE', 'PIO', 19, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260b21cd61a.png'),
+(158, ' Christ Jissel L. Roxas', 'SITE', 'Public Information Officer', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260b21cd61a.png'),
 (159, 'Edward C Dumaog ', 'PAFE', 'President', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260b4e58e69.png'),
 (160, 'Glizy Mae Abarquez', 'PAFE', 'Vice-President', 19, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260b6e8e9b9.png'),
 (161, ' Ira Claire Mangao', 'PAFE', 'General Secretary', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260b92bde49.png'),
 (162, 'Laichel Malay', 'PAFE', 'Associate Secretary', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260bbeadb5d.png'),
 (163, 'Chynna M. Indonto', 'PAFE', 'Treasurer', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260bf7ae79a.png'),
 (164, 'John Scaesar Maglinte', 'PAFE', 'Auditor', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260c2947571.png'),
-(165, 'Diozen John Bregoños', 'PAFE', 'PIO', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260c4ce60d4.png');
+(165, 'Diozen John Bregoños', 'PAFE', 'PIO', 20, '\r\nDisclaimer: testing platform for development purposes only. All data may be inaccurate, mismatched, or placeholder and should not be relied upon as official information.\r\n', 'uploads/68260c4ce60d4.png'),
+(166, 'Ian Duman-ag', 'USG', 'President', 99, 'gfhn', 'uploads/68261b9e8b85e.png'),
+(168, 'Silver Swan', 'USG', 'BSIT Representative', 19, 'dzsc', 'uploads/682976bebeec3.png'),
+(169, 'bRO', 'SITE', 'Vice-President', 19, 'WSRDFV', 'uploads/68297b2a258ab.gif');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `department`
+-- Table structure for table `elecom_department`
 --
 
-CREATE TABLE `department` (
+CREATE TABLE `elecom_department` (
   `department_id` int(11) NOT NULL,
   `name` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `department`
+-- Dumping data for table `elecom_department`
 --
 
-INSERT INTO `department` (`department_id`, `name`) VALUES
+INSERT INTO `elecom_department` (`department_id`, `name`) VALUES
 (3, 'BFPT'),
 (2, 'BTLED'),
 (1, 'IT');
@@ -93,10 +96,10 @@ INSERT INTO `department` (`department_id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `election_dates`
+-- Table structure for table `elecom_election_dates`
 --
 
-CREATE TABLE `election_dates` (
+CREATE TABLE `elecom_election_dates` (
   `id` int(11) NOT NULL,
   `start_date` datetime NOT NULL,
   `end_date` datetime NOT NULL,
@@ -107,19 +110,19 @@ CREATE TABLE `election_dates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `election_dates`
+-- Dumping data for table `elecom_election_dates`
 --
 
-INSERT INTO `election_dates` (`id`, `start_date`, `end_date`, `results_date`, `created_at`, `updated_at`, `status`) VALUES
-(1, '2025-05-01 13:05:00', '2025-05-15 21:46:00', '2025-05-13 13:47:00', '2025-05-06 07:31:06', '2025-05-15 15:50:35', 'pending');
+INSERT INTO `elecom_election_dates` (`id`, `start_date`, `end_date`, `results_date`, `created_at`, `updated_at`, `status`) VALUES
+(1, '2025-05-01 13:05:00', '2025-05-18 12:46:00', '2025-05-13 13:47:00', '2025-05-06 07:31:06', '2025-05-18 06:17:05', 'pending');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `result`
+-- Table structure for table `elecom_result`
 --
 
-CREATE TABLE `result` (
+CREATE TABLE `elecom_result` (
   `result_id` int(11) NOT NULL,
   `department` varchar(20) NOT NULL,
   `position` varchar(50) NOT NULL,
@@ -128,13 +131,22 @@ CREATE TABLE `result` (
   `published_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `elecom_result`
+--
+
+INSERT INTO `elecom_result` (`result_id`, `department`, `position`, `candidate_id`, `votes`, `published_at`) VALUES
+(205, 'SITE', 'BSIT Representative', 148, 1, '2025-05-18 06:18:28'),
+(206, 'SITE', 'Vice-President', 169, 1, '2025-05-18 06:18:28'),
+(207, 'SITE', 'Associate Secretary', 155, 1, '2025-05-18 06:18:28');
+
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user`
+-- Table structure for table `elecom_user`
 --
 
-CREATE TABLE `user` (
+CREATE TABLE `elecom_user` (
   `user_id` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('student','officer') NOT NULL DEFAULT 'student',
@@ -142,10 +154,10 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `user`
+-- Dumping data for table `elecom_user`
 --
 
-INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
+INSERT INTO `elecom_user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2019101563', '2019101563', 'student', NULL),
 ('2020304505', '2020304505', 'student', NULL),
 ('2020304540', '2020304540', 'student', NULL),
@@ -1249,9 +1261,9 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('2024303244', '2024303244', 'student', NULL),
 ('2024303245', '2024303245', 'student', NULL),
 ('2024303246', '2024303246', 'student', NULL),
-('2024303249', '2024303249', 'student', NULL),
-('2024303250', '2024303250', 'student', NULL);
-INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
+('2024303249', '2024303249', 'student', NULL);
+INSERT INTO `elecom_user` (`user_id`, `password`, `role`, `department`) VALUES
+('2024303250', '2024303250', 'student', NULL),
 ('2024303251', '2024303251', 'student', NULL),
 ('2024303252', '2024303252', 'student', NULL),
 ('2024303253', '2024303253', 'student', NULL),
@@ -1647,15 +1659,15 @@ INSERT INTO `user` (`user_id`, `password`, `role`, `department`) VALUES
 ('4-2019400381', '4-2019400381', 'student', NULL),
 ('4-2019400383', '4-2019400383', 'student', NULL),
 ('4-6160033', '4-6160033', 'student', NULL),
-('officer02', '$2y$10$Jj5psYrdvJGS1pz0GuwQK.cSVlpPXM0v/RfX3zL2mABJMK9sQ2xyC', 'officer', NULL);
+('officer02', '$2y$10$PKOtDb6GMuvVIhNGPGou/efTL2U33wz..a5jJbS.YE9sk2xji0JYq', 'officer', NULL);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `user_profile`
+-- Table structure for table `elecom_user_profile`
 --
 
-CREATE TABLE `user_profile` (
+CREATE TABLE `elecom_user_profile` (
   `user_id` varchar(50) NOT NULL,
   `email` varchar(255) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
@@ -1670,10 +1682,10 @@ CREATE TABLE `user_profile` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `user_profile`
+-- Dumping data for table `elecom_user_profile`
 --
 
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+INSERT INTO `elecom_user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
 ('2019101563', '2019101563@domain.com', '000-000-0000', NULL, '2025-05-15 05:00:00', '2025-05-15 05:00:00', 'BUNGA, URIEL JOSHUA L', 'BSIT 3C', 'Bachelor of Science in Information Technology', 3, 'M'),
 ('2020304505', '2020304505@domain.com', '000-000-0000', NULL, '2025-05-15 04:40:27', '2025-05-15 04:40:27', 'NERI, GLYDYL NHEM S.', 'BTLED-HE 4A', 'Bachelor of Technology & Livelihood Education - Major in Home Economics', 4, 'F'),
 ('2020304540', '2020304540@domain.com', '000-000-0000', NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'PATOY, JODAH O.', 'BTLED-IA 4A', 'Bachelor of Technology & Livelihood Education - Major in Industrial Arts', 4, 'M'),
@@ -1902,7 +1914,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2021308369', '2021308369@domain.com', '000-000-8369', NULL, '2025-05-02 02:22:36', '2025-05-02 02:22:36', 'AUREA, JESEL KATE N', 'BSIT 3B', 'Bachelor of Science in Information Technology', 3, 'F'),
 ('2021308371', '2021308371@domain.com', '000-000-0000', NULL, '2025-05-02 02:22:36', '2025-05-02 02:22:36', 'PENALES, JESSA T', 'BSIT 4A', 'Bachelor of Science in Information Technology', 4, 'F'),
 ('2021308373', '2021308373@domain.com', '000-000-0000', NULL, '2025-05-02 02:22:36', '2025-05-02 02:22:36', 'BULARON, JOLINA A', 'BSIT 4B', 'Bachelor of Science in Information Technology', 4, 'F');
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+INSERT INTO `elecom_user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
 ('2021308375', '2021308375@domain.com', NULL, NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'CABERTE, NICE ZEL M', 'BSIT 4A', 'Bachelor of Science in Information Technology', 4, 'F'),
 ('2021308376', '2021308376@domain.com', '000-000-0000', NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'LARIBA, CHARLIE P', 'BTLED-ICT 4', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 4, 'M'),
 ('2021308378', '2021308378@domain.com', '000-000-0000', NULL, '2025-05-02 02:22:36', '2025-05-02 02:22:36', 'CASINILLO, LIMUEL B', 'BSIT 4A', 'Bachelor of Science in Information Technology', 4, 'M'),
@@ -2140,7 +2152,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2022308942', '2022308942@domain.com', '000-000-0000', NULL, '2025-05-15 09:11:01', '2025-05-15 09:11:01', 'MONTEZA, EMELYN J', 'BSIT 3D', 'Bachelor of Science in Information Technology', 3, 'F'),
 ('2022308944', '2022308944@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'JORDA, ANGEL JOY', 'BTLED-ICT 3', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 3, 'F'),
 ('2022308945', '2022308945@domain.com', '000-000-0000', NULL, '2025-05-15 05:00:00', '2025-05-15 05:00:00', 'VILLARAZA, KHYLLE ALEXES C', 'BSIT 3C', 'Bachelor of Science in Information Technology', 3, 'M');
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+INSERT INTO `elecom_user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
 ('2022308949', '2022308949@domain.com', '000-000-0000', NULL, '2025-05-15 09:11:01', '2025-05-15 09:11:01', 'PALLUTO, MARK ARIEL B', 'BSIT 3D', 'Bachelor of Science in Information Technology', 3, 'M'),
 ('2022308966', '2022308966@domain.com', '000-000-8966', NULL, '2025-05-02 02:22:36', '2025-05-02 02:22:36', 'GALABIN, BRANDON JAMES C', 'BSIT 3B', 'Bachelor of Science in Information Technology', 3, 'M'),
 ('2022308967', '2022308967@domain.com', '000-000-0000', NULL, '2025-05-15 05:00:00', '2025-05-15 05:00:00', 'MAGHILUM, JAN DEXTER E', 'BSIT 3B', 'Bachelor of Science in Information Technology', 3, 'M'),
@@ -2383,9 +2395,9 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2023304631', '2023304631@domain.com', NULL, NULL, '2025-05-15 05:00:00', '2025-05-15 05:00:00', 'CALOG, MARY FLOR T', 'BTLED-HE 2', 'Bachelor of Technology & Livelihood Education - Major in Home Economics', 2, 'F'),
 ('2023304632', '2023304632@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'ANTERO, JESSA MAE', 'BSIT 2D', 'Bachelor of Science in Information Technology', 2, 'F'),
 ('2023304635', '2023304635@domain.com', '000-000-0000', NULL, '2025-05-15 07:07:09', '2025-05-15 07:07:09', 'DOMINGUEZ, NOEL R JR.', 'BSIT 2E', 'Bachelor of Science in Information Technology', 2, 'M'),
-('2023304637', '2023304637@domain.com', '000-000-0000', NULL, '2025-05-15 06:50:55', '2025-05-15 06:50:55', 'VISITACION, REDJAN PHIL S', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'M'),
+('2023304637', '2023304637@domain.com', '09534181760', '2023304637_682951bf7b411_redj.jpg', '2025-05-15 06:50:55', '2025-05-18 03:19:27', 'VISITACION, REDJAN PHIL S', 'BSIT 2A', 'Bachelor of Science in Information Technology', 2, 'Male'),
 ('2023304638', '2023304638@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'NOVAL, KIAN', 'BSIT 2D', 'Bachelor of Science in Information Technology', 2, 'M');
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+INSERT INTO `elecom_user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
 ('2023304643', '4-2023304643@domain.com', '000-000-0000', NULL, '2025-05-15 14:16:37', '2025-05-15 14:16:37', 'BACALING, MARILOU C', 'BFPT 2B', 'Bachelor in Food Processing and Technology', 2, 'F'),
 ('2023304648', '2023304648@domain.com', NULL, NULL, '2025-05-15 06:54:51', '2025-05-15 06:54:51', 'BERDON, EVIN MAE S', 'BSIT 2B', 'Bachelor of Science in Information Technology', 2, 'F'),
 ('2023304649', '2023304649@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'MAESTRE, BJEE FABRE F', 'BSIT 2D', 'Bachelor of Science in Information Technology', 2, 'M'),
@@ -2627,7 +2639,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2023305263', '2023305263@domain.com', NULL, NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'LABALAN, LG JOHN F', 'BSIT 2C', 'Bachelor of Science in Information Technology', 2, 'M'),
 ('2023305266', '2023305266@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'GAMAYA, DESIREE JOY S', 'BSIT 2D', 'Bachelor of Science in Information Technology', 2, 'F'),
 ('2023305297', '2023305297@domain.com', '000-000-0000', NULL, '2025-05-15 11:51:32', '2025-05-15 11:51:32', 'NARANJO, ESTEVEN LOUISE G', 'BTLED-IA 1', 'Bachelor of Technology & Livelihood Education - Major in Industrial Arts', 1, 'M');
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+INSERT INTO `elecom_user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
 ('2023305300', '2023305300@domain.com', '000-000-0000', NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'OBUT, MARK A', 'BTLED-ICT 2', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 2, 'M'),
 ('2023305303', '2023305303@domain.com', NULL, NULL, '2025-05-15 05:00:00', '2025-05-15 05:00:00', 'NAVARRO, MATTHEW ANDREW G', 'BTLED-IA 2', 'Bachelor of Technology & Livelihood Education - Major in Industrial Arts', 2, 'M'),
 ('2023305322', '2023305322@domain.com', NULL, NULL, '2025-05-15 06:54:51', '2025-05-15 06:54:51', 'JARIOL, JUDE ESIDORE Z.', 'BSIT 2B', 'Bachelor of Science in Information Technology', 2, 'M'),
@@ -2870,7 +2882,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2024303379', '2024303379@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'ALAMIN, DIANNE ANGELA M', 'BTLED-ICT 1', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 1, 'F'),
 ('2024303380', '2024303380@domain.com', '000-000-0000', NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'VILLARIAS, HERVIL CRISTIAN H', 'BSIT 1D', 'Bachelor of Science in Information Technology', 1, 'M'),
 ('2024303381', '4-2024303381@domain.com', '000-000-0000', NULL, '2025-05-15 05:00:00', '2025-05-15 05:00:00', 'SUMALPONG, ROY M', 'BFPT 1C', 'Bachelor in Food Processing and Technology', 1, 'M');
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+INSERT INTO `elecom_user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
 ('2024303382', '2024303382@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'ADELA, RONALYN P', 'BTLED-ICT 1', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 1, 'F'),
 ('2024303384', '4-2024303384@domain.com', '000-000-3384', NULL, '2025-05-15 03:00:00', '2025-05-15 03:00:00', 'PELEGRINO, JYERALD G', 'BFPT 1C', 'Bachelor in Food Processing and Technology', 1, 'M'),
 ('2024303387', '2024303387@domain.com', '000-000-0000', NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'YARI, KHRISRONALD E', 'BFPT 1B', 'Bachelor in Food Processing and Technology', 1, 'M'),
@@ -3114,7 +3126,7 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('2024304276', '4-2024304276@domain.com', '000-000-0000', NULL, '2025-05-15 05:00:00', '2025-05-15 05:00:00', 'BATOY, JULIAN JESUS E', 'BFPT 1C', 'Bachelor in Food Processing and Technology', 1, 'M'),
 ('2024304279', '2024304279@domain.com', NULL, NULL, '2025-05-15 06:54:51', '2025-05-15 06:54:51', 'TAC-AN, JOHN LLOYD H', 'BSIT 2A', 'Bachelor of Science in Information Technology', 1, 'M'),
 ('2024304282', '2024304282@domain.com', '000-000-0000', NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'GABULE, MICOLE C', 'BSIT 1D', 'Bachelor of Science in Information Technology', 1, 'F');
-INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
+INSERT INTO `elecom_user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `created_at`, `updated_at`, `full_name`, `section_name`, `program_name`, `year_level`, `gender`) VALUES
 ('2024304290', '2024304290@domain.com', '000-000-0000', NULL, '2025-05-15 11:51:32', '2025-05-15 11:51:32', 'MAGTAJAS, MARILOU P', 'BTLED-IA 1', 'Bachelor of Technology & Livelihood Education - Major in Industrial Arts', 1, 'F'),
 ('2024304309', '2024304309@domain.com', '000-000-0000', NULL, '2025-05-14 19:00:00', '2025-05-14 19:00:00', 'DELA CRUZ, LOVERN JANE B', 'BSIT 1D', 'Bachelor of Science in Information Technology', 1, 'F'),
 ('2024304324', '2024304324@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'CABILLO, NICOLE', 'BSIT 1E', 'Bachelor of Science in Information Technology', 1, 'F'),
@@ -3180,15 +3192,15 @@ INSERT INTO `user_profile` (`user_id`, `email`, `phone`, `profile_picture`, `cre
 ('4-2019400381', '4-2019400381@domain.com', '000-000-0000', NULL, '2025-05-15 05:14:43', '2025-05-15 05:14:43', 'CABATCHA, MARK JONEFEL DOYUGAN', 'BTLED-IA 4A', 'Bachelor of Technology & Livelihood Education - Major in Industrial Arts', 4, 'M'),
 ('4-2019400383', '4-2019400383@domain.com', '000-000-0000', NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'CUBRADO, RUEL JAPSON', 'BTLED-ICT 3', 'Bachelor of Technology & Livelihood Education - Major in Information and Communication Technology', 3, 'M'),
 ('4-6160033', '4-6160033@domain.com', NULL, NULL, '2025-05-15 07:00:00', '2025-05-15 07:00:00', 'GALINDO, QUEENIE HO', 'BSIT 4A', 'Bachelor of Science in Information Technology', 4, 'F'),
-('officer02', 'visitacionredjanphils@gmail.com', '09534181760', 'officer02_6823c41782935_redj-removebg-preview.png', '2025-05-01 16:11:20', '2025-05-13 22:13:43', 'Redjan Phil S. Visitacion', '2A', 'BSIT', 2, 'Male');
+('officer02', 'visitacionredjanphils@gmail.com', '09534181760', 'officer02_6823c41782935_redj-removebg-preview.png', '2025-05-01 16:11:20', '2025-05-18 06:14:31', 'Redjan Phil S. Visitacion', '2A', 'BSIT', 2, 'Male');
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `vote`
+-- Table structure for table `elecom_vote`
 --
 
-CREATE TABLE `vote` (
+CREATE TABLE `elecom_vote` (
   `vote_id` int(11) NOT NULL,
   `user_id` varchar(50) NOT NULL,
   `candidate_id` int(11) NOT NULL,
@@ -3197,51 +3209,60 @@ CREATE TABLE `vote` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data for table `elecom_vote`
+--
+
+INSERT INTO `elecom_vote` (`vote_id`, `user_id`, `candidate_id`, `voted_at`, `vote_status`) VALUES
+(223, '2023304637', 148, '2025-05-18 06:18:28', 'Voted'),
+(224, '2023304637', 169, '2025-05-18 06:18:28', 'Voted'),
+(225, '2023304637', 155, '2025-05-18 06:18:28', 'Voted');
+
+--
 -- Indexes for dumped tables
 --
 
 --
--- Indexes for table `candidate`
+-- Indexes for table `elecom_candidate`
 --
-ALTER TABLE `candidate`
+ALTER TABLE `elecom_candidate`
   ADD PRIMARY KEY (`candidate_id`);
 
 --
--- Indexes for table `department`
+-- Indexes for table `elecom_department`
 --
-ALTER TABLE `department`
+ALTER TABLE `elecom_department`
   ADD PRIMARY KEY (`department_id`),
   ADD UNIQUE KEY `name` (`name`);
 
 --
--- Indexes for table `election_dates`
+-- Indexes for table `elecom_election_dates`
 --
-ALTER TABLE `election_dates`
+ALTER TABLE `elecom_election_dates`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `result`
+-- Indexes for table `elecom_result`
 --
-ALTER TABLE `result`
+ALTER TABLE `elecom_result`
   ADD PRIMARY KEY (`result_id`),
   ADD KEY `candidate_id` (`candidate_id`);
 
 --
--- Indexes for table `user`
+-- Indexes for table `elecom_user`
 --
-ALTER TABLE `user`
+ALTER TABLE `elecom_user`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- Indexes for table `user_profile`
+-- Indexes for table `elecom_user_profile`
 --
-ALTER TABLE `user_profile`
+ALTER TABLE `elecom_user_profile`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- Indexes for table `vote`
+-- Indexes for table `elecom_vote`
 --
-ALTER TABLE `vote`
+ALTER TABLE `elecom_vote`
   ADD PRIMARY KEY (`vote_id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `candidate_id` (`candidate_id`);
@@ -3251,57 +3272,57 @@ ALTER TABLE `vote`
 --
 
 --
--- AUTO_INCREMENT for table `candidate`
+-- AUTO_INCREMENT for table `elecom_candidate`
 --
-ALTER TABLE `candidate`
-  MODIFY `candidate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=166;
+ALTER TABLE `elecom_candidate`
+  MODIFY `candidate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=170;
 
 --
--- AUTO_INCREMENT for table `department`
+-- AUTO_INCREMENT for table `elecom_department`
 --
-ALTER TABLE `department`
+ALTER TABLE `elecom_department`
   MODIFY `department_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT for table `election_dates`
+-- AUTO_INCREMENT for table `elecom_election_dates`
 --
-ALTER TABLE `election_dates`
+ALTER TABLE `elecom_election_dates`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `result`
+-- AUTO_INCREMENT for table `elecom_result`
 --
-ALTER TABLE `result`
-  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=160;
+ALTER TABLE `elecom_result`
+  MODIFY `result_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=208;
 
 --
--- AUTO_INCREMENT for table `vote`
+-- AUTO_INCREMENT for table `elecom_vote`
 --
-ALTER TABLE `vote`
-  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=177;
+ALTER TABLE `elecom_vote`
+  MODIFY `vote_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=226;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `result`
+-- Constraints for table `elecom_result`
 --
-ALTER TABLE `result`
-  ADD CONSTRAINT `result_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `candidate` (`candidate_id`);
+ALTER TABLE `elecom_result`
+  ADD CONSTRAINT `elecom_result_ibfk_1` FOREIGN KEY (`candidate_id`) REFERENCES `elecom_candidate` (`candidate_id`);
 
 --
--- Constraints for table `user_profile`
+-- Constraints for table `elecom_user_profile`
 --
-ALTER TABLE `user_profile`
-  ADD CONSTRAINT `user_profile_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE;
+ALTER TABLE `elecom_user_profile`
+  ADD CONSTRAINT `elecom_user_profile_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `elecom_user` (`user_id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `vote`
+-- Constraints for table `elecom_vote`
 --
-ALTER TABLE `vote`
-  ADD CONSTRAINT `vote_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`),
-  ADD CONSTRAINT `vote_ibfk_2` FOREIGN KEY (`candidate_id`) REFERENCES `candidate` (`candidate_id`);
+ALTER TABLE `elecom_vote`
+  ADD CONSTRAINT `elecom_vote_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `elecom_user` (`user_id`),
+  ADD CONSTRAINT `elecom_vote_ibfk_2` FOREIGN KEY (`candidate_id`) REFERENCES `elecom_candidate` (`candidate_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
