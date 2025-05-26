@@ -613,6 +613,9 @@
         </button>
         <div class="input-error text-center" id="loginError"></div>
       </form>
+      <div class="text-center mt-3">
+        <a href="register.php" class="btn btn-outline-secondary" style="width: 100%; max-width: 320px; border-radius: 10px; font-weight: 600;">Register</a>
+      </div>
     </div>
   </div>
   <div id="loginLoadingOverlay" style="display:none;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(37,99,235,0.18);backdrop-filter:blur(4px);align-items:center;justify-content:center;flex-direction:column;">
