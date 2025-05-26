@@ -78,6 +78,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <style>
+   
+    body {
+      min-height: 100vh;
+      width: 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(57, 66, 77, 0.5) 0%, rgba(6, 73, 117, 0.9) 100%), url('../img/votE.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      
+    }
+
+    .card {
+      border-radius: 28px;
+      box-shadow: 0 8px 40px rgba(60,60,100,0.13), 0 2px 8px rgba(37,99,235,0.08);
+      overflow: hidden;
+      background: rgba(255,255,255,0.15);
+      background: linear-gradient(rgba(210, 213, 218, 0.7), rgba(230, 234, 243, 0.9)),
+                url('../img/bg.gif') center/cover no-repeat fixed;
+    
+
+      backdrop-filter: blur(8px);
+    }
+
+    .highlight {
+      color: #2563eb;
+      background: linear-gradient(90deg,rgb(50, 78, 201) 0%,rgb(52, 66, 104) 50%, #1e40af 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      font-weight: 900;
+      text-decoration: none;
+      letter-spacing: 1px;
+      text-align: center;
+      
+      animation: fadeInUp 0.8s ease forwards 0.3s;
+    }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
@@ -85,7 +130,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="text-center">User Registration</h3>
+                        <h3 class="highlight">User Registration</h3>
                     </div>
                     <div class="card-body">
                         <?php if ($error): ?>

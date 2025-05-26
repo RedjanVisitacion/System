@@ -51,6 +51,7 @@
 
       backdrop-filter: blur(8px);
     }
+    
     .login-logo-side {
       display: flex;
       align-items: center;
